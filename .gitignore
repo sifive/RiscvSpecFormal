@@ -1,0 +1,16 @@
+.nia.cache
+obj_dir
+.*.aux
+.coqdeps.d
+*.glob
+*.vo
+Makefile.coq.all
+Makefile.coq.all.conf
+*.hi
+*.ho
+*.o
+*.hs
+.lia.cache
+*.vcd
+*.hex
+*.sv
