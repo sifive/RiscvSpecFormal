@@ -63,7 +63,7 @@ notice "Generating a hex file from the binary program."
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' ./MemoryInit.hex"
 
 notice "Remapping the memory addresses within the hex file."
-execute "sed -i 's/@800/@000/g;' ./MemoryInit.hex &> /dev/null" # || gsed -i 's/@800/@000/g;' ./MemoryInit.hex"
+execute "sed -i 's/@800/@000/g;' ./MemoryInit.hex &> /dev/null || gsed -i 's/@800/@000/g;' ./MemoryInit.hex"
 
 notice "Running $(basename $path)"
 execute "./obj_dir/Vsystem"
