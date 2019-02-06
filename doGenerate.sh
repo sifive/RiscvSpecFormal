@@ -1,31 +1,12 @@
 # !/bin/bash
+
 # This script generates the RISC-V processor simulator from the
 # Gallina and Verilog source files.
 
+source common.sh
+
 verbose=0
 rebuild=0 # indicates whether or not to recompile source files that Make thinks have not changed.
-
-# Accepts one argument: message, a message
-# string; and prints the given message iff the
-# verbose flag has been set.
-function notice () {
-  local msg=$1
-
-  if [[ $verbose == 1 ]]
-  then
-    echo -e "\033[44mNotice:\033[0m $msg"
-  fi
-}
-
-# Accepts one argument: message, a message
-# string; and prints the given message iff the
-# verbose flag has been set.
-function error () {
-  local emsg=$1
-
-  echo -e "\033[41mError:\033[0m $emsg"
-  exit 1
-}
 
 options=$(getopt --options="hrv" --longoptions="help,rebuild,verbose,version" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
@@ -93,19 +74,6 @@ EOF
   esac
 done
 shift $((OPTIND - 1))
-
-# Accepts one argument, $cmd, a bash command
-# string, executes the command and returns an
-# error message if it fails.
-function execute () {
-  local cmd=$1
-  if [[ $verbose == 1 ]]
-  then
-    echo -e "\033[44mNotice:\033[0m $cmd"
-  fi
-  eval $cmd
-  [ $? == 0 ] || error "An error occured while trying to execute the following command: "'"'$cmd'"'"."
-}
 
 notice "Compiling the Gallina (COQ) source code."
 cmd="make -j"
