@@ -18,8 +18,15 @@ module memory32 (
   output out_write_exception
 );
 
-parameter integer numBlockBytes = 1048575;
+parameter integer size = 20;
+parameter integer numBlockBytes = (2**size-1);
 parameter integer numWordBytes = 4;
+
+logic [size-1:0] in_fetch_addr, in_read_addr, in_write_addr;
+
+assign in_fetch_addr = in_fetch_address[size-1:0];
+assign in_read_addr = in_read_address[size-1:0];
+assign in_write_addr = in_write_address[size-1:0];
 
 reg [7:0] block [numBlockBytes:0];
 initial $readmemh ("MemoryInit.hex", block);
@@ -31,9 +38,9 @@ initial $readmemh ("MemoryInit.hex", block);
 
   Note: this restriction prevents 
 */
-assign out_fetch_exception = 0; // in_read_address >= (numBlockBytes - numWordBytes);
-assign out_read_exception = 0; // in_read_address >= (numBlockBytes - numWordBytes);
-assign out_write_exception = 0; // in_write_address >= (numBlockBytes - numWordBytes);
+assign out_fetch_exception = 0; // in_read_addr >= (numBlockBytes - numWordBytes);
+assign out_read_exception = 0; // in_read_addr >= (numBlockBytes - numWordBytes);
+assign out_write_exception = 0; // in_write_addr >= (numBlockBytes - numWordBytes);
 
 /*
   This memory model executes requests in the order in which they
@@ -46,18 +53,18 @@ assign out_reservation = 1;
 
 // fetch operations.
 assign out_fetch_data = {
-  block [in_fetch_address + 3],
-  block [in_fetch_address + 2],
-  block [in_fetch_address + 1],
-  block [in_fetch_address + 0]
+  block [in_fetch_addr + 3],
+  block [in_fetch_addr + 2],
+  block [in_fetch_addr + 1],
+  block [in_fetch_addr + 0]
 };
 
 // load operations.
 assign out_read_data = {
-  block [in_read_address + 3],
-  block [in_read_address + 2],
-  block [in_read_address + 1],
-  block [in_read_address + 0]
+  block [in_read_addr + 3],
+  block [in_read_addr + 2],
+  block [in_read_addr + 1],
+  block [in_read_addr + 0]
 };
 
 /*
@@ -76,10 +83,10 @@ begin
   $write ("[Memory] read data %d\n", out_read_data);
   if (in_write_enable && !RESET)
   begin
-    block [in_write_address + 3] <= in_write_data [31:24];
-    block [in_write_address + 2] <= in_write_data [23:16];
-    block [in_write_address + 1] <= in_write_data [15:8];
-    block [in_write_address + 0] <= in_write_data [7:0];
+    block [in_write_addr + 3] <= in_write_data [31:24];
+    block [in_write_addr + 2] <= in_write_data [23:16];
+    block [in_write_addr + 1] <= in_write_data [15:8];
+    block [in_write_addr + 0] <= in_write_data [7:0];
     $write ("[Memory] write address %h\n", in_write_address);
     $write ("[Memory] write data %d\n", in_write_data);
   end

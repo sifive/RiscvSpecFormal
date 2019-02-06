@@ -1,30 +1,9 @@
-#/bin/bash
+# !/bin/bash
+
 # This script updates the Kami source files and builds the RISC-V
 # processor simulator.
 
-verbose=0
-
-# Accepts one argument: message, a message
-# string; and prints the given message iff the
-# verbose flag has been set.
-function notice () {
-  local msg=$1
-
-  if [[ $verbose == 1 ]]
-  then
-    echo -e "\033[44mNotice:\033[0m $msg"
-  fi
-}
-
-# Accepts one argument: message, a message
-# string; and prints the given message iff the
-# verbose flag has been set.
-function error () {
-  local emsg=$1
-
-  echo -e "\033[41mError:\033[0m $emsg"
-  exit 1
-}
+source common.sh
 
 options=$(getopt --options="hv" --longoptions="help,verbose,version" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
@@ -87,31 +66,18 @@ EOF
 done
 shift $((OPTIND - 1))
 
-# Accepts one argument, $cmd, a bash command
-# string, executes the command and returns an
-# error message if it fails.
-function execute () {
-  local cmd=$1
-  if [[ $verbose == 1 ]]
-  then
-    echo -e "\033[44mNotice:\033[0m $cmd"
-  fi
-  eval $cmd
-  [ $? == 0 ] || error "An error occured while trying to execute the following command: "'"'$cmd'"'"."
-}
-
 notice "Updating the Kami dependencies."
-git submodule update --init
-make -j -C coq-record-update
-make -j -C bbv
-make -j -C Kami
-make -j -C FpuKami
-make -j -C ProcKami
-make -j
+execute "git submodule update --init"
+execute "execute make -j -C coq-record-update"
+execute "make -j -C bbv"
+execute "make -j -C Kami"
+execute "make -j -C FpuKami"
+execute "make -j -C ProcKami"
+execute "make -j"
 
 if [[ $verbose == 1 ]]
 then 
-  ./doGenerate.sh --verbose
+  execute "./doGenerate.sh --verbose"
 else
-  ./doGenerate.sh
+  execute "./doGenerate.sh"
 fi
