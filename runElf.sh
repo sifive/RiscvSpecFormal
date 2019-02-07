@@ -72,7 +72,7 @@ fail_address=$(awk '/([[:alnum:]])* <fail>:/ {print $1}' $path.asm)
 pass_address=$(awk '/([[:alnum:]])* <pass>:/ {print $1}' $path.asm)
 if [[ !pass_address ]]
 then 
-  pass_address=$(awk '/([[:alnum:]])*/ {print $2}' $path.asm.tail)
+  pass_address=$(awk 'match($0, /([[:alnum:]])*/, matches) {print matches[0]}' $path.asm.tail)
 fi
 
 echo "pass: $pass_address"
