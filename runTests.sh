@@ -82,10 +82,22 @@ rv32ui-p-or
 rv32ui-p-ori
 rv32ui-p-sb
 rv32ui-p-sh
+rv32ui-p-sll
+rv32ui-p-slli
 rv32ui-p-slt
-rv32ui-p-sltu
 rv32ui-p-slti
+rv32ui-p-sltu
 rv32ui-p-sltiu
+rv32ui-p-sltu
+rv32ui-p-sra
+rv32ui-p-srai
+rv32ui-p-srl
+rv32ui-p-srli
+rv32ui-p-sub
+rv32ui-p-sw
+rv32ui-p-xor
+rv32ui-p-xori
+rv32ui-p-simple
 "
 
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
