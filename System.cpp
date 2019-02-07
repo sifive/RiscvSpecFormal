@@ -32,8 +32,6 @@ int main(int argc, char ** argv, char **env) {
   int fail_pc = strtol(argv[1], NULL, 16);
   int pass_pc = strtol(argv[2], NULL, 16);
 
-  fprintf(stderr, "Fail PC: %x Pass PC: %x\n", fail_pc, pass_pc);
-
   while(!Verilated::gotFinish() && main_time < timeout){
     top->CLK = main_time%2;
     if(main_time < 10)
