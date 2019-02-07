@@ -9,7 +9,9 @@
 
 module system(
   input CLK,
-  input RESET
+  input RESET,
+  output [31:0] pc,
+  output pc_enable
 );
 
 // Fetch wires.
@@ -152,6 +154,10 @@ top system (
   .proc_core_fregWrite$_enable(proc_core_fregWrite_enable_req),
   .proc_core_csrWrite$_enable(write_csr_en_req),
   .proc_core_fcsrWrite$_enable(write_fcsr_en_req),
+
+  .proc_core_pc$_argument(pc),
+  .proc_core_pc$_enable(pc_enable),
+
   .CLK(CLK),
   .RESET(RESET)
 );

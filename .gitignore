@@ -13,5 +13,5 @@ Makefile.coq.all.conf
 .lia.cache
 *.vcd
 *.hex
-*.sv
+Processor.sv
 system.out

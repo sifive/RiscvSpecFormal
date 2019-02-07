@@ -15,7 +15,6 @@ int main(int argc, char ** argv, char **env) {
   top->trace(tfp,99);
   tfp->open("trace.vcd");
 
-
   uint32_t in;
   uint8_t roundMode;
 
@@ -30,6 +29,11 @@ int main(int argc, char ** argv, char **env) {
 
   uint32_t timeout = 1<<10;
 
+  int fail_pc = strtol(argv[1], NULL, 16);
+  int pass_pc = strtol(argv[2], NULL, 16);
+
+  fprintf(stderr, "Fail PC: %x Pass PC: %x\n", fail_pc, pass_pc);
+
   while(!Verilated::gotFinish() && main_time < timeout){
     top->CLK = main_time%2;
     if(main_time < 10)
@@ -38,6 +42,24 @@ int main(int argc, char ** argv, char **env) {
 
     top->eval();
     tfp->dump(main_time);
+    if(top->pc_enable && top->pc == fail_pc) {
+      fprintf(stderr, "Failed\n");
+      
+      top->final();
+      tfp->close();
+      delete top;
+      delete tfp;
+      return 0;
+
+    } else if(top->pc_enable && top->pc == pass_pc) {
+      fprintf(stderr, "Passed\n");
+
+      top->final();
+      tfp->close();
+      delete top;
+      delete tfp;
+      return 0;
+    }
     main_time++;
   }
 

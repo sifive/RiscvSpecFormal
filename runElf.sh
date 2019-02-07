@@ -65,7 +65,14 @@ execute "riscv64-unknown-elf-objcopy -O verilog '$path' ./MemoryInit.hex"
 notice "Remapping the memory addresses within the hex file."
 execute "sed -i 's/@800/@000/g;' ./MemoryInit.hex &> /dev/null || gsed -i 's/@800/@000/g;' ./MemoryInit.hex"
 
+execute "riscv64-unknown-elf-objdump --disassemble $path > $path.asm"
+fail_address=$(awk '/([[:alnum:]])* <fail>:/ {print $1}' $path.asm)
+pass_address=$(awk '/([[:alnum:]])* <pass>:/ {print $1}' $path.asm)
+
+echo "fail: $fail_address"
+echo "pass: $pass_address"
+
 notice "Running $(basename $path)"
-execute "./obj_dir/Vsystem"
+execute "./obj_dir/Vsystem $fail_address $pass_address"
 
 notice "Done."
