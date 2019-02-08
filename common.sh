@@ -11,7 +11,7 @@ function notice () {
 
   if [[ $verbose == 1 ]]
   then
-    echo -e "\033[44mNotice:\033[0m $msg"
+    echo -e "\033[44mNotice:\033[0m $msg" >&2
   fi
 }
 
@@ -21,7 +21,7 @@ function notice () {
 function error () {
   local emsg=$1
 
-  echo -e "\033[41mError:\033[0m $emsg"
+  echo -e "\033[41mError:\033[0m $emsg" >&2
   exit 1
 }
 
@@ -32,7 +32,7 @@ function execute () {
   local cmd=$1
   if [[ $verbose == 1 ]]
   then
-    echo -e "\033[44mNotice:\033[0m $cmd"
+    echo -e "\033[44mNotice:\033[0m $cmd" >&2
   fi
   eval $cmd
   [ $? == 0 ] || error "An error occured while trying to execute the following command: \"$cmd\"."

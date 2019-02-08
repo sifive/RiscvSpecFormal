@@ -68,9 +68,9 @@ int main(int argc, char ** argv, char **env) {
       if(top->pc_enable && top->pc == halt_address) {
         printf("\033[31;1mFinished at address: %x\033[0m\n", halt_address);
         if (arg_index == 1) {
-          printf("Passed\n");
+          fprintf(stderr, "Passed\n");
         } else {
-          printf("Failed\n");
+          fprintf(stderr, "Failed\n");
         }
         fflush(stdout);
         top->final();

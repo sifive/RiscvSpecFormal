@@ -66,19 +66,19 @@ notice "Remapping the memory addresses within the hex file."
 execute "sed -i 's/@800/@000/g;' ./MemoryInit.hex &> /dev/null || gsed -i 's/@800/@000/g;' ./MemoryInit.hex"
 
 execute "riscv64-unknown-elf-objdump --disassemble $path > $path.asm"
-execute "tail --lines 2 $path.asm > $path.asm.tail"
 
 fail_address=$(awk '/([[:alnum:]])* <fail>:/ {print $1}' $path.asm)
 pass_address=$(awk '/([[:alnum:]])* <pass>:/ {print $1}' $path.asm)
-if [[ !pass_address ]]
-then 
-  pass_address=$(awk 'match($0, /([[:alnum:]])*/, matches) {print matches[0]}' $path.asm.tail)
+
+if [[ ! $pass_address ]]
+then
+  pass_address=$(tail -n 2 $path.asm | head -n 1 | awk '{print $1}')
 fi
 
-echo "pass: $pass_address"
-echo "fail: $fail_address"
-
 notice "Running $(basename $path)"
+notice "pass: $pass_address"
+notice "fail: $fail_address"
+
 execute "./obj_dir/Vsystem $pass_address $fail_address"
 
 notice "Done."
