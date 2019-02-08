@@ -52,7 +52,7 @@ int main(int argc, char ** argv, char **env) {
   int ready_top = 0;
   uint32_t outtop, outchisel;
 
-  uint32_t timeout = 1<<10;
+  uint32_t timeout = 1<<15;
 
   while(!Verilated::gotFinish() && main_time < timeout){
     top->CLK = main_time%2;
