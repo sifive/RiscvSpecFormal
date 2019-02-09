@@ -13,7 +13,7 @@ do
   case "$1" in
     -h | --help)
       cat <<- EOF
-Usage: ./runELF.sh [OPTIONS] PATH
+Usage: ./runElf.sh [OPTIONS] PATH
 
 This script reads the RISC-V binary referenced by PATH and executes
 it within the RISC-V processor simulator.
