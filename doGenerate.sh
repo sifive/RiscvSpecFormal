@@ -91,14 +91,16 @@ execute "Kami/PrettyPrintVerilog > Processor.sv"
 
 notice "Generating the simulator source code."
 cmd="verilator"
-if [[ $verbose == 1 ]]
-then
-  cmd="$cmd  --debug --no-dump-tree"
-fi
 cmd="$cmd --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
 execute "$cmd"
 
 notice "Compiling the simulation program."
-execute "make -j -C obj_dir -f Vsystem.mk Vsystem"
+if [ -x "$(command -v clang)" ]; then
+  compiler=clang
+else
+  compiler=g++
+fi
+
+execute "make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
 
 notice "Done."
