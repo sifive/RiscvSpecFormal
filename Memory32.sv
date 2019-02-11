@@ -18,9 +18,11 @@ module memory32 (
   output out_write_exception
 );
 
-parameter integer size = 20;
-parameter integer numBlockBytes = (2**size-1);
-parameter integer numWordBytes = 4;
+parameter int size = 20;
+parameter int numBlockBytes = (2**size-1);
+parameter int startAddr = 2**31;
+   
+parameter int numWordBytes = 4;
 
 logic [size-1:0] in_fetch_addr, in_read_addr, in_write_addr;
 
@@ -29,8 +31,22 @@ assign in_read_addr = in_read_address[size-1:0];
 assign in_write_addr = in_write_address[size-1:0];
 
 reg [7:0] block [numBlockBytes:0];
-initial $readmemh ("MemoryInit.hex", block);
+string testfile;
+string signature;
+int sign_size;
+   
+initial begin
+   $value$plusargs("testfile=%s", testfile);
+   $value$plusargs("signature=%s", signature);
+   $value$plusargs("sign_size=%d", sign_size);
+   $readmemh (testfile, block);
+end
 
+final begin
+   $writememh(signature, block, numBlockBytes+sign_size+1, numBlockBytes);
+   $display("|Finishing up everything|");
+end
+  
 /*
   This memory unit only supports 64 bit word requests. It returns
   an exception for any request that is not aligned to a 64 bit

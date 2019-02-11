@@ -107,7 +107,7 @@ notice "Running tests in $path."
 for file in $files
 do
   echo "Running test $file."
-  ./runElf.sh "$path/$file" > system.out
+  ./runElf.sh "$path/$file"
   if [[ $? != 0 ]]
   then
     echo "The test suite failed."

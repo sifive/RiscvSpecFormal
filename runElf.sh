@@ -62,23 +62,21 @@ path=$1
 notice "Generating a hex file from the binary program."
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' ./MemoryInit.hex"
 
-notice "Remapping the memory addresses within the hex file."
-execute "sed -i 's/@800/@000/g;' ./MemoryInit.hex &> /dev/null || gsed -i 's/@800/@000/g;' ./MemoryInit.hex"
+#notice "Remapping the memory addresses within the hex file."
+#execute "sed -i 's/@800/@000/g;' ./MemoryInit.hex &> /dev/null || gsed -i 's/@800/@000/g;' ./MemoryInit.hex"
 
-execute "riscv64-unknown-elf-objdump --disassemble $path > $path.asm"
-
-fail_address=$(awk '/([[:alnum:]])* <fail>:/ {print $1}' $path.asm)
-pass_address=$(awk '/([[:alnum:]])* <pass>:/ {print $1}' $path.asm)
+fail_address=$(awk '/([[:alnum:]])* <fail>:/ {print $1}' $path.dump)
+pass_address=$(awk '/([[:alnum:]])* <pass>:/ {print $1}' $path.dump)
 
 if [[ ! $pass_address ]]
 then
-  pass_address=$(tail -n 2 $path.asm | head -n 1 | awk '{print $1}')
+  pass_address=$(tail -n 1 $path.dump | awk '{print $1}')
 fi
 
 notice "Running $(basename $path)"
 notice "pass: $pass_address"
 notice "fail: $fail_address"
 
-execute "./obj_dir/Vsystem $pass_address $fail_address"
+execute "./obj_dir/Vsystem +pass_address=$pass_address +fail_address=$fail_address +testfile=MemoryInit.hex +signature=signature +sign_size=8192 > system.out"
 
 notice "Done."
