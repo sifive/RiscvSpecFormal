@@ -62,8 +62,8 @@ path=$1
 notice "Generating a hex file from the binary program."
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' ./MemoryInit.hex"
 
-pass_address=$(readelf -a $path.dump | grep "pass" | awk '{print $2}')
-fail_address=$(readelf -a $path.dump | grep "fail" | awk '{print $2}')
+pass_address=$(riscv64-unknown-elf-readelf -a $path.dump | grep "pass" | awk '{print $2}')
+fail_address=$(riscv64-unknown-elf-readelf -a $path.dump | grep "fail" | awk '{print $2}')
 
 if [[ ! $pass_address ]]
 then
