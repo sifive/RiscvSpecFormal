@@ -43,7 +43,7 @@ initial begin
 end
 
 final begin
-   $writememh(signature, block, numBlockBytes+sign_size+1, numBlockBytes);
+   $writememh(signature, block, numBlockBytes-sign_size+1, numBlockBytes);
    $display("|Finishing up everything|");
 end
   
