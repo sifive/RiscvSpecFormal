@@ -62,11 +62,8 @@ path=$1
 notice "Generating a hex file from the binary program."
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' ./MemoryInit.hex"
 
-#notice "Remapping the memory addresses within the hex file."
-#execute "sed -i 's/@800/@000/g;' ./MemoryInit.hex &> /dev/null || gsed -i 's/@800/@000/g;' ./MemoryInit.hex"
-
-fail_address=$(awk '/([[:alnum:]])* <fail>:/ {print $1}' $path.dump)
-pass_address=$(awk '/([[:alnum:]])* <pass>:/ {print $1}' $path.dump)
+pass_address=$(readelf -a $path.dump | grep "pass" | awk '{print $2}')
+fail_address=$(readelf -a $path.dump | grep "fail" | awk '{print $2}')
 
 if [[ ! $pass_address ]]
 then
