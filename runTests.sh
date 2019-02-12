@@ -98,6 +98,14 @@ rv32ui-p-sw
 rv32ui-p-xor
 rv32ui-p-xori
 rv32ui-p-simple
+rv32um-p-div
+rv32um-p-divu
+rv32um-p-mul
+rv32um-p-mulh
+rv32um-p-mulhsu
+rv32um-p-mulhu
+rv32um-p-rem
+rv32um-p-remu
 "
 
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
