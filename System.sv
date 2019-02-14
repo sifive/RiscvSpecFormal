@@ -213,15 +213,15 @@ register32 registers (
 register32 fp_registers (
   .CLK (CLK),
   .RESET (RESET),
-  .in_write_enable (proc_core_regWrite_enable_req),
+  .in_write_enable (proc_core_fregWrite_enable_req),
   .in_write_register_select (proc_core_fregWrite_req.index), (* TODO: check bit width *)
   .in_read_register_select_0 (read_freg_1_id_req),
   .in_read_register_select_1 (read_freg_2_id_req),
-  .in_read_register_select_2 (read_freg_2_id_req),
+  .in_read_register_select_2 (read_freg_3_id_req),
   .in_write_data (proc_core_fregWrite_req.data),
   .out_read_data_0 (read_freg_1_res),
   .out_read_data_1 (read_freg_2_res),
-  .out_read_data_2 (read_freg_2_res)
+  .out_read_data_2 (read_freg_3_res)
 );
 
 csr_register csr_registers (
