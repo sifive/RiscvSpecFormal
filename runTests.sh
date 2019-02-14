@@ -106,6 +106,7 @@ rv32um-p-mulhsu
 rv32um-p-mulhu
 rv32um-p-rem
 rv32um-p-remu
+rv32uc-p-rvc
 rv32ua-p-amoadd_w
 rv32ua-p-amoand_w
 rv32ua-p-amoor_w
