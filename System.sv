@@ -171,7 +171,6 @@ end
 
 (* TODO: wire up exceptions. *)
 
-wire ram_void0;
 wire ram_void1;
 wire ram_void2;
 wire ram_void3;
@@ -187,7 +186,7 @@ memory32 ram (
   .in_write_data (memWrite_req.data),
   .out_fetch_data (fetch_res.inst),
   .out_read_data (memRead_res.data),
-  .out_reservation (ram_void0),
+  .out_reservation (memRead_res.reservation),
   .out_fetch_exception (ram_void1),
   .out_read_exception (ram_void2),
   .out_write_exception (ram_void3)
