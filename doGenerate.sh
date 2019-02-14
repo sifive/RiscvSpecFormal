@@ -84,14 +84,14 @@ fi
 execute "$cmd"
 
 notice "Compiling the Verilog generator."
-execute "ghc -O0 --make Kami/PrettyPrintVerilog.hs"
+execute "time ghc -O0 --make Kami/PrettyPrintVerilog.hs"
 
 notice "Generating the Verilog model."
-execute "Kami/PrettyPrintVerilog > Processor.sv"
+execute "time Kami/PrettyPrintVerilog > Processor.sv"
 
 notice "Generating the simulator source code."
 cmd="verilator"
-cmd="$cmd --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
+cmd="time $cmd --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
 execute "$cmd"
 
 notice "Compiling the simulation program."
@@ -101,6 +101,6 @@ else
   compiler=g++
 fi
 
-execute "make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
 
 notice "Done."
