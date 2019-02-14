@@ -12,7 +12,7 @@ module memory32 (
   input [31:0] in_write_data,
   output [31:0] out_fetch_data,
   output [31:0] out_read_data,
-  output out_reservation, // indicates whether or not a memory reservation was successfull 
+  output [1:0] out_reservation, // indicates whether or not a memory reservation was successfull 
   output out_fetch_exception,
   output out_read_exception,
   output out_write_exception
@@ -65,7 +65,7 @@ assign out_write_exception = 0; // in_write_addr >= (numBlockBytes - numWordByte
   program order. Accordingly, reservation requests always return
   true.
 */
-assign out_reservation = 1;
+assign out_reservation = 2'd2;
 
 // fetch operations.
 assign out_fetch_data = {
