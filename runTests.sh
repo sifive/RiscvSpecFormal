@@ -106,6 +106,15 @@ rv32um-p-mulhsu
 rv32um-p-mulhu
 rv32um-p-rem
 rv32um-p-remu
+rv32ua-p-amoadd_w
+rv32ua-p-amoand_w
+rv32ua-p-amoor_w
+rv32ua-p-amoxor_w
+rv32ua-p-amoswap_w
+rv32ua-p-amomax_w
+rv32ua-p-amomaxu_w
+rv32ua-p-amomin_w
+rv32ua-p-amominu_w
 "
 
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
