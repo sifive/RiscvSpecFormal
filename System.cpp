@@ -18,7 +18,7 @@ int main(int argc, char ** argv, char **env) {
 
   vluint64_t main_time = 0;
 
-  uint32_t timeout = 1<<15;
+  uint32_t timeout = 1<<10;
 
   uint32_t pass_address, fail_address = 0, sign_size;
   bool hasfail, finished;
@@ -34,6 +34,7 @@ int main(int argc, char ** argv, char **env) {
   }
   
   while(!Verilated::gotFinish() && main_time < timeout && !finished){
+    printf("MainTime = %lu\n", main_time);
     top->CLK = main_time%2;
     if(main_time < 10)
       top->RESET = 1;
