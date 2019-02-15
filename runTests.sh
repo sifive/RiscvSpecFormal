@@ -60,6 +60,16 @@ done
 shift $((OPTIND - 1))
 
 files="
+rv32uc-p-rvc
+rv32ua-p-amoadd_w
+rv32ua-p-amoand_w
+rv32ua-p-amoor_w
+rv32ua-p-amoxor_w
+rv32ua-p-amoswap_w
+rv32ua-p-amomax_w
+rv32ua-p-amomaxu_w
+rv32ua-p-amomin_w
+rv32ua-p-amominu_w
 rv32ui-p-add
 rv32ui-p-addi
 rv32ui-p-and
@@ -106,16 +116,6 @@ rv32um-p-mulhsu
 rv32um-p-mulhu
 rv32um-p-rem
 rv32um-p-remu
-rv32uc-p-rvc
-rv32ua-p-amoadd_w
-rv32ua-p-amoand_w
-rv32ua-p-amoor_w
-rv32ua-p-amoxor_w
-rv32ua-p-amoswap_w
-rv32ua-p-amomax_w
-rv32ua-p-amomaxu_w
-rv32ua-p-amomin_w
-rv32ua-p-amominu_w
 "
 
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
