@@ -17,33 +17,39 @@ module memory32 (
   output out_read_exception,
   output out_write_exception
 );
-
 parameter int size = 20;
 parameter int numBlockBytes = (2**size-1);
 parameter int startAddr = 2**31;
    
 parameter int numWordBytes = 4;
-
 logic [size-1:0] in_fetch_addr, in_read_addr, in_write_addr;
-
 assign in_fetch_addr = in_fetch_address[size-1:0];
 assign in_read_addr = in_read_address[size-1:0];
 assign in_write_addr = in_write_address[size-1:0];
-
 reg [7:0] block [numBlockBytes:0];
 string testfile;
-string signature;
-int sign_size;
-   
+string signature = "";
+int unsigned sign_size = 0;
+bit has_signature = |($value$plusargs("signature=%s", signature));
+bit sig_size_present = |($value$plusargs("sign_size=%d", sign_size));
+typedef logic [31:0] cmpl_fmt_t;
 initial begin
    $value$plusargs("testfile=%s", testfile);
-   $value$plusargs("signature=%s", signature);
-   $value$plusargs("sign_size=%d", sign_size);
    $readmemh (testfile, block);
 end
-
+function automatic void write_signature_file(int unsigned signature_bytes);
+  int cmpl_idx = 0;
+  cmpl_fmt_t cmpl_sig[1024];
+  for (int idx = numBlockBytes-sign_size+1; idx < numBlockBytes; idx = idx+4) begin
+    cmpl_sig[cmpl_idx] = {block[idx+3], block[idx+2], block[idx+1], block[idx]};
+    cmpl_idx += 1;
+  end
+  $writememh(signature, cmpl_sig, 0, (sign_size/4)-1);
+endfunction : write_signature_file
 final begin
-   $writememh(signature, block, numBlockBytes-sign_size+1, numBlockBytes);
+  if (has_signature && sig_size_present) begin
+    write_signature_file(sign_size);
+  end
    $display("|Finishing up everything|");
 end
   
@@ -51,13 +57,11 @@ end
   This memory unit only supports 64 bit word requests. It returns
   an exception for any request that is not aligned to a 64 bit
   word boundary.
-
   Note: this restriction prevents 
 */
 assign out_fetch_exception = 0; // in_read_addr >= (numBlockBytes - numWordBytes);
 assign out_read_exception = 0; // in_read_addr >= (numBlockBytes - numWordBytes);
 assign out_write_exception = 0; // in_write_addr >= (numBlockBytes - numWordBytes);
-
 /*
   This memory model executes requests in the order in which they
   are recieved and all harts within the executing environment,
@@ -66,7 +70,6 @@ assign out_write_exception = 0; // in_write_addr >= (numBlockBytes - numWordByte
   true.
 */
 assign out_reservation = 2'd2;
-
 // fetch operations.
 assign out_fetch_data = {
   block [in_fetch_addr + 3],
@@ -74,7 +77,6 @@ assign out_fetch_data = {
   block [in_fetch_addr + 1],
   block [in_fetch_addr + 0]
 };
-
 // load operations.
 assign out_read_data = {
   block [in_read_addr + 3],
@@ -82,10 +84,8 @@ assign out_read_data = {
   block [in_read_addr + 1],
   block [in_read_addr + 0]
 };
-
 /*
   store operations.
-
   The processor model assumes that each read and write operation
   reads and writes either 32 or 64 bit words depending on the
   processor's XLEN parameter. When the processor needs to write
@@ -108,3 +108,5 @@ begin
   end
 end
 endmodule
+
+
