@@ -37,7 +37,7 @@ module memory32 (
    initial begin
       $value$plusargs("testfile=%s", testfile);
       $readmemh (testfile, block);
-      fd = $fopen("signature", "w");
+      fd = $fopen(signature, "w");
    end
    function automatic void write_signature_file(int unsigned signature_bytes);
       int cmpl_idx = 0;
