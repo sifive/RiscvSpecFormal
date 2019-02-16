@@ -74,12 +74,12 @@ notice "Running $(basename $path)"
 notice "pass: $pass_address"
 notice "fail: $fail_address"
 
-cmd="./obj_dir/Vsystem +pass_address=$pass_address"
+cmd="./obj_dir/Vsystem +sign_size=8192 +signature=signature +testfile=./MemoryInit.hex +pass_address=$pass_address"
 if [[ $fail_address ]]
 then
   cmd="$cmd +fail_address=$fail_address"
 fi
-cmd="$cmd +testfile=MemoryInit.hex +signature=signature +sign_size=8192 > system.out"
+cmd="$cmd > system.out"
 execute "$cmd"
 
 notice "Done."
