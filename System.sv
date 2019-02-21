@@ -95,15 +95,17 @@ wire logic[31:0] memRead_address_req;
 wire logic memRead_enable_req;
 
 struct packed {
-  logic[31:0] data;
-  logic[1:0] reservation;
+  struct packed {
+    logic[31:0] data;
+    logic[1:0] reservation;
+  } fst;
   struct packed {
     logic valid;
     struct packed {
       logic[3:0] exception;
       logic [31:0] value;
     } data;
-  } exception;
+  } snd;
 } memRead_res;
 
 struct packed {
@@ -191,8 +193,8 @@ memory32 ram (
   .in_write_address (memWrite_req.addr),
   .in_write_data (memWrite_req.data),
   .out_fetch_data (fetch_res.fst),
-  .out_read_data (memRead_res.data),
-  .out_reservation (memRead_res.reservation),
+  .out_read_data (memRead_res.fst.data),
+  .out_reservation (memRead_res.fst.reservation),
   .out_fetch_exception (fetch_res.snd),
   .out_read_exception (ram_void2),
   .out_write_exception (ram_void3)
