@@ -20,14 +20,14 @@ logic fetch_enable;
 logic[31:0] fetch_address_req;
 
 struct packed {
-  logic[31:0] inst;
+  logic[31:0] fst;
   struct packed {
     logic valid;
     struct packed {
       logic[3:0] exception;
       logic[31:0] value;
     } data;
-  } exception;
+  } snd;
 } fetch_res;
 
 // Register read wires.
@@ -99,8 +99,11 @@ struct packed {
   logic[1:0] reservation;
   struct packed {
     logic valid;
-    logic[3:0] data;
-  } exception$;
+    struct packed {
+      logic[3:0] exception;
+      logic [31:0] value;
+    } data;
+  } exception;
 } memRead_res;
 
 struct packed {
@@ -112,7 +115,10 @@ wire logic memWrite_enable_req;
 
 struct packed {
   logic valid;
-  logic[3:0] data;
+  struct packed {
+    logic[3:0] exception;
+    logic [31:0] value;
+  } data;
 } memWrite_res;
 
 // System components and connections
@@ -184,10 +190,10 @@ memory32 ram (
   .in_read_address (memRead_address_req),
   .in_write_address (memWrite_req.addr),
   .in_write_data (memWrite_req.data),
-  .out_fetch_data (fetch_res.inst),
+  .out_fetch_data (fetch_res.fst),
   .out_read_data (memRead_res.data),
   .out_reservation (memRead_res.reservation),
-  .out_fetch_exception (ram_void1),
+  .out_fetch_exception (fetch_res.snd),
   .out_read_exception (ram_void2),
   .out_write_exception (ram_void3)
 );
