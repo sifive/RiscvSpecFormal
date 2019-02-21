@@ -18,7 +18,7 @@ int main(int argc, char ** argv, char **env) {
 
   vluint64_t main_time = 0;
 
-  uint32_t timeout = 1<<10;
+  uint32_t timeout = 5000;
 
   uint32_t pass_address, fail_address = 0, sign_size;
   bool hasfail, finished;
@@ -48,7 +48,7 @@ int main(int argc, char ** argv, char **env) {
 	fprintf(stderr, "Passed at address: %x\n", pass_address);
         finished = true;
       }	else if(hasfail && top->pc == fail_address) {
-	fprintf(stderr, "Failed at address: %x\n", fail_address);
+	fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED!\n");
         finished = true;
       }
       fflush(stdout);
@@ -57,7 +57,7 @@ int main(int argc, char ** argv, char **env) {
   }
 
   if (main_time >= timeout) {
-    printf("Simulation Timed Out\n");
+    fprintf(stderr, "Simulation Timed Out\n");
   }
 
   top->final();
