@@ -20,14 +20,14 @@ logic fetch_enable;
 logic[31:0] fetch_address_req;
 
 struct packed {
-  logic[31:0] fst;
+  logic[31:0] inst;
   struct packed {
     logic valid;
     struct packed {
       logic[3:0] exception;
       logic[31:0] value;
     } data;
-  } snd;
+  } exception;
 } fetch_res;
 
 // Register read wires.
@@ -77,6 +77,9 @@ wire logic read_csr_en_req;
 wire logic [11:0] read_csr_sel_req;
 wire logic [31:0] read_csr_data_res;
 
+wire logic read_fcsr_en_req;
+wire logic [31:0] read_fcsr_data_res;
+
 // CSR write wires.
 
 wire logic write_csr_en_req;
@@ -95,17 +98,12 @@ wire logic[31:0] memRead_address_req;
 wire logic memRead_enable_req;
 
 struct packed {
-  struct packed {
-    logic[31:0] data;
-    logic[1:0] reservation;
-  } fst;
+  logic[31:0] data;
+  logic[1:0] reservation;
   struct packed {
     logic valid;
-    struct packed {
-      logic[3:0] exception;
-      logic [31:0] value;
-    } data;
-  } snd;
+    logic[3:0] data;
+  } exception$;
 } memRead_res;
 
 struct packed {
@@ -117,10 +115,7 @@ wire logic memWrite_enable_req;
 
 struct packed {
   logic valid;
-  struct packed {
-    logic[3:0] exception;
-    logic [31:0] value;
-  } data;
+  logic[3:0] data;
 } memWrite_res;
 
 // System components and connections
@@ -133,6 +128,7 @@ top system (
   .proc_core_read_freg_2$_return(read_freg_2_res),
   .proc_core_read_freg_3$_return(read_freg_3_res),
   .proc_core_read_csr$_return(read_csr_data_res),
+  .proc_core_read_fcsr$_return(read_fcsr_data_res),
   .proc_core_memRead$_return(memRead_res),
   .proc_core_memWrite$_return(memWrite_res),
 
@@ -149,6 +145,7 @@ top system (
   .proc_core_fregWrite$_argument(proc_core_fregWrite_req),
   .proc_core_csrWrite$_argument(proc_core_csrWrite_req),
   .proc_core_fcsrWrite$_argument(write_fcsr_data_req),
+  .proc_core_pc$_argument(pc),
   .proc_core_fetch$_enable(fetch_enable),
   .proc_core_read_reg_1$_enable(read_reg_1_enable_req),
   .proc_core_read_reg_2$_enable(read_reg_2_enable_req),
@@ -156,26 +153,18 @@ top system (
   .proc_core_read_freg_2$_enable(read_freg_2_enable_req),
   .proc_core_read_freg_3$_enable(read_freg_3_enable_req),
   .proc_core_read_csr$_enable(read_csr_en_req),
+  .proc_core_read_fcsr$_enable(read_fcsr_en_req),
   .proc_core_memRead$_enable(memRead_enable_req),
   .proc_core_memWrite$_enable(memWrite_enable_req),
   .proc_core_regWrite$_enable(proc_core_regWrite_enable_req),
   .proc_core_fregWrite$_enable(proc_core_fregWrite_enable_req),
   .proc_core_csrWrite$_enable(write_csr_en_req),
   .proc_core_fcsrWrite$_enable(write_fcsr_en_req),
-
-  .proc_core_pc$_argument(pc),
   .proc_core_pc$_enable(pc_enable),
 
   .CLK(CLK),
   .RESET(RESET)
 );
-
-always @(posedge CLK)
-begin
-  $write ("[System] read csr en %b\n", read_csr_en_req);
-  $write ("[System] read csr sel %d\n", read_csr_sel_req);
-  $write ("[System] read csr val %d\n", read_csr_data_res);
-end
 
 (* TODO: wire up exceptions. *)
 
@@ -192,10 +181,10 @@ memory32 ram (
   .in_read_address (memRead_address_req),
   .in_write_address (memWrite_req.addr),
   .in_write_data (memWrite_req.data),
-  .out_fetch_data (fetch_res.fst),
-  .out_read_data (memRead_res.fst.data),
-  .out_reservation (memRead_res.fst.reservation),
-  .out_fetch_exception (fetch_res.snd),
+  .out_fetch_data (fetch_res.inst),
+  .out_read_data (memRead_res.data),
+  .out_reservation (memRead_res.reservation),
+  .out_fetch_exception (ram_void1),
   .out_read_exception (ram_void2),
   .out_write_exception (ram_void3)
 );
@@ -235,13 +224,22 @@ csr_register csr_registers (
   .CLK (CLK),
   .RESET (RESET),
   .in_read_csr_enable (read_csr_en_req),
+  .in_read_fcsr_enable (read_fcsr_en_req),
   .in_write_csr_enable (write_csr_en_req),
   .in_write_fcsr_enable (write_fcsr_en_req),
   .in_read_csr_select (read_csr_sel_req),
   .in_write_csr_select (proc_core_csrWrite_req.index),
   .in_write_csr_data (proc_core_csrWrite_req.data),
   .in_write_fcsr_data (write_fcsr_data_req),
-  .out_read_csr_data (read_csr_data_res)
+  .out_read_csr_data (read_csr_data_res),
+  .out_read_fcsr_data (read_fcsr_data_res)
 );
+
+always @(posedge CLK)
+begin
+  $write ("[System] read csr en %b\n", read_csr_en_req);
+  $write ("[System] read csr sel %d\n", read_csr_sel_req);
+  $write ("[System] read csr val %d\n", read_csr_data_res);
+end
 
 endmodule
