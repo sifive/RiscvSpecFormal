@@ -97,13 +97,17 @@ wire logic [31:0] write_fcsr_data_req;
 wire logic[31:0] memRead_address_req;
 wire logic memRead_enable_req;
 
+// TODO: does this match PktWithException MemRead in FU.v?
 struct packed {
   logic[31:0] data;
   logic[1:0] reservation;
   struct packed {
     logic valid;
-    logic[3:0] data;
-  } exception$;
+    struct packed {
+      logic[3:0] data;
+      logic[31:0] value;
+    } exception;
+  } maybe_exception;
 } memRead_res;
 
 struct packed {
