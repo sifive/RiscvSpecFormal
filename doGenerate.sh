@@ -7,8 +7,10 @@ source common.sh
 
 verbose=0
 rebuild=0 # indicates whether or not to recompile source files that Make thinks have not changed.
+skip_kami=0
 
-options=$(getopt --options="hrv" --longoptions="help,rebuild,verbose,version" -- "$@")
+
+options=$(getopt --options="hrkv" --longoptions="help,rebuild,skip-kami,verbose,version" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -40,6 +42,9 @@ Options:
   -r|--rebuild
   Recompile source files that Make believes have not changed.
 
+  -s|--skip-kami
+  Skip compiling the Coq/Kami source files.
+
   -v|--verbose
   Enables verbose output.
 
@@ -65,6 +70,9 @@ EOF
     -r|--rebuild)
       rebuild=1
       shift;;
+    -k|--skip-kami)
+      skip_kami=1
+      shift;;
     --version)
       echo "version: 1.0.0"
       exit 0;;
@@ -75,19 +83,24 @@ EOF
 done
 shift $((OPTIND - 1))
 
-notice "Compiling the Gallina (COQ) source code."
-cmd="make -j"
-if [[ $rebuild == 1 ]]
+if [[ $skip_kami == 1 ]]
 then
-  cmd="$cmd -B"
+  notice "Skipping compiling the Coq/Kami source code files."
+else
+  notice "Compiling the Gallina (COQ) source code."
+  cmd="make -j"
+  if [[ $rebuild == 1 ]]
+  then
+    cmd="$cmd -B"
+  fi
+  execute "$cmd"
+
+  notice "Compiling the Verilog generator."
+  execute "time ghc -O0 --make Kami/PrettyPrintVerilog.hs"
+
+  notice "Generating the Verilog model."
+  execute "time Kami/PrettyPrintVerilog > Processor.sv"
 fi
-execute "$cmd"
-
-notice "Compiling the Verilog generator."
-execute "time ghc -O0 --make Kami/PrettyPrintVerilog.hs"
-
-notice "Generating the Verilog model."
-execute "time Kami/PrettyPrintVerilog > Processor.sv"
 
 notice "Generating the simulator source code."
 cmd="verilator"
