@@ -4,7 +4,7 @@
 */
 `include "Processor.sv"
 `include "Memory32.sv"
-`include "Register32.sv"
+`include "Register.sv"
 `include "CSRRegister.sv"
 
 module system(
