@@ -1,8 +1,7 @@
 /*
   This module simulates a 32 bit register file attached to a processor core.
 */
-module register32 (
-  parameter DataSz=32,
+module Register (
   input 	CLK,
   input 	RESET,
   input 	in_write_enable,
@@ -16,6 +15,8 @@ module register32 (
   output [DataSz:0] out_read_data_2
 );
 
+parameter DataSz=32;
+   
 parameter integer num_registers = 32;
 reg [DataSz:0] register_bank [(num_registers - 1):0];
 
