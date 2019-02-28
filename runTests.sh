@@ -117,6 +117,11 @@ rv32um-p-mulhu
 rv32um-p-rem
 rv32um-p-remu
 rv32uf-p-fadd
+rv32uf-p-fclass
+rv32uf-p-fcmp
+rv32uf-p-ldst
+rv32uf-p-fmadd
+rv32uf-p-fmin
 "
 
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
