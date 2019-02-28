@@ -165,7 +165,7 @@ To compile the Coq source codes, simply type `make`. To clean the Coq-generated 
 
 To build the simulator from source simply run: `./doGenerate.sh`. See `./doGenerate.sh --help` for more information about building the program.
 
-To run RISC-V binaries within the simulator, simply run: `./runElf.sh $PATH`, where `$PATH` represents the RISC-V binary to run.
+To run RISC-V binaries within the simulator, simply run: `./runElf.sh $PATH/file.elf`, where `$PATH` represents the directory containing the RISC-V binary and `file.elf` represents the RISC-V binary.
 
 To run the suite of RISC-V binaries supported by the simulator, simply run: `./runTests.sh $PATH`, where `$PATH` represents the directory where the RISC-V binaries reside. The file `runTests.sh` lists all the binaries currently running on the simulator.
 
