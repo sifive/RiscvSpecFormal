@@ -55,7 +55,7 @@ Using Coq and Kami, we can do more than create programs that simulate RISC-V pro
 
 The current model covers RV-IMACF. However, the current implementation can easily be extended to support a larger subset of the RISC-V instruction set. Rather than hardcode the interpretation and behavior of every individual RISC-V instruction, the current model uses an extensible instruction database that may be expanded with little to no modification of the model's core. The resulting modularity means that, once the core has become stable, our model can be extended and modified easily to track changes to RISC-V spec.
 
-[//]: ## Current specification of assembly syntax and encoding
+[//]: # "## Current specification of assembly syntax and encoding"
 
 ## Current treatment of concurrency
 
