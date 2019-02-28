@@ -69,9 +69,9 @@ We currently support the entire floating-point instruction set (RVF). The floati
 
 Our model can be compiled to Verilog. Accordingly, it can be simulated and synthesized using standard tools. 
 
-### Emulation
+[//]: # "### Emulation"
 
-### Use as test oracle in tandem verification
+[//]: # "### Use as test oracle in tandem verification"
 
 ### Theorem-prover definitions that support proof
 
@@ -81,6 +81,7 @@ Our processor model is implemented in Kami. Accordingly, it's behavior is immedi
 
 Our model's instruction database will provide a description of every instruction in the RISC-V spec. Anyone looking to determine the behavior of a given RISC-V instruction will eventually be able to refer to the instruction database and find a description of its semantics.
 
+[//]: # "
 ### Use in test generation
 
 ### Use for concurrency-model litmus test evaluation
@@ -94,6 +95,7 @@ Our model's instruction database will provide a description of every instruction
 ### Concurrency litmus test testing
 
 ### Other
+"
 
 ## Plans for future functional coverage
 
@@ -103,7 +105,7 @@ Our aspiration is to eventually cover the entire RISC-V instruction set, includi
 
 SiFive plans to sponsor the RISC-V Kami spec for the indefinite future, with all the standard extensions being implemented in this spec.
 
-## Example instructions
+[//]: # "## Example instructions"
 
 ## Documentation for model and tools
 
