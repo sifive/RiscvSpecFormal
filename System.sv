@@ -196,7 +196,7 @@ memory32 ram (
 wire logic [4:0] register_void0;
 wire logic [31:0] register_void1;
 
-register32 registers (
+Register #(.DataSz(32)) registers (
   .CLK (CLK),
   .RESET (RESET),
   .in_write_enable (proc_core_regWrite_enable_req),
@@ -210,7 +210,7 @@ register32 registers (
   .out_read_data_2 (register_void1)
 );
 
-register32 fp_registers (
+Register #(.DataSz(32)) fp_registers (
   .CLK (CLK),
   .RESET (RESET),
   .in_write_enable (proc_core_fregWrite_enable_req),

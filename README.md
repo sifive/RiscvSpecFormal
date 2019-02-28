@@ -2,13 +2,12 @@
 
 ## Name
 
-RISC-V Kami Spec
+RISC-V ISA Spec in Kami
 
 ## Authors
 
 1. Murali Vijayaraghavan (SiFive)
-2. Kade Phillips (MIT)
-3. Larry Lee (SiFive) 
+2. Larry Lee (SiFive) 
 
 ## Spec sources snapshot
 
@@ -36,41 +35,43 @@ The RISC-V Kami Spec relies on the following tools/libraries:
 
 1. Coq
 2. Kami
-3. Verilog compilation and simulation tools
+3. Verilog compilation and simulation tools (verilator)
+4. BBV (Bedrock Bit Vector) -- it implements the bit-vector library in Coq
+5. coq-record-update -- it implements notation for updating structures in place
 
 ## Tool ecosystem: what other work has been/is being done with those tools
 
 The product of over 30 years of development, Coq is a leading proof assistant and is under active development. It has been used to develop formally verified C compilers (see the CompCert project), and to prove numerous mathematical theorems. 
 
-The result of over 5 years of development, Kami was created to model digital circuits and has been sponsored by SiFive. It has been used to model and verify processors developed at SiFive and is being developed in conjunction with MIT.
+The result of over 5 years of development, Kami was created at MIT to model digital circuits and has since been developed by SiFive. It has been used to model and verify processors developed at SiFive.
 
 ## Motivation
 
-SiFive's goal is to do more than just create a functional model of a RISC-V processor. Rather, our goal is to use Coq's general purpose theorem proving features to formalize the RISC-V semantics, to validate our model against these semantics, and to verify the correctness of our model implementation using certified programming techniques.
+SiFive's goal is to do more than just create a functional model of a RISC-V processor. Rather, our goal is to use Coq's general purpose theorem proving features to formalize the RISC-V semantics, to validate our implementation against these semantics, and to verify the correctness of our model implementation using certified programming techniques.
 
 Using Coq and Kami, we can do more than create programs that simulate RISC-V processors; we can create a framework for abstractly representing and reasoning over the behavior of systems using RISC-V.
 
 ## Current functional coverage
 
-The current model covers RV-IF. However, the current implementation can easily be extended to support a larger subset of the RISC-V instruction set. Rather than hardcode the interpretation and behavior of every individual RISC-V instruction, the current model uses an extensible instruction database that may be expanded with little to no modification of the model's core. The resulting modularity means that, once the core has become stable, our model can be extended and modified easily to track changes to RISC-V spec.
+The current model covers RV-IMACF. However, the current implementation can easily be extended to support a larger subset of the RISC-V instruction set. Rather than hardcode the interpretation and behavior of every individual RISC-V instruction, the current model uses an extensible instruction database that may be expanded with little to no modification of the model's core. The resulting modularity means that, once the core has become stable, our model can be extended and modified easily to track changes to RISC-V spec.
 
-## Current specification of assembly syntax and encoding
+[//]: # "## Current specification of assembly syntax and encoding"
 
 ## Current treatment of concurrency
 
-The implementation model presented here consists of a single RISC-V processor. 
+The implementation model presented here consists of a single RISC-V processor with plans to extend it to multicore systems, implementing the most relaxed version of the memory model. In fact, since Kami is a general purpose hardware specification language, it is trivial to design arbitrarily complex concurrent hardware systems in Kami.
 
 ## Current treatment of floating-point
 
-We currently support the entire floating-point instruction set (RVF). 
+We currently support the entire floating-point instruction set (RVF). The floating point unit is completely implemented in Kami.
 
 ## Current capabilities
 
 Our model can be compiled to Verilog. Accordingly, it can be simulated and synthesized using standard tools. 
 
-### Emulation
+[//]: # "### Emulation"
 
-### Use as test oracle in tandem verification
+[//]: # "### Use as test oracle in tandem verification"
 
 ### Theorem-prover definitions that support proof
 
@@ -80,29 +81,29 @@ Our processor model is implemented in Kami. Accordingly, it's behavior is immedi
 
 Our model's instruction database will provide a description of every instruction in the RISC-V spec. Anyone looking to determine the behavior of a given RISC-V instruction will eventually be able to refer to the instruction database and find a description of its semantics.
 
-### Use in test generation
+[//]: # "### Use in test generation"
 
-### Use for concurrency-model litmus test evaluation
+[//]: # "### Use for concurrency-model litmus test evaluation"
 
-## Current test coverage
+[//]: # "## Current test coverage"
 
-### RISC-V compliance tests
+[//]: # "### RISC-V compliance tests"
 
-### OS boot testing
+[//]: # "### OS boot testing"
 
-### Concurrency litmus test testing
+[//]: # "### Concurrency litmus test testing"
 
-### Other
+[//]: # "### Other"
 
 ## Plans for future functional coverage
 
-Our aspiration is to eventually cover the entire RISC-V instruction set, including both user and machine modes.
+Our aspiration is to eventually cover the entire RISC-V instruction set, including both supervisor and machine modes.
 
 ## Plans for long-term access, maintenance, etc.
 
-SiFive plans to sponsor the RISC-V Kami spec for the indefinite future. 
+SiFive plans to sponsor the RISC-V Kami spec for the indefinite future, with all the standard extensions being implemented in this spec.
 
-## Example instructions
+[//]: # "## Example instructions"
 
 ## Documentation for model and tools
 
@@ -124,13 +125,13 @@ Each of these contains a datastructure that lists various RISC-V instructions. E
 |}
 ```
 
-Every functional unit has a single "semantic function" which gives the basic operation performed by all of the affiliated instructions. 
+Every functional unit has a single "semantic function" which gives the basic operation performed by all of the affiliated instructions. For instance, the "add" functional unit supports several RISC-V instructions such as ADD, SUB, SLT (set less than), etc. This grouping of instructions into functional units enable generating optimized microarchitectures without having to reimplement the data-path functions.
 
-The `instName` field gives the instruction's name. The `extensions` field lists the RISC-V extensions that provide the instruction. The `uniqId` field, specifies the bit ranges in the instruction's encoding that uniquely identify the instruction. Finally `instHints` specifies the registers used by the instruction.
+The `instName` field gives the instruction's name. The `extensions` field lists the RISC-V extensions that provide the instruction. The `uniqId` field, specifies the bit encoding that uniquely identifies the instruction. Finally `instHints` specifies the registers read or written by the instruction.
 
 The remaining three fields, `inputXform`, `outputXform`, and `optMemXform` are more complicated.
 
-`inputXform` specify how the values stored within various registers are transformed before being processed by the semantic function associated with the instruction's functional unit. `outputXform` specifies how the values returned by the semantic function are transformed before being written to various registers. And, `optMemXform` specifies how values returned by the semantic function are transformed before being written to memory. Note that of non store instructions `optMemXform` is omitted.
+`inputXform` specify how the values stored within various registers are transformed before being processed by the semantic function associated with the instruction's functional unit. `outputXform` specifies how the values returned by the semantic function are transformed before being written to various registers. And, `optMemXform` takes as input the output of the semantic function and the value returned by memory (for load/store/AMO instructions), and provide the value written to the register and to the memory. Note that of non memory instructions `optMemXform` is omitted.
 
 For example, Fpu.v contains the following entry for the `fnadd.s` instruction:
 
@@ -154,45 +155,28 @@ For example, Fpu.v contains the following entry for the `fnadd.s` instruction:
 
 Anyone may refer to these instruction database files to learn about the instructions defined within the RISC-V ISA.
 
-Eventually, we will refine and collect these instruction databases into a single file to improve readability.
-
 ### snapshot of "How to Compile/Run Guide" for those who want to execute a model on programs (ISA tests, Compliance tests, other programs)
 
 Our package includes two scripts for building and running our simulator program.
 
+To get all the submodules first, type `git submodule update --init`.
+
+To compile the Coq source codes, simply type `make`. To clean the Coq-generated files, type `make clean`.
+
 To build the simulator from source simply run: `./doGenerate.sh`. See `./doGenerate.sh --help` for more information about building the program.
 
-To run RISC-V binaries within the simulator, simply run: `.runELF.sh PATH`.
+To run RISC-V binaries within the simulator, simply run: `./runElf.sh $PATH/file.elf`, where `$PATH` represents the directory containing the RISC-V binary and `file.elf` represents the RISC-V binary.
 
-The following provides further details about the process used to build our processor model from source.
+To run the suite of RISC-V binaries supported by the simulator, simply run: `./runTests.sh $PATH`, where `$PATH` represents the directory where the RISC-V binaries reside. The file `runTests.sh` lists all the binaries currently running on the simulator.
 
-Our processor model is implemented using Kami. To generate a Verilog module, you must complete the following steps:
-
-1. Compile the Kami modules using Coqc
-
-This will generate a Haskell file named Target.hs
-
-2. Compile PrettyPrintVerilog.hs using GHC
-
-This will produce a Verilog generator that outputs the processor model described in Target.hs.
-
-3. Generate Verilog by running PrettyPrintVerilog
-
-This will generate Processor.sv which represents the processor core.
-
-4. Load System.sv into a Verilog simulator, etc.
-
-At this point you can load System.sv into a Verilog simulator or any other program. System.sv includes both the processor model defined in Processor.sv and the memory and register file models contained in MemoryX.sv and RegisterX.sv and combines them into a functioning system.
-
-MemoryX.sv reads a hex file named "MemoryInit.hex" and loads the data stored therein into the memory of the system being simulated.
-
-To simplify the process outlined above, we provide a script `build.sh` that performs steps 1-3 and returns a Verilog module that represents a RISC-V processor core (Processor.sv).
-
-We use Verilator to simulate the execution of our processor model. Verilator compiles Verilog files into C code that, when compiled and run, simulates the behavior of the given Verilog modules. The program should be linked to System.cpp, which generates a trace of the processor while it runs. This program stops once the simulator reaches a given timeout measured in clock cycles.
-
-To simplify running RISC-V programs, we include an additional script named `runELF.sh`.
-
-Lastly, we provide a script named `runRVtests.sh` to compile and simulate tests from the RISC-V test suite. 
+In summary:
+```
+$ git submodule update --init
+$ make
+$ ./doGenerate.sh
+$ ./runElf.sh $PATH
+$ ./runTests.sh $PATH
+```
 
 ### snapshot of "How to Extend Guide" for those who want to extend the model to capture new ISA extensions/experiments.
 
@@ -210,7 +194,7 @@ A function unit has the following format:
 {|
   fuName  := NAME;
   fuFunc  := SEMANTICFUNCTION;
-  fuInsts := []
+  fuInsts := [ ... ]
 |}.
 ```
 
