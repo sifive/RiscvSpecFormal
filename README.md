@@ -81,21 +81,19 @@ Our processor model is implemented in Kami. Accordingly, it's behavior is immedi
 
 Our model's instruction database will provide a description of every instruction in the RISC-V spec. Anyone looking to determine the behavior of a given RISC-V instruction will eventually be able to refer to the instruction database and find a description of its semantics.
 
-[//]: # "
-### Use in test generation
+[//]: # "### Use in test generation"
 
-### Use for concurrency-model litmus test evaluation
+[//]: # "### Use for concurrency-model litmus test evaluation"
 
-## Current test coverage
+[//]: # "## Current test coverage"
 
-### RISC-V compliance tests
+[//]: # "### RISC-V compliance tests"
 
-### OS boot testing
+[//]: # "### OS boot testing"
 
-### Concurrency litmus test testing
+[//]: # "### Concurrency litmus test testing"
 
-### Other
-"
+[//]: # "### Other"
 
 ## Plans for future functional coverage
 
