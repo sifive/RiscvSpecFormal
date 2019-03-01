@@ -161,8 +161,6 @@ Our package includes two scripts for building and running our simulator program.
 
 To get all the submodules first, type `git submodule update --init`.
 
-To compile the Coq source codes, simply type `make`. To clean the Coq-generated files, type `make clean`.
-
 To build the simulator from source simply run: `./doGenerate.sh`. See `./doGenerate.sh --help` for more information about building the program.
 
 To run RISC-V binaries within the simulator, simply run: `./runElf.sh $PATH/file.elf`, where `$PATH` represents the directory containing the RISC-V binary and `file.elf` represents the RISC-V binary.
@@ -172,7 +170,6 @@ To run the suite of RISC-V binaries supported by the simulator, simply run: `./r
 In summary:
 ```
 $ git submodule update --init
-$ make
 $ ./doGenerate.sh
 $ ./runElf.sh $PATH
 $ ./runTests.sh $PATH
