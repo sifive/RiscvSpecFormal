@@ -42,7 +42,7 @@ Options:
   -r|--rebuild
   Recompile source files that Make believes have not changed.
 
-  -s|--skip-kami
+  -k|--skip-kami
   Skip compiling the Coq/Kami source files.
 
   -v|--verbose
