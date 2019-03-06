@@ -124,7 +124,6 @@ rv32uf-p-fcvt_w
 rv32uf-p-ldst
 rv32uf-p-fmadd
 rv32uf-p-fmin
-rv32uf-p-ldst
 rv32uf-p-move
 rv32uf-p-recoding
 "
