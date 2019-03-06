@@ -33,7 +33,7 @@ begin
   begin
     // read the fflags field within the fcsr register.
     out_read_csr_data = (registers [fcsr_index] & 32'h1F);
-    $write("[CSRRegister] read fflags NEW 3 %d\n", out_read_csr_data);
+    $write("[CSRRegister] read fflags %d\n", out_read_csr_data);
   end else if (in_read_csr_select == frm_index)
   begin
     // read the frm field within the fcsr register.
