@@ -126,6 +126,7 @@ rv32uf-p-fmadd
 rv32uf-p-fmin
 rv32uf-p-move
 rv32uf-p-recoding
+rv32uf-p-fdiv
 "
 
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
