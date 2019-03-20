@@ -103,9 +103,7 @@ else
 fi
 
 notice "Generating the simulator source code."
-cmd="verilator"
-cmd="time $cmd --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
-execute "$cmd"
+execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
 
 notice "Compiling the simulation program."
 if [ -x "$(command -v clang)" ]; then
