@@ -6,7 +6,5 @@
 Require Import Kami.All.
 Require Import ProcKami.ProcessorCoreInstance.
 
-Definition rtlMod := rtlModParam "MemoryInit.hex".
-
 Separate Extraction size RtlModule WriteRegFile wordToNat getFins rtlMod.
 
