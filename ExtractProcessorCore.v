@@ -6,5 +6,5 @@
 Require Import Kami.All.
 Require Import ProcKami.ProcessorCoreInstance.
 
-Extraction "Target.hs" rtlMod size RtlModule WriteRegFile Nat.testbit wordToNat getFins.
+Separate Extraction Nat.testbit rtlMod size RtlModule WriteRegFile wordToNat getFins.
 
