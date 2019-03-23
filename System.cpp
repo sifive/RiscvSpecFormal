@@ -5,13 +5,13 @@
 #include <getopt.h>
 #include "verilated_vcd_c.h"
 
-#include "Vsystem.h"
+#include "Vtop.h"
 
 int main(int argc, char ** argv, char **env) {
   Verilated::commandArgs(argc, argv);
   Verilated::traceEverOn(true);
 
-  Vsystem* top = new Vsystem;
+  Vtop* top = new Vtop;
   VerilatedVcdC* tfp = new VerilatedVcdC;
   top->trace(tfp,99);
   tfp->open("trace.vcd");
@@ -43,11 +43,11 @@ int main(int argc, char ** argv, char **env) {
     top->eval();
     tfp->dump(main_time);
 
-    if(top->pc_enable) {
-      if(top->pc == pass_address) {
+    if(top->proc_core_pc__024_enable) {
+      if(top->proc_core_pc__024_argument == pass_address) {
 	fprintf(stderr, "Passed at address: %x\n", pass_address);
         finished = true;
-      }	else if(hasfail && top->pc == fail_address) {
+      }	else if(hasfail && top->proc_core_pc__024_argument == fail_address) {
 	fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED!\n");
         finished = true;
       }
