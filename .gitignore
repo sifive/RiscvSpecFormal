@@ -14,5 +14,6 @@ Makefile.coq.all.conf
 *.vcd
 *.hex
 Processor.sv
+System.sv
 system.out
 signature

@@ -5,6 +5,8 @@
 #include <getopt.h>
 #include "verilated_vcd_c.h"
 
+#include "Vtop_proc_core_mem_reg_file.h"
+#include "Vtop_top.h"
 #include "Vtop.h"
 
 int main(int argc, char ** argv, char **env) {
@@ -24,8 +26,21 @@ int main(int argc, char ** argv, char **env) {
   bool hasfail, finished;
   std::string testfile, signature;
 
+  uint64_t numBlockBytes = (1<<20)-1;
+
   finished = false;
 
+  VL_VALUEPLUSARGS_INN(-1, "signature=%s", signature);
+
+  FILE* signature_fd = fopen(signature.c_str(), "w");
+
+  if(signature_fd == NULL) {
+    fprintf(stderr, "Can't open signature file %s\n", signature.c_str());
+    exit(-1);
+  }
+  
+  VL_VALUEPLUSARGS_INI(32, "sign_size=%d", sign_size);
+  
   VL_VALUEPLUSARGS_INI(32, "pass_address=%h", pass_address);
   if(VL_VALUEPLUSARGS_INI(32, "fail_address=%h", fail_address)) {
     hasfail = true;
@@ -60,6 +75,14 @@ int main(int argc, char ** argv, char **env) {
     fprintf(stderr, "Simulation Timed Out\n");
   }
 
+  
+  for(int i = numBlockBytes-sign_size+1; i < numBlockBytes; i+=4) {
+    for(int j = 0; j < 4; j++) {
+      fprintf(signature_fd, "%d", top->top->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[i+j]);
+    }
+    fprintf(signature_fd, "\n");
+  }
+  
   top->final();
   tfp->close();
   delete top;
