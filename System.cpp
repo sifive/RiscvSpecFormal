@@ -77,8 +77,8 @@ int main(int argc, char ** argv, char **env) {
 
   
   for(int i = numBlockBytes-sign_size+1; i < numBlockBytes; i+=4) {
-    for(int j = 0; j < 4; j++) {
-      fprintf(signature_fd, "%d", top->top->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[i+j]);
+    for(int j = 3; j >= 0; j--) {
+      fprintf(signature_fd, "%02x", top->top->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[i+j]);
     }
     fprintf(signature_fd, "\n");
   }
