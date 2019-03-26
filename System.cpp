@@ -5,17 +5,17 @@
 #include <getopt.h>
 #include "verilated_vcd_c.h"
 
-#include "Vtop_proc_core_mem_reg_file.h"
-#include "Vtop_top.h"
-#include "Vtop.h"
+#include "Vsystem_proc_core_mem_reg_file.h"
+#include "Vsystem_system.h"
+#include "Vsystem.h"
 
 int main(int argc, char ** argv, char **env) {
   Verilated::commandArgs(argc, argv);
   Verilated::traceEverOn(true);
 
-  Vtop* top = new Vtop;
+  Vsystem* system = new Vsystem;
   VerilatedVcdC* tfp = new VerilatedVcdC;
-  top->trace(tfp,99);
+  system->trace(tfp,99);
   tfp->open("trace.vcd");
 
   vluint64_t main_time = 0;
@@ -50,19 +50,19 @@ int main(int argc, char ** argv, char **env) {
   
   while(!Verilated::gotFinish() && main_time < timeout && !finished){
     printf("MainTime = %lu\n", main_time);
-    top->CLK = main_time%2;
+    system->CLK = main_time%2;
     if(main_time < 10)
-      top->RESET = 1;
-    else top->RESET = 0;
+      system->RESET = 1;
+    else system->RESET = 0;
 
-    top->eval();
+    system->eval();
     tfp->dump(main_time);
 
-    if(top->proc_core_pc__024_enable) {
-      if(top->proc_core_pc__024_argument == pass_address) {
+    if(system->proc_core_pc__024_enable) {
+      if(system->proc_core_pc__024_argument == pass_address) {
 	fprintf(stderr, "Passed at address: %x\n", pass_address);
         finished = true;
-      }	else if(hasfail && top->proc_core_pc__024_argument == fail_address) {
+      }	else if(hasfail && system->proc_core_pc__024_argument == fail_address) {
 	fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED!\n");
         finished = true;
       }
@@ -78,14 +78,14 @@ int main(int argc, char ** argv, char **env) {
   
   for(int i = numBlockBytes-sign_size+1; i < numBlockBytes; i+=4) {
     for(int j = 3; j >= 0; j--) {
-      fprintf(signature_fd, "%02x", top->top->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[i+j]);
+      fprintf(signature_fd, "%02x", system->system->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[i+j]);
     }
     fprintf(signature_fd, "\n");
   }
   
-  top->final();
+  system->final();
   tfp->close();
-  delete top;
+  delete system;
   delete tfp;
   return 0;
 }

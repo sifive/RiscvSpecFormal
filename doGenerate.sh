@@ -24,7 +24,7 @@ Usage: ./doGenerate.sh [OPTIONS]
 This script generates the RISC-V processor simulator from the
 Gallina and Verilog source files.
 
-By default this simulator program is ./obj_dir/Vtop. It will
+By default this simulator program is ./obj_dir/Vsystem. It will
 execute any program whose object code is stored in the hex file
 MemoryInit.hex.
 
@@ -96,14 +96,14 @@ else
   execute "$cmd"
 
   notice "Compiling the Verilog generator."
-  execute "time ghc -O0 --make Kami/PrettyPrintVerilog.hs"
+  execute "time ghc -H8G -O0 --make Kami/PrettyPrintVerilog.hs"
 
   notice "Generating the Verilog model."
   execute "time Kami/PrettyPrintVerilog > System.sv"
 fi
 
 notice "Generating the simulator source code."
-execute "time verilator --top-module top -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
+execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
 
 notice "Compiling the simulation program."
 if [ -x "$(command -v clang)" ]; then
@@ -112,6 +112,6 @@ else
   compiler=g++
 fi
 
-execute "time make -j -C obj_dir -f Vtop.mk Vtop CXX=$compiler LINK=$compiler"
+execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
 
 notice "Done."
