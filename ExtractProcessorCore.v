@@ -6,5 +6,5 @@
 Require Import Kami.All.
 Require Import ProcKami.ProcessorCoreInstance.
 
-Separate Extraction size RtlModule WriteRegFile wordToNat getFins rtlMod.
+Separate Extraction size wordToNat getFins rtlMod.
 
