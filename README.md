@@ -11,15 +11,19 @@ RISC-V ISA Spec in Kami
 
 ## Spec sources snapshot
 
-https://github.com/sifive/RiscvSpecKami
+https://github.com/sifive/RiscvSpecFormal
 
 Note that the master branch of the RISC-V Kami Spec only presents the current stable release version.
 
 ## Spec sources live development
 
-https://github.com/sifive/RiscvSpecKami
+https://github.com/sifive/RiscvSpecFormal/ProcKami
+
+The idea is to keep the top-level git repository always stable, and link it to the stable version of the submodule constantly.
 
 ## Licence
+
+Apache 2.0
 
 ## Metalanguage
 
@@ -33,17 +37,23 @@ The complete processor model includes register and memory modules written in Ver
 
 The RISC-V Kami Spec relies on the following tools/libraries:
 
-1. Coq
+1. Coq 8.9.x
 2. Kami
-3. Verilog compilation and simulation tools (verilator)
+3. Verilator >= 3.9xx (for compiling and simulating verilog)
 4. BBV (Bedrock Bit Vector) -- it implements the bit-vector library in Coq
 5. coq-record-update -- it implements notation for updating structures in place
+6. clang (C-compiler that can run verilator generated C code fast)
+7. GHC 8.4.x (Haskell compiler to generate verilog)
 
 ## Tool ecosystem: what other work has been/is being done with those tools
 
 The product of over 30 years of development, Coq is a leading proof assistant and is under active development. It has been used to develop formally verified C compilers (see the CompCert project), and to prove numerous mathematical theorems. 
 
 The result of over 5 years of development, Kami was created at MIT to model digital circuits and has since been developed by SiFive. It has been used to model and verify processors developed at SiFive.
+
+The BBV and coq-record-update libraries are fairly small libraries maintained by MIT.
+
+The clang compiler, verilator and GHC compiler are all fairly mature open source tools.
 
 ## Motivation
 
@@ -53,29 +63,42 @@ Using Coq and Kami, we can do more than create programs that simulate RISC-V pro
 
 ## Current functional coverage
 
+### Base ISA and extensions
+
 The current model covers RV-IMACF. However, the current implementation can easily be extended to support a larger subset of the RISC-V instruction set. Rather than hardcode the interpretation and behavior of every individual RISC-V instruction, the current model uses an extensible instruction database that may be expanded with little to no modification of the model's core. The resulting modularity means that, once the core has become stable, our model can be extended and modified easily to track changes to RISC-V spec.
 
-[//]: # "## Current specification of assembly syntax and encoding"
+### Privilege levels
+It currently supports only user privilege level, with Machine and Supervisor privilege levels in unstable branches.
+
+### Parameterisation of the model
+The extensible instruction database is written in a parameterized manner, which can be instantiated to 32-bits, 64-bits, 128-bits or any other bit-widths for data path. It also supports extensions using a parameter table that lists all the extensions to generate in the formal model.
+
+## Current specification of assembly syntax and encoding
+
+The specification is written as a database, i.e., a list of entries in Gallina, with the specification of each instruction written as a Kami LetExpression. The syntax is discussed in greater detail below.
 
 ## Current treatment of concurrency
 
-The implementation model presented here consists of a single RISC-V processor with plans to extend it to multicore systems, implementing the most relaxed version of the memory model. In fact, since Kami is a general purpose hardware specification language, it is trivial to design arbitrarily complex concurrent hardware systems in Kami.
+The implementation model presented here consists of a single RISC-V processor with plans to extend it to multicore systems, implementing the most relaxed version of the memory model. In fact, since Kami is a general purpose hardware specification language, it is trivial to design arbitrarily complex concurrent hardware systems in Kami (see the Multicore system + hierarchical caches written in Kami in the ICFP 2018 Kami paper).
 
 ## Current treatment of floating-point
 
-We currently support the entire floating-point instruction set (RVF). The floating point unit is completely implemented in Kami.
+We currently support the entire floating-point instruction set (RVF). The floating point unit is completely implemented in Kami. The unstable version also contains RVD (double-precision floating point).
 
-## Current capabilities
+## What the specification and associated tooling generates and enables
 
 Our model can be compiled to Verilog. Accordingly, it can be simulated and synthesized using standard tools. 
 
-[//]: # "### Emulation"
+### Emulation
 
-[//]: # "### Use as test oracle in tandem verification"
+Since it generates verilog, verilator can be used to run the generated verilog
+
+### Use as test oracle in tandem verification
+It prints out the instruction packets through various stages (i.e. Fetch, Decode, Execute, Memory, Writeback, even though these stages all together happen in one clock cycle). This trace can be used in tandem verification.
 
 ### Theorem-prover definitions that support proof
 
-Our processor model is implemented in Kami. Accordingly, it's behavior is immediately verifiable using Coq. In addition, various tools and utilities exist for export Coq definitions and theorems into other proof assistants.
+Our processor model is implemented in Kami. Accordingly, it's behavior is immediately verifiable using Coq. We have developed an elaborate ecosystem for Kami in Coq that includes several tactics to perform proof search and several general theorems about the semantics of Kami that helps in proving designs to be equivalent to the formal specification. In addition, various tools and utilities exist for export Coq definitions and theorems into other proof assistants.
 
 ### Use in documentation
 
@@ -85,9 +108,14 @@ Our model's instruction database will provide a description of every instruction
 
 [//]: # "### Use for concurrency-model litmus test evaluation"
 
-[//]: # "## Current test coverage"
+### Current test coverage
 
-[//]: # "### RISC-V compliance tests"
+It passes all the "rv32u.-p-.*" tests in riscv-tests
+
+### RISC-V compliance tests
+
+We have a target in the compliance test suite.
+https://github.com/riscv/riscv-compliance/tree/master/riscv-target/sifive-formal
 
 [//]: # "### OS boot testing"
 
@@ -109,7 +137,7 @@ SiFive plans to sponsor the RISC-V Kami spec for the indefinite future, with all
 
 ### snapshot of "Reading Guide", for those who just want to read it like an ISA manual
 
-RISC-V Spec Kami refers to "instruction databases" to model the behavior of the instructions that it supports. These database entries are referred to as "functional units" internally, and are stored in the following files: Alu.v, Fpu.v, and Mem.v.
+RISC-V Spec Kami refers to "instruction databases" to model the behavior of the instructions that it supports. These database entries are referred to as "functional units" internally, and are stored in the following directories: FuncUnits/Alu/*.v, FuncUnits/Fpu/*.v, and FuncUnits/Mem/*.v.
 
 Each of these contains a datastructure that lists various RISC-V instructions. Each instruction entry has the following format:
 
@@ -149,7 +177,7 @@ For example, Fpu.v contains the following entry for the `fnadd.s` instruction:
   inputXform  := add_in_pkt $0;
   outputXform := muladd_out_pkt;
   optMemXform := None;
-  instHints := falseHints[[hasFrs1 := true]][[hasFrs2 := true]][[hasFrd := true]] 
+  instHints := falseHints{*hasFrs1 := true*}{*hasFrs2 := true*}{*hasFrd := true*}
 |};
 ```
 
@@ -171,7 +199,7 @@ In summary:
 ```
 $ git submodule update --init
 $ ./doGenerate.sh
-$ ./runElf.sh $PATH
+$ ./runElf.sh $PATH/file.elf
 $ ./runTests.sh $PATH
 ```
 
@@ -213,8 +241,9 @@ Once the developer has selected, or created, the functional unit whose semantic 
   inputXform  := add_in_pkt $0;
   outputXform := muladd_out_pkt;
   optMemXform := None;
-  instHints := falseHints[[hasFrs1 := true]][[hasFrs2 := true]][[hasFrd := true]] 
+  instHints := falseHints{*hasFrs1 := true*}{*hasFrs2 := true*}{*hasFrd := true*}
 |}
 ```
 
 The developer will need to define the `inputXform`, `outputXform`, and `optMemXform` transformation functions.
+
