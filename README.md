@@ -39,7 +39,7 @@ The RISC-V Kami Spec relies on the following tools/libraries:
 
 1. Coq 8.9.x
 2. Kami
-3. Verilator >= 4.014 (for compiling and simulating verilog)
+3. Verilator >= 4.014, the master branch on the git tree as of March 29, 2019 -- it contains a critical patch for 64-bit systems (for compiling and simulating verilog)
 4. BBV (Bedrock Bit Vector) -- it implements the bit-vector library in Coq
 5. coq-record-update -- it implements notation for updating structures in place
 6. clang (C-compiler that can run verilator generated C code fast)
