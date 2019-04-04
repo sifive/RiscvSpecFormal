@@ -111,6 +111,17 @@ rv64ui-p-simple
 rv64ui-p-slti
 rv64ui-p-sraw
 rv64ui-p-subw
+rv64uf-p-fadd
+rv64uf-p-fcvt
+rv64uf-p-fmadd
+rv64uf-p-move
+rv64uf-p-fclass
+rv64uf-p-fcvt_w
+rv64uf-p-fmin
+rv64uf-p-recoding
+rv64uf-p-fcmp
+rv64uf-p-fdiv
+rv64uf-p-ldst
 "
 
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
