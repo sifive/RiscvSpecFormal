@@ -261,3 +261,25 @@ This model can be used to generate a processor simulator. The standard way to do
 6. Compile the C simulator.
 
 The `doGenerate.sh` script performs these steps when building the simulator.
+
+## Bugs
+
+When the "RV64I" and "D" extensions are enabled, the current version of Verilator (4.012) generates calls to a function that does not exist - `VL_SHIFTR_QQW`.
+
+To fix this bug:
+
+1. clone the latest version of Verilator using `git clone http://git.veripool.org/git/verilator`
+2. add the following to include/verilated.h after the definition for `VL_SHIFTR_IIW`:
+```
+static inline QData VL_SHIFTR_QQW(int obits,int,int rbits,QData lhs, WDataInP rwp) VL_MT_SAFE {
+    for (int i=1; i < VL_WORDS_I(rbits); ++i) {
+        if (VL_UNLIKELY(rwp[i])) {  // Huge shift 1>>32 or more
+            return 0;
+        }
+    }
+    return VL_CLEAN_QQ(obits,obits,lhs>>(static_cast<QData>(rwp[0])));
+}
+```
+3. compile Verilator using `./configure; make`
+
+For convenience, you can use the following prepatched version of Verilator: https://github.com/llee454/verilator.
