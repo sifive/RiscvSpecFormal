@@ -282,4 +282,4 @@ static inline QData VL_SHIFTR_QQW(int obits,int,int rbits,QData lhs, WDataInP rw
 ```
 3. compile Verilator using `./configure; make`
 
-For convenience, you can use the following prepatched version of Verilator: https://github.com/llee454/verilator.
+A patched version of Verilator is available from Veripool. To download it simply execute `git clone http://git.veripool.org/git/verilator`.
