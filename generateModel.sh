@@ -80,12 +80,12 @@ shift $((OPTIND - 1))
 [[ -z $xlen ]]   && error "Invalid command line. The <xlen> argument is missing."
 
 tee Target.hs <<- EOF
-module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module ProcessorCoreInstance, module PeanoNat, rtlMod) where
+module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module System, module PeanoNat, rtlMod) where
 
 import EclecticLib
 import PeanoNat
 import Fin
-import ProcessorCoreInstance hiding (unsafeCoerce)
+import System hiding (unsafeCoerce)
 import Rtl
 import Syntax hiding (unsafeCoerce)
 import Word
