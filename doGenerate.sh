@@ -9,8 +9,9 @@ verbose=0
 rebuild=0 # indicates whether or not to recompile source files that Make thinks have not changed.
 skip_kami=0
 
+xlen=32
 
-options=$(getopt --options="hrkv" --longoptions="help,rebuild,skip-kami,verbose,version" -- "$@")
+options=$(getopt --options="hrkv" --longoptions="help,rebuild,skip-kami,verbose,version,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -19,7 +20,7 @@ do
   case "$1" in
     -h | --help)
       cat <<- EOF
-Usage: ./doGenerate.sh [OPTIONS]
+Usage: ./doGenerate.sh [ARGUMENTS] [OPTIONS]
 
 This script generates the RISC-V processor simulator from the
 Gallina and Verilog source files.
@@ -33,6 +34,11 @@ of its registers and actions during each clock cycle.
 
 The simulator also outputs a VCD trace file, named trace.vcd,
 that can be viewed using programs such as GTKWave.
+
+Arguments:
+  --xlen 32|64
+  Specifies whether or not the generator should produce a 32 or 64
+  bit RISC-V processor model. Default is 32.
 
 Options:
 
@@ -53,9 +59,9 @@ Options:
 
 Example
 
-./doGenerate.sh --verbose
+./doGenerate.sh --xlen 32 --verbose
 
-Generates the RISC-V processor simulator.
+Generates the RISC-V 32-bit processor simulator.
 
 Authors
 
@@ -76,6 +82,9 @@ EOF
     --version)
       echo "version: 1.0.0"
       exit 0;;
+    -x|--xlen)
+      xlen=$2
+      shift 2;;
     --)
       shift
       break;;
@@ -97,10 +106,26 @@ else
 
   notice "Compiling the Verilog generator."
   execute "time ghc -H8G -O0 --make Kami/PrettyPrintVerilog.hs"
-
-  notice "Generating the Verilog model."
-  execute "time Kami/PrettyPrintVerilog > System.sv"
 fi
+
+cat > Target.hs <<- EOF
+module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, rtlMod) where
+
+import EclecticLib
+import PeanoNat
+import Fin
+import System
+import Rtl
+import Syntax hiding (unsafeCoerce)
+import Word
+
+rtlMod :: RtlModule
+rtlMod = model$xlen
+EOF
+
+
+notice "Generating the Verilog model."
+execute "time Kami/PrettyPrintVerilog > System.sv"
 
 notice "Generating the simulator source code."
 execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
