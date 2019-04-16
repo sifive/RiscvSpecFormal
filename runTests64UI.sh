@@ -127,6 +127,9 @@ rv64uf-p-ldst
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
 path=$1
 
+notice "Generating model".
+./doGenerate.sh --xlen 64
+
 notice "Running tests in $path."
 for file in $files
 do

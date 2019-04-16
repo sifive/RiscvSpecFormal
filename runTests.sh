@@ -132,6 +132,10 @@ rv32uf-p-fdiv
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
 path=$1
 
+notice "Generating model".
+./doGenerate.sh --xlen 32
+
+
 notice "Running tests in $path."
 for file in $files
 do
