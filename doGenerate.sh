@@ -127,6 +127,9 @@ EOF
 notice "Generating the Verilog model."
 execute "time Kami/PrettyPrintVerilog > System.sv"
 
+notice "Clearing obj_dir"
+execute "rm -rf obj_dir"
+
 notice "Generating the simulator source code."
 execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
 
