@@ -72,7 +72,7 @@ int main(int argc, char ** argv, char **env) {
   }
 
   if (main_time >= timeout) {
-    fprintf(stderr, "Simulation Timed Out\n");
+    fprintf(stderr, "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT\n");
   }
 
   
