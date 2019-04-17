@@ -31,7 +31,7 @@ Arguments:
   --xlen 32|64
   Specifies whether we are running 32-bit or 64-bit tests.
 
-  --xlen 32|64
+  --path location
   Path to the directory where all the tests are located.
 
 Options:
