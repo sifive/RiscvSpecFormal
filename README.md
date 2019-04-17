@@ -189,7 +189,7 @@ Our package includes two scripts for building and running our simulator program.
 
 To get all the submodules first, type `git submodule update --init`.
 
-To build the simulator from source simply run: `./generateModel.sh`. See `./generateModel.sh --help` for more information about building the program.
+To build the simulator from source simply run: `./doGenerate.sh`. See `./doGenerate.sh --help` for more information about building the program.
 
 To run RISC-V binaries within the simulator, simply run: `./runElf.sh $PATH/file.elf`, where `$PATH` represents the directory containing the RISC-V binary and `file.elf` represents the RISC-V binary.
 
@@ -198,7 +198,7 @@ To run the suite of RISC-V binaries supported by the simulator, simply run: `./r
 In summary:
 ```
 $ git submodule update --init
-$ ./generateModel.sh -v --xlen=32
+$ ./doGenerate.sh -v --xlen=32
 $ ./runElf.sh $PATH/file.elf
 $ ./runTests.sh $PATH
 ```
@@ -261,7 +261,7 @@ This model can be used to generate a processor simulator. The standard way to do
 6. Pass the Verilog model to Verilator to produce C source code for the processor simulator
 7. Compile the C simulator.
 
-The `generateModel.sh` script performs these steps when building the simulator.
+The `doGenerate.sh` script performs these steps when building the simulator.
 
 ## Bugs
 
