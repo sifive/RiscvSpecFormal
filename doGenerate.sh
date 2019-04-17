@@ -11,7 +11,7 @@ skip_kami=0
 
 xlen=32
 
-options=$(getopt --options="hrkv" --longoptions="help,rebuild,skip-kami,verbose,version,xlen:" -- "$@")
+options=$(getopt --options="hrkvx:" --longoptions="help,rebuild,skip-kami,verbose,version,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
