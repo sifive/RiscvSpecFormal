@@ -103,9 +103,6 @@ else
     cmd="$cmd -B"
   fi
   execute "$cmd"
-
-  notice "Compiling the Verilog generator."
-  execute "time ghc -H8G -O0 --make Kami/PrettyPrintVerilog.hs"
 fi
 
 cat > Target.hs <<- EOF
@@ -123,6 +120,8 @@ rtlMod :: RtlModule
 rtlMod = model$xlen
 EOF
 
+notice "Compiling the Verilog generator."
+execute "time ghc -H8G -O0 --make Kami/PrettyPrintVerilog.hs"
 
 notice "Generating the Verilog model."
 execute "time Kami/PrettyPrintVerilog > System.sv"
