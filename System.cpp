@@ -20,7 +20,7 @@ int main(int argc, char ** argv, char **env) {
 
   vluint64_t main_time = 0;
 
-  uint32_t timeout = 5000;
+  uint32_t timeout = 50000;
 
   uint32_t pass_address, fail_address = 0, sign_size;
   bool hasfail, finished;
