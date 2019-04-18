@@ -13,3 +13,6 @@
 [submodule "coq-record-update"]
 	path = coq-record-update
 	url = https://github.com/tchajed/coq-record-update
+[submodule "StdLibKami"]
+	path = StdLibKami
+	url = https://github.com/sifive/StdLibKami.git
