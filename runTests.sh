@@ -30,6 +30,7 @@ script returns 0.
 Arguments:
   --xlen 32|64
   Specifies whether we are running 32-bit or 64-bit tests.
+  Default 32.
 
   --path location
   Path to the directory where all the tests are located.
