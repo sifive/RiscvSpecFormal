@@ -3,7 +3,7 @@ sudo: enabled
 before_install:
   - sudo apt update -qq
   - sudo apt install opam
-  - opam init
+  - yes | opam init
   - opam --version
   - yes | opam install opam-devel
   - yes | opam init
