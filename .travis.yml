@@ -2,11 +2,12 @@ language: coq
 sudo: enabled
 before_install:
   - sudo apt update -qq
-  - sudo apt install opam
-  - yes | opam init
+  - yes | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+  #- sudo apt install opam
+  - yes | opam init --disable-sandboxing --reinit
   - opam --version
-  - yes | opam install opam-devel
-  - yes | opam init
+  # - yes | opam install opam-devel
+  # - yes | opam init
   - yes | opam repo add coq-released http://coq.inria.fr/opam/released
   - yes | opam install coq.8.9.0
   - export OPAMROOT=~/opam-coq.8.9.0
