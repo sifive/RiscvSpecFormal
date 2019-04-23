@@ -17,10 +17,7 @@ before_install:
   - eval $(opam env)
   - opam install coq.8.9.0 --yes
   - eval $(opam env)
-  - cd ~
-  - ls
-  - pwd
-  - cd sifive/RiscvSpecFormal
+  - cd /home/travis/build/sifive/RiscvSpecFormal
 install:
   - make 
 script:
