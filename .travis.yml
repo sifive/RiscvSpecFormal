@@ -1,7 +1,6 @@
 language: coq
 sudo: enabled
 before_install:
-  - sudo apt update -qq
   - sudo apt install opam
   - opam install opam-devel
   - opam --version
