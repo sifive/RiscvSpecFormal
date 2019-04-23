@@ -3,7 +3,7 @@ sudo: enabled
 before_install:
   - sudo apt update -qq
   - sudo apt install opam
-  - opam version
+  - opam --version
   - opam init -a
   - opam repo add coq-released http://coq.inria.fr/opam/released
   - opam init -a
