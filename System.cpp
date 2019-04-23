@@ -61,10 +61,10 @@ int main(int argc, char ** argv, char **env) {
 
     if(system->proc_core_pc__024_enable) {
       if(system->proc_core_pc__024_argument == pass_address) {
-	fprintf(stderr, "Passed at address: %x\n", pass_address);
+	fprintf(stderr, "Passed\n");
         finished = true;
       }	else if(hasfail && system->proc_core_pc__024_argument == fail_address) {
-	fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED!\n");
+	fprintf(stderr, "FAILED\n");
         finished = true;
         result=1;
       }

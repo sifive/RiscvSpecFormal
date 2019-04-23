@@ -81,6 +81,6 @@ then
 fi
 cmd="$cmd > system.out"
 execute "$cmd"
-result=1
+result=$?
 notice "Done."
 exit $result
