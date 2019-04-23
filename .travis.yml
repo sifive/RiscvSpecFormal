@@ -5,9 +5,9 @@ before_install:
   - sudo apt install opam
   - opam init
   - opam --version
-  - yes | opam install opam-devel
-  - opam init
-  - opam repo add coq-released http://coq.inria.fr/opam/released
+  - opam install --yes opam-devel
+  - opam init --yes 
+  - yes | opam repo add coq-released http://coq.inria.fr/opam/released
   - opam install --yes coq.8.9.0
   - export OPAMROOT=~/opam-coq.8.9.0
   - eval `opam config env`
