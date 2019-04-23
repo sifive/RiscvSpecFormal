@@ -20,6 +20,7 @@ int main(int argc, char ** argv, char **env) {
 
   vluint64_t main_time = 0;
 
+  int result = 0;
   uint32_t timeout = 50000;
 
   uint32_t pass_address, fail_address = 0, sign_size;
@@ -65,6 +66,7 @@ int main(int argc, char ** argv, char **env) {
       }	else if(hasfail && system->proc_core_pc__024_argument == fail_address) {
 	fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED!\n");
         finished = true;
+        result=1;
       }
       fflush(stdout);
     }
@@ -73,6 +75,7 @@ int main(int argc, char ** argv, char **env) {
 
   if (main_time >= timeout) {
     fprintf(stderr, "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT\n");
+    result=1;
   }
 
   
@@ -87,5 +90,5 @@ int main(int argc, char ** argv, char **env) {
   tfp->close();
   delete system;
   delete tfp;
-  return 0;
+  return result;
 }
