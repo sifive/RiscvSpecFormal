@@ -3,10 +3,10 @@ sudo: enabled
 before_install:
   - sudo apt update -qq
   - sudo apt install opam
-  - opam init -n --comp=4.02.3 
+  - opam init
   - opam repo add coq-released http://coq.inria.fr/opam/released
-  - opam install coq.8.8.1 && opam pin add coq 8.8.1
-  - export OPAMROOT=~/opam-coq.8.8.1
+  - opam install coq.8.9.0 && opam pin add coq 8.9.0
+  - export OPAMROOT=~/opam-coq.8.9.0
   - eval `opam config env`
 install:
   - make 
