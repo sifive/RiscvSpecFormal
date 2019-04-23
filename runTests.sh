@@ -82,11 +82,10 @@ shift $((OPTIND - 1))
 [[ -z "$path" ]] && error "Invalid command line. The PATH argument is missing."
 
 notice "Generating model".
-# ./doGenerate.sh -v --xlen $xlen
+./doGenerate.sh -v --xlen $xlen
 
 notice "Running tests in $path."
-#for file in $(ls $path/rv${xlen}u?-p-*)
-for file in riscv-tests/rv32ui-p-add
+for file in $(ls $path/rv${xlen}u?-p-*)
 do
   file $file | grep -iq elf
   if [[ $? == 0 ]]
