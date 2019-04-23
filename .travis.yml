@@ -3,14 +3,16 @@ sudo: enabled
 before_install:
   - sudo apt update -qq
   - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+  - yes | opam init --disable-sandboxing --reinit
   - opam --version
   - opam init -a
   - opam repo add coq-released http://coq.inria.fr/opam/released
   - opam install --yes coq.8.9.0
   - echo $PATH 
+  - # export OPAMROOT=~/opam-coq.8.9.0
+  - # eval `opam config env`
 install:
   - make 
 script:
-  - coqchk -norec pigeonhole_principle.v
   - ./runTests.sh -v -x 32 -p riscv-tests
   - ./runTests.sh -v -x 64 -p riscv-tests

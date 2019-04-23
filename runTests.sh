@@ -5,6 +5,7 @@
 
 source common.sh
 
+result=0
 verbose=0
 
 xlen=32
@@ -94,8 +95,9 @@ do
     if [[ $? != 0 ]]
     then
       echo "The test suite failed."
+      result=1
     fi
   fi
 done
 notice "All tests passed."
-
+exit $result
