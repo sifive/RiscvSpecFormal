@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/sifive/RiscvSpecFormal.svg?branch=master)](https://travis-ci.org/sifive/RiscvSpecFormal)
+
 # RISC-V ISA Formal Specification
 
 ## Name
