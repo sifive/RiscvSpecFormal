@@ -1,6 +1,8 @@
 language: coq
 sudo: enabled
 before_install:
+  - ls
+  - pwd
   - sudo apt update -qq
   - sudo apt install clang
   - wget https://downloads.haskell.org/~ghc/8.6.4/ghc-8.6.4-x86_64-deb9-linux.tar.xz && tar -xvf ghc-8.6.4-x86_64-deb9-linux.tar.xz && cd ghc-8.6.4 && ./configure && sudo make install
