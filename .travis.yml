@@ -1,5 +1,6 @@
 language: generic
 sudo: enabled
+dist: xenial
 cache:
   directories:
     - $TRAVIS_BUILD_DIR/verilator-compiled
@@ -19,15 +20,14 @@ jobs:
         - sudo apt update
         - sudo apt install opam
         - sudo apt install ocaml
-        - cd $TRAVIS_BUILD_DIR
-        - echo $TRAVIS_BUILD_DIR
-        - chmod a+x /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh
-        - /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh
-        - (yes | opam init --disable-sandboxing --reinit)
-        - opam --version
-        - (yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default)
-        - opam repo add --set-default default
-        - eval $(opam env)
+        #- cd $TRAVIS_BUILD_DIR
+        #- echo $TRAVIS_BUILD_DIR
+        #- chmod a+x /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh
+        #- /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh
+        #- (yes | opam init --disable-sandboxing --reinit)
+        #- opam --version
+        #- (yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default)
+        #- eval $(opam env)
         - opam switch list-available
         - opam switch create ocaml --yes
         - eval $(opam env)
