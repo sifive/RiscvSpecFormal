@@ -26,6 +26,7 @@ jobs:
         - (yes | opam init --disable-sandboxing --reinit)
         - opam --version
         - (yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default)
+        - opam switch list-available
         - opam switch create ocaml --yes
         - eval $(opam env)
         - opam install coq.8.9.0 --yes
