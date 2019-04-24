@@ -24,7 +24,7 @@ jobs:
         yes | opam init --disable-sandboxing --reinit &&
         eval $(opam env)
       script:
-        sudo apt install clang
+        sudo apt install clang-3.5 &&
         sudo apt install ghc
 
     - stage: arbitrarynameb 
