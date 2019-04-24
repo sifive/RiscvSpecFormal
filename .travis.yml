@@ -21,7 +21,7 @@ before_install:
       export PATH=$PATH:$(pwd)/bin;
     else
       echo "Verilator installed. Skipping.";
-      ls $TRAVIS_BUILD_DIR/verilator-compiled;
+      ls $TRAVIS_BUILD_DIR;
     fi
 
   # Coq
@@ -48,7 +48,7 @@ before_install:
       eval $(opam env);
     else
       echo "Coq installed. Skipping.";
-      ls ~/.opam;
+      ls ~;
     fi
 
 install:
