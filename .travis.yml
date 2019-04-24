@@ -8,17 +8,9 @@ jobs:
   include:
   - stage: RiscvFormalDependencies
     script:
-    - #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/verilator ]]
-      #then
-        cd $TRAVIS_BUILD_DIR &&
-        git clone http://git.veripool.org/git/verilator &&
-        unset VERILATOR_ROOT &&
-        cd verilator &&
-        autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/verilator && make && make install
-      #fi
-  - script:
     - #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/haskell ]]
       #then
+        mkdir -p $TRAVIS_BUILD_DIR/binaries &&
         cd $TRAVIS_BUILD_DIR &&
         wget https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-deb9-linux.tar.xz &&
         tar xf ghc-8.6.5-x86_64-deb9-linux.tar.xz &&
@@ -28,14 +20,28 @@ jobs:
   - script:
     - #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-gcc ]]
       #then
+        mkdir -p $TRAVIS_BUILD_DIR/binaries &&
         cd $TRAVIS_BUILD_DIR &&
         wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz &&
         tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz &&
         mv riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14 $TRAVIS_BUILD_DIR/binaries/riscv-gcc
       #fi
   - script:
+    - #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/verilator ]]
+      #then
+        mkdir -p $TRAVIS_BUILD_DIR/binaries &&
+        cd $TRAVIS_BUILD_DIR &&
+        git clone http://git.veripool.org/git/verilator &&
+        unset VERILATOR_ROOT &&
+        cd verilator &&
+        autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/verilator && make && make install
+      #fi
+
+  - stage: RiscvFormalBuildTests
+    script:
     - #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-tests ]]
       #then
+        mkdir -p $TRAVIS_BUILD_DIR/binaries &&
         cd $TRAVIS_BUILD_DIR &&
         git clone https://github.com/riscv/riscv-tests.git &&
         cd riscv-tests &&
@@ -44,8 +50,6 @@ jobs:
         sed -i -e"s/0x80000000/0x00000000/g" link.ld &&
         autconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/target && make && make install
       #fi
-
-
 
   - stage: RiscvFormalRun
     script:
