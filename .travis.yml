@@ -19,6 +19,9 @@ before_install:
       tar --bzip2 -xvf bin-042419.tar.bz2 &&
       chmod a+x -R bin &&
       export PATH=$PATH:$(pwd)/bin;
+    else
+      echo "Verilator installed. Skipping.";
+      ls $TRAVIS_BUILD_DIR/verilator-compiled;
     fi
 
   # Coq
@@ -43,6 +46,9 @@ before_install:
       yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh) &&
       yes | opam init --disable-sandboxing --reinit &&
       eval $(opam env);
+    else
+      echo "Coq installed. Skipping.";
+      ls ~/.opam;
     fi
 
 install:
