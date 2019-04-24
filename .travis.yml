@@ -56,22 +56,33 @@ before_install:
   - ls
   - pwd
   # - sudo apt update -qq
-  ## - sudo apt install clang
+  - sudo apt install clang
   # - wget https://downloads.haskell.org/~ghc/8.6.4/ghc-8.6.4-x86_64-deb9-linux.tar.xz && tar -xf ghc-8.6.4-x86_64-deb9-linux.tar.xz && cd ghc-8.6.4 && ./configure && sudo make install
   - cabal update
   - cabal install mtl-2.2.2
-  - cd ~
+
+  # Get Verilator
   ##- git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure && sudo make install
-  ##- cd ~
-  # - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
-  # - yes | opam init --disable-sandboxing --reinit
-  # - opam --version
-  # - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
-  # - opam switch create ocaml --yes
-  # - eval $(opam env)
-  # - opam install coq.8.9.0 --yes
-  # - eval $(opam env)
-  - sudo apt install coq
+  - cd ~
+  - wget https://github.com/llee454/verilator/archive/compiled.zip
+  - unzip verilator-compiled.zip
+  - cd verilator-compiled
+  - tar --bzip2 -xvf bin-042419.tar.bz2
+  - chmod a+x -R bin
+  - export PATH=$PATH:$(pwd)/bin
+
+  # Update Opam
+  - cd ~
+  - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+  - yes | opam init --disable-sandboxing --reinit
+  - opam --version
+  - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
+  - opam switch create ocaml --yes
+  - eval $(opam env)
+  - opam install coq.8.9.0 --yes
+  - eval $(opam env)
+
+  # Prepare RiscvSpecFormal
   - cd /home/travis/build/sifive/RiscvSpecFormal
   - rm -v coq-record-update/src/{RegressionTests.v,RecordSetTests.v,ReadmeExampleTests.v,ListNotationTests.v}
 install:
