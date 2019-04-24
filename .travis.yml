@@ -8,7 +8,7 @@ jobs:
   include:
     - stage: dependencies
       script:
-        cabal update &&
+        # cabal update &&
         cabal install mtl-2.2.2 &&
         sudo apt install clang
       script:
