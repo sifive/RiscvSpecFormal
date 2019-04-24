@@ -1,0 +1,190 @@
+
+rv32uf-p-fclass:     file format elf32-littleriscv
+
+
+Disassembly of section .text.init:
+
+00000000 <_start>:
+   0:	04c0006f          	j	4c <reset_vector>
+
+00000004 <trap_vector>:
+   4:	34202f73          	csrr	t5,mcause
+   8:	00800f93          	li	t6,8
+   c:	03ff0a63          	beq	t5,t6,40 <write_tohost>
+  10:	00900f93          	li	t6,9
+  14:	03ff0663          	beq	t5,t6,40 <write_tohost>
+  18:	00b00f93          	li	t6,11
+  1c:	03ff0263          	beq	t5,t6,40 <write_tohost>
+  20:	00000f17          	auipc	t5,0x0
+  24:	fe0f0f13          	addi	t5,t5,-32 # 0 <_start>
+  28:	000f0463          	beqz	t5,30 <trap_vector+0x2c>
+  2c:	000f0067          	jr	t5
+  30:	34202f73          	csrr	t5,mcause
+  34:	000f5463          	bgez	t5,3c <handle_exception>
+  38:	0040006f          	j	3c <handle_exception>
+
+0000003c <handle_exception>:
+  3c:	5391e193          	ori	gp,gp,1337
+
+00000040 <write_tohost>:
+  40:	00001f17          	auipc	t5,0x1
+  44:	fc3f2023          	sw	gp,-64(t5) # 1000 <tohost>
+  48:	ff9ff06f          	j	40 <write_tohost>
+
+0000004c <reset_vector>:
+  4c:	f1402573          	csrr	a0,mhartid
+  50:	00051063          	bnez	a0,50 <reset_vector+0x4>
+  54:	00000297          	auipc	t0,0x0
+  58:	01028293          	addi	t0,t0,16 # 64 <reset_vector+0x18>
+  5c:	30529073          	csrw	mtvec,t0
+  60:	18005073          	csrwi	satp,0
+  64:	00000297          	auipc	t0,0x0
+  68:	01c28293          	addi	t0,t0,28 # 80 <reset_vector+0x34>
+  6c:	30529073          	csrw	mtvec,t0
+  70:	fff00293          	li	t0,-1
+  74:	3b029073          	csrw	pmpaddr0,t0
+  78:	01f00293          	li	t0,31
+  7c:	3a029073          	csrw	pmpcfg0,t0
+  80:	00000297          	auipc	t0,0x0
+  84:	01828293          	addi	t0,t0,24 # 98 <reset_vector+0x4c>
+  88:	30529073          	csrw	mtvec,t0
+  8c:	30205073          	csrwi	medeleg,0
+  90:	30305073          	csrwi	mideleg,0
+  94:	30405073          	csrwi	mie,0
+  98:	00000193          	li	gp,0
+  9c:	00000297          	auipc	t0,0x0
+  a0:	f6828293          	addi	t0,t0,-152 # 4 <trap_vector>
+  a4:	30529073          	csrw	mtvec,t0
+  a8:	00100513          	li	a0,1
+  ac:	01f51513          	slli	a0,a0,0x1f
+  b0:	00054863          	bltz	a0,c0 <reset_vector+0x74>
+  b4:	0ff0000f          	fence
+  b8:	00100193          	li	gp,1
+  bc:	00000073          	ecall
+  c0:	00000297          	auipc	t0,0x0
+  c4:	f4028293          	addi	t0,t0,-192 # 0 <_start>
+  c8:	00028e63          	beqz	t0,e4 <reset_vector+0x98>
+  cc:	10529073          	csrw	stvec,t0
+  d0:	0000b2b7          	lui	t0,0xb
+  d4:	10928293          	addi	t0,t0,265 # b109 <_end+0x9109>
+  d8:	30229073          	csrw	medeleg,t0
+  dc:	30202373          	csrr	t1,medeleg
+  e0:	f4629ee3          	bne	t0,t1,3c <handle_exception>
+  e4:	30005073          	csrwi	mstatus,0
+  e8:	00002537          	lui	a0,0x2
+  ec:	30052073          	csrs	mstatus,a0
+  f0:	00305073          	csrwi	fcsr,0
+  f4:	00000297          	auipc	t0,0x0
+  f8:	01428293          	addi	t0,t0,20 # 108 <test_2>
+  fc:	34129073          	csrw	mepc,t0
+ 100:	f1402573          	csrr	a0,mhartid
+ 104:	30200073          	mret
+
+00000108 <test_2>:
+ 108:	ff800537          	lui	a0,0xff800
+ 10c:	f0050553          	fmv.w.x	fa0,a0
+ 110:	e0051553          	fclass.s	a0,fa0
+ 114:	00100e93          	li	t4,1
+ 118:	00200193          	li	gp,2
+ 11c:	0fd51663          	bne	a0,t4,208 <fail>
+
+00000120 <test_3>:
+ 120:	bf800537          	lui	a0,0xbf800
+ 124:	f0050553          	fmv.w.x	fa0,a0
+ 128:	e0051553          	fclass.s	a0,fa0
+ 12c:	00200e93          	li	t4,2
+ 130:	00300193          	li	gp,3
+ 134:	0dd51a63          	bne	a0,t4,208 <fail>
+
+00000138 <test_4>:
+ 138:	80800537          	lui	a0,0x80800
+ 13c:	fff50513          	addi	a0,a0,-1 # 807fffff <_end+0x807fdfff>
+ 140:	f0050553          	fmv.w.x	fa0,a0
+ 144:	e0051553          	fclass.s	a0,fa0
+ 148:	00400e93          	li	t4,4
+ 14c:	00400193          	li	gp,4
+ 150:	0bd51c63          	bne	a0,t4,208 <fail>
+
+00000154 <test_5>:
+ 154:	80000537          	lui	a0,0x80000
+ 158:	f0050553          	fmv.w.x	fa0,a0
+ 15c:	e0051553          	fclass.s	a0,fa0
+ 160:	00800e93          	li	t4,8
+ 164:	00500193          	li	gp,5
+ 168:	0bd51063          	bne	a0,t4,208 <fail>
+
+0000016c <test_6>:
+ 16c:	00000513          	li	a0,0
+ 170:	f0050553          	fmv.w.x	fa0,a0
+ 174:	e0051553          	fclass.s	a0,fa0
+ 178:	01000e93          	li	t4,16
+ 17c:	00600193          	li	gp,6
+ 180:	09d51463          	bne	a0,t4,208 <fail>
+
+00000184 <test_7>:
+ 184:	00800537          	lui	a0,0x800
+ 188:	fff50513          	addi	a0,a0,-1 # 7fffff <_end+0x7fdfff>
+ 18c:	f0050553          	fmv.w.x	fa0,a0
+ 190:	e0051553          	fclass.s	a0,fa0
+ 194:	02000e93          	li	t4,32
+ 198:	00700193          	li	gp,7
+ 19c:	07d51663          	bne	a0,t4,208 <fail>
+
+000001a0 <test_8>:
+ 1a0:	3f800537          	lui	a0,0x3f800
+ 1a4:	f0050553          	fmv.w.x	fa0,a0
+ 1a8:	e0051553          	fclass.s	a0,fa0
+ 1ac:	04000e93          	li	t4,64
+ 1b0:	00800193          	li	gp,8
+ 1b4:	05d51a63          	bne	a0,t4,208 <fail>
+
+000001b8 <test_9>:
+ 1b8:	7f800537          	lui	a0,0x7f800
+ 1bc:	f0050553          	fmv.w.x	fa0,a0
+ 1c0:	e0051553          	fclass.s	a0,fa0
+ 1c4:	08000e93          	li	t4,128
+ 1c8:	00900193          	li	gp,9
+ 1cc:	03d51e63          	bne	a0,t4,208 <fail>
+
+000001d0 <test_10>:
+ 1d0:	7f800537          	lui	a0,0x7f800
+ 1d4:	00150513          	addi	a0,a0,1 # 7f800001 <_end+0x7f7fe001>
+ 1d8:	f0050553          	fmv.w.x	fa0,a0
+ 1dc:	e0051553          	fclass.s	a0,fa0
+ 1e0:	10000e93          	li	t4,256
+ 1e4:	00a00193          	li	gp,10
+ 1e8:	03d51063          	bne	a0,t4,208 <fail>
+
+000001ec <test_11>:
+ 1ec:	7fc00537          	lui	a0,0x7fc00
+ 1f0:	f0050553          	fmv.w.x	fa0,a0
+ 1f4:	e0051553          	fclass.s	a0,fa0
+ 1f8:	20000e93          	li	t4,512
+ 1fc:	00b00193          	li	gp,11
+ 200:	01d51463          	bne	a0,t4,208 <fail>
+ 204:	00301c63          	bne	zero,gp,21c <pass>
+
+00000208 <fail>:
+ 208:	0ff0000f          	fence
+ 20c:	00018063          	beqz	gp,20c <fail+0x4>
+ 210:	00119193          	slli	gp,gp,0x1
+ 214:	0011e193          	ori	gp,gp,1
+ 218:	00000073          	ecall
+
+0000021c <pass>:
+ 21c:	0ff0000f          	fence
+ 220:	00100193          	li	gp,1
+ 224:	00000073          	ecall
+ 228:	c0001073          	unimp
+ 22c:	0000                	unimp
+ 22e:	0000                	unimp
+ 230:	0000                	unimp
+ 232:	0000                	unimp
+ 234:	0000                	unimp
+ 236:	0000                	unimp
+ 238:	0000                	unimp
+ 23a:	0000                	unimp
+ 23c:	0000                	unimp
+ 23e:	0000                	unimp
+ 240:	0000                	unimp
+ 242:	0000                	unimp
