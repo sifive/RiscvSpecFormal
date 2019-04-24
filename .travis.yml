@@ -65,8 +65,8 @@ before_install:
   ##- git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure && sudo make install
   - cd ~
   - wget https://github.com/llee454/verilator/archive/compiled.zip
-  - unzip verilator-compiled.zip
-  - cd verilator-compiled
+  - unzip compiled.zip
+  - cd compiled
   - tar --bzip2 -xvf bin-042419.tar.bz2
   - chmod a+x -R bin
   - export PATH=$PATH:$(pwd)/bin
