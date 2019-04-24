@@ -19,5 +19,6 @@ clean:: Makefile.coq.all
 	find . -type f -name '*.hi' -exec rm {} \;
 	find . -type f -name '*.o' -exec rm {} \;
 	find . -type f -name '*.aux' -exec rm {} \;
+	find . -type f -name '*.hs' -exec rm {} \;
 	rm -f Makefile.coq.all Makefile.coq.all.conf
 	rm -rf obj_dir

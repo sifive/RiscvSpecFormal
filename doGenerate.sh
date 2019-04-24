@@ -121,7 +121,7 @@ rtlMod = model$xlen
 EOF
 
 notice "Compiling the Verilog generator."
-execute "time ghc -O0 --make Kami/PrettyPrintVerilog.hs"
+execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
 
 notice "Generating the Verilog model."
 execute "time Kami/PrettyPrintVerilog > System.sv"
