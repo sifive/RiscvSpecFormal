@@ -269,7 +269,7 @@ echo "## opam $VERSION installed to $BINDIR"
 
 if [ ! "$FRESH" = 1 ]; then
     echo "## Converting the opam root format & updating"
-    yes 'Y' | "$BINDIR/opam" init --reinit -ni --yes
+    yes 'Y' | "$BINDIR/opam" init --reinit -ni --yes --disable-sandboxing
 fi
 
 WHICH=$(command -v opam || echo notfound)
