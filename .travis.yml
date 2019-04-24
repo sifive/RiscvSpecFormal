@@ -26,13 +26,23 @@ jobs:
         cd ghc-8.6.5 &&
         ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/haskell && make install
       fi
+  - script:
+    - if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-gcc ]]
+      then
+        cd $TRAVIS_BUILD_DIR &&
+        wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz &&
+        tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz &&
+        mv riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14 $TRAVIS_BUILD_DIR/binaries/riscv-gcc
+      fi
 
-  - stage: RiscvFormalFinal
+
+  - stage: RiscvFormalRun
     script:
-    - export PATH=$TRAVIS_BUILD_DIR/binaries/haskell/bin:$TRAVIS_BUILD_DIR/binaries/verilator/bin:$PATH
+    - export PATH=$TRAVIS_BUILD_DIR/binaries/riscv-gcc/bin:$TRAVIS_BUILD_DIR/binaries/haskell/bin:$TRAVIS_BUILD_DIR/binaries/verilator/bin:$PATH
     - echo $PATH
     - ghc --version
     - verilator --version
+    - riscv64-unknown-elf-gcc --version
     
 
 #
