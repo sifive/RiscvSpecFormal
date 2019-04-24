@@ -17,7 +17,7 @@ jobs:
         export PATH=$PATH:$(pwd)/bin
     - script:
         sudo apt update &&
-        sudo apt install ocaml &&
+        sudo apt install opam &&
         cd $TRAVIS_BUILD_DIR &&
         echo $TRAVIS_BUILD_DIR &&
         chmod a+x /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh &&
@@ -35,7 +35,7 @@ jobs:
         - sudo apt update
         - sudo apt install clang-3.5
         - sudo apt install ghc
-        - sudo apt install ocaml
+        - sudo apt install opam
         - export PATH=$PATH:$TRAVIS_BUILD_DIR/verilator-compiled/bin
         - eval $(opam env)
         - echo $PATH
