@@ -123,8 +123,6 @@ EOF
 if [[ $verbose == 1 ]]
 then
   verboseflag="-v"
-else
-  verboseflag=""
 fi
 
 notice "Compiling the Verilog generator."

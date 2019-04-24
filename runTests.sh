@@ -83,8 +83,6 @@ shift $((OPTIND - 1))
 
 if [[ $verbose == 1 ]]
   verboseflag="-v"
-else
-  verboseflag=""
 fi
 
 notice "Generating model".
