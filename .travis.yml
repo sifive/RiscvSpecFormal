@@ -2,59 +2,92 @@ language: haskell
 sudo: enabled
 cache:
   directories:
-  - $TRAVIS_BUILD_DIR/verilator-compiled
-  - ~/.opam
-before_install:
-  - cabal update
-  - cabal install mtl-2.2.2
-  - sudo apt install clang
+    - $TRAVIS_BUILD_DIR/verilator-compiled
+    - ~/.opam
+jobs:
+  include:
+    - stage: dependencies
+        script:
+          cabal update &&
+          cabal install mtl-2.2.2 &&
+          sudo apt install clang
+        script:
+          cd $TRAVIS_BUILD_DIR &&
+          wget https://github.com/llee454/verilator/archive/compiled.zip &&
+          unzip compiled.zip &&
+          cd verilator-compiled &&
+          tar --bzip2 -xvf bin-042419.tar.bz2 &&
+          chmod a+x -R bin &&
+          export PATH=$PATH:$(pwd)/bin
+        script:
+          cd $TRAVIS_BUILD_DIR &&
+          wget https://github.com/llee454/opam-coq/archive/master.zip &&
+          unzip master.zip &&
+          cp -rf opam-coq-master/opam ~/.opam &&
+          yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh) &&
+          yes | opam init --disable-sandboxing --reinit &&
+          eval $(opam env)
 
-  # Verilator
-  - if [ ! -d $TRAVIS_BUILD_DIR/verilator-compiled ];
-    then
-      cd $TRAVIS_BUILD_DIR &&
-      wget https://github.com/llee454/verilator/archive/compiled.zip &&
-      unzip compiled.zip &&
-      cd verilator-compiled &&
-      tar --bzip2 -xvf bin-042419.tar.bz2 &&
-      chmod a+x -R bin &&
-      export PATH=$PATH:$(pwd)/bin;
-    else
-      echo "Verilator installed. Skipping.";
-      ls $TRAVIS_BUILD_DIR;
-    fi
-
-  # Coq
-# Coq (using source Coq)
-#  - cd $TRAVIS_BUILD_DIR
-#  - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
-#  - yes | opam init --disable-sandboxing --reinit
-#  - opam --version
-#  - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
-#  - opam switch create ocaml --yes
-#  - eval $(opam env)
-#  - opam install coq.8.9.0 --yes
-#  - eval $(opam env)
-
-# Coq (using precompiled source)
-  - if [ ! -d ~/.opam ];
-    then
-      cd $TRAVIS_BUILD_DIR &&
-      wget https://github.com/llee454/opam-coq/archive/master.zip &&
-      unzip master.zip &&
-      cp -rf opam-coq-master/opam ~/.opam &&
-      yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh) &&
-      yes | opam init --disable-sandboxing --reinit &&
-      eval $(opam env);
-    else
-      echo "Coq installed. Skipping.";
-      ls ~;
-    fi
-
-install:
-  - cd /home/travis/build/sifive/RiscvSpecFormal
-  - make 
-
-script:
-  - ./runTests.sh -v -x 32 -p riscv-tests
-  - ./runTests.sh -v -x 64 -p riscv-tests
+    - stage: test 
+        install:
+          - cd /home/travis/build/sifive/RiscvSpecFormal
+          - make 
+        script:
+          - ./runTests.sh -v -x 32 -p riscv-tests
+          - ./runTests.sh -v -x 64 -p riscv-tests
+#
+#
+#before_install:
+#  - cabal update
+#  - cabal install mtl-2.2.2
+#  - sudo apt install clang
+#
+#  # Verilator
+#  - if [ ! -d $TRAVIS_BUILD_DIR/verilator-compiled ];
+#    then
+#      cd $TRAVIS_BUILD_DIR &&
+#      wget https://github.com/llee454/verilator/archive/compiled.zip &&
+#      unzip compiled.zip &&
+#      cd verilator-compiled &&
+#      tar --bzip2 -xvf bin-042419.tar.bz2 &&
+#      chmod a+x -R bin &&
+#      export PATH=$PATH:$(pwd)/bin;
+#    else
+#      echo "Verilator installed. Skipping.";
+#      ls $TRAVIS_BUILD_DIR;
+#    fi
+#
+#  # Coq
+## Coq (using source Coq)
+##  - cd $TRAVIS_BUILD_DIR
+##  - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+##  - yes | opam init --disable-sandboxing --reinit
+##  - opam --version
+##  - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
+##  - opam switch create ocaml --yes
+##  - eval $(opam env)
+##  - opam install coq.8.9.0 --yes
+##  - eval $(opam env)
+#
+## Coq (using precompiled source)
+#  - if [ ! -d ~/.opam ];
+#    then
+#      cd $TRAVIS_BUILD_DIR &&
+#      wget https://github.com/llee454/opam-coq/archive/master.zip &&
+#      unzip master.zip &&
+#      cp -rf opam-coq-master/opam ~/.opam &&
+#      yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh) &&
+#      yes | opam init --disable-sandboxing --reinit &&
+#      eval $(opam env);
+#    else
+#      echo "Coq installed. Skipping.";
+#      ls ~;
+#    fi
+#
+#install:
+#  - cd /home/travis/build/sifive/RiscvSpecFormal
+#  - make 
+#
+#script:
+#  - ./runTests.sh -v -x 32 -p riscv-tests
+#  - ./runTests.sh -v -x 64 -p riscv-tests
