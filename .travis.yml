@@ -10,15 +10,15 @@ before_install:
   - sudo apt install clang
 
   # Verilator
-  - if [ ! -d $TRAVIS_BUILD_DIR/verilator-compiled ]
+  - if [ ! -d $TRAVIS_BUILD_DIR/verilator-compiled ];
     then
-      cd $TRAVIS_BUILD_DIR
-      wget https://github.com/llee454/verilator/archive/compiled.zip
-      unzip compiled.zip
-      cd verilator-compiled
-      tar --bzip2 -xvf bin-042419.tar.bz2
-      chmod a+x -R bin
-      export PATH=$PATH:$(pwd)/bin
+      cd $TRAVIS_BUILD_DIR &&
+      wget https://github.com/llee454/verilator/archive/compiled.zip &&
+      unzip compiled.zip &&
+      cd verilator-compiled &&
+      tar --bzip2 -xvf bin-042419.tar.bz2 &&
+      chmod a+x -R bin &&
+      export PATH=$PATH:$(pwd)/bin;
     fi
 
   # Coq
@@ -34,15 +34,15 @@ before_install:
 #  - eval $(opam env)
 
 # Coq (using precompiled source)
-  - if [ ! -d ~/.opam ]
+  - if [ ! -d ~/.opam ];
     then
-      cd $TRAVIS_BUILD_DIR
-      wget https://github.com/llee454/opam-coq/archive/master.zip
-      unzip master.zip
-      cp -rf opam-coq-master/opam ~/.opam
-      yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
-      yes | opam init --disable-sandboxing --reinit
-      eval $(opam env) 
+      cd $TRAVIS_BUILD_DIR &&
+      wget https://github.com/llee454/opam-coq/archive/master.zip &&
+      unzip master.zip &&
+      cp -rf opam-coq-master/opam ~/.opam &&
+      yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh) &&
+      yes | opam init --disable-sandboxing --reinit &&
+      eval $(opam env);
     fi
 
 install:
