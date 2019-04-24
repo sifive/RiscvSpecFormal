@@ -20,12 +20,12 @@ jobs:
         echo $TRAVIS_BUILD_DIR &&
         chmod a+x /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh &&
         /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh &&
-        (yes | opam init --disable-sandboxing --reinit) &&
-        opam --version &&
-        (yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default) &&
-        opam switch create ocaml --yes &&
-        eval $(opam env) &&
-        opam install coq.8.9.0 --yes
+        #(yes | opam init --disable-sandboxing --reinit) &&
+        #opam --version &&
+        #(yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default) &&
+        #opam switch create ocaml --yes &&
+        #eval $(opam env) &&
+        #opam install coq.8.9.0 --yes
     - script:
         sudo apt update &&
         sudo apt install clang-3.5 &&
