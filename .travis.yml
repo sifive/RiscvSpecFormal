@@ -8,27 +8,27 @@ jobs:
   include:
     - stage: arbitrarynamea
       script:
-        cd $TRAVIS_BUILD_DIR &&
-        wget https://github.com/llee454/verilator/archive/compiled.zip &&
-        unzip compiled.zip &&
-        cd verilator-compiled &&
-        tar --bzip2 -xvf bin-042419.tar.bz2 &&
-        chmod a+x -R bin &&
-        export PATH=$PATH:$(pwd)/bin
+        - cd $TRAVIS_BUILD_DIR
+        - wget https://github.com/llee454/verilator/archive/compiled.zip
+        - unzip compiled.zip
+        - cd verilator-compiled
+        - tar --bzip2 -xvf bin-042419.tar.bz2
+        - chmod a+x -R bin
+        - export PATH=$PATH:$(pwd)/bin
     - script:
-        sudo apt update &&
-        sudo apt install opam &&
-        sudo apt install ocaml &&
-        cd $TRAVIS_BUILD_DIR &&
-        echo $TRAVIS_BUILD_DIR &&
-        chmod a+x /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh &&
-        /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh &&
-        (yes | opam init --disable-sandboxing --reinit) &&
-        opam --version &&
-        (yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default) &&
-        opam switch create ocaml --yes &&
-        eval $(opam env) &&
-        opam install coq.8.9.0 --yes
+        - sudo apt update
+        - sudo apt install opam
+        - sudo apt install ocaml
+        - cd $TRAVIS_BUILD_DIR
+        - echo $TRAVIS_BUILD_DIR
+        - chmod a+x /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh
+        - /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh
+        - (yes | opam init --disable-sandboxing --reinit)
+        - opam --version
+        - (yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default)
+        - opam switch create ocaml --yes
+        - eval $(opam env)
+        - opam install coq.8.9.0 --yes
     - script:
 
     - stage: arbitrarynameb 
