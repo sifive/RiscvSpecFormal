@@ -16,6 +16,8 @@ jobs:
         chmod a+x -R bin &&
         export PATH=$PATH:$(pwd)/bin
     - script:
+        sudo apt update &&
+        sudo apt install ocaml &&
         cd $TRAVIS_BUILD_DIR &&
         echo $TRAVIS_BUILD_DIR &&
         chmod a+x /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh &&
@@ -27,12 +29,13 @@ jobs:
         eval $(opam env) &&
         opam install coq.8.9.0 --yes
     - script:
-        sudo apt update &&
-        sudo apt install clang-3.5 &&
-        sudo apt install ghc
 
     - stage: arbitrarynameb 
       install:
+        - sudo apt update
+        - sudo apt install clang-3.5
+        - sudo apt install ghc
+        - sudo apt install ocaml
         - export PATH=$PATH:$TRAVIS_BUILD_DIR/verilator-compiled/bin
         - eval $(opam env)
         - echo $PATH
