@@ -82,6 +82,7 @@ shift $((OPTIND - 1))
 [[ -z "$path" ]] && error "Invalid command line. The PATH argument is missing."
 
 if [[ $verbose == 1 ]]
+then
   verboseflag="-v"
 fi
 
