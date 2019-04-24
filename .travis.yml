@@ -9,7 +9,7 @@ jobs:
     - stage: dependencies
       script:
         # cabal update &&
-        cabal install mtl-2.2.2 &&
+        # cabal install mtl-2.2.2 &&
         sudo apt install clang
       script:
         cd $TRAVIS_BUILD_DIR &&
