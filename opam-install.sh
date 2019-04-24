@@ -204,6 +204,7 @@ fi
 while true; do
     printf "## Where should it be installed ? [$DEFAULT_BINDIR] "
     # read BINDIR
+    BINDIR=
     if [ -z "$BINDIR" ]; then BINDIR="$DEFAULT_BINDIR"; fi
 
     #if [ -d "$BINDIR" ]; then break
