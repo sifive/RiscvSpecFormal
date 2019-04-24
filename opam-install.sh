@@ -204,19 +204,20 @@ fi
 while true; do
     printf "## Where should it be installed ? [$DEFAULT_BINDIR] "
     # read BINDIR
-    BINDIR=
+    BINDIR="$DEFAULT_BINDIR"
     if [ -z "$BINDIR" ]; then BINDIR="$DEFAULT_BINDIR"; fi
 
-    #if [ -d "$BINDIR" ]; then break
-    #else
-    #    printf "## $BINDIR does not exist. Create ? [Y/n] "
-    #    read R
-    #    case "$R" in
-    #        ""|"y"|"Y"|"yes")
-    #        xsudo mkdir -p $BINDIR
-    #        break;;
-    #    esac
-    #fi
+    if [ -d "$BINDIR" ]; then break
+    else
+        printf "## $BINDIR does not exist. Create ? [Y/n] "
+        # read R
+        R="Y"
+        case "$R" in
+            ""|"y"|"Y"|"yes")
+            xsudo mkdir -p $BINDIR
+            break;;
+        esac
+    fi
 done
 
 if [ -e "$EXISTING_OPAM" ]; then
