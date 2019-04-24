@@ -120,8 +120,15 @@ rtlMod :: RtlModule
 rtlMod = model$xlen
 EOF
 
+if [[ $verbose == 1 ]]
+then
+  verboseflag="-v"
+else
+  verboseflag=""
+fi
+
 notice "Compiling the Verilog generator."
-execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
+execute "time ghc $verboseflag -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
 
 notice "Generating the Verilog model."
 execute "time Kami/PrettyPrintVerilog > System.sv"

@@ -81,8 +81,14 @@ shift $((OPTIND - 1))
 
 [[ -z "$path" ]] && error "Invalid command line. The PATH argument is missing."
 
+if [[ $verbose == 1 ]]
+  verboseflag="-v"
+else
+  verboseflag=""
+fi
+
 notice "Generating model".
-./doGenerate.sh --xlen $xlen
+./doGenerate.sh $verboseflag --xlen $xlen
 
 notice "Running tests in $path."
 for file in $(ls $path/rv${xlen}u?-p-*)
