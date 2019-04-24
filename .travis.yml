@@ -19,7 +19,7 @@ jobs:
         cd $TRAVIS_BUILD_DIR &&
         echo $TRAVIS_BUILD_DIR &&
         chmod a+x /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh &&
-        /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh # &&
+        (yes 'Y' | /home/travis/build/sifive/RiscvSpecFormal/opam-install.sh) # &&
         #(yes | opam init --disable-sandboxing --reinit) &&
         #opam --version &&
         #(yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default) &&
