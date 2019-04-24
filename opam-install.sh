@@ -272,21 +272,23 @@ if [ ! "$FRESH" = 1 ]; then
     "$BINDIR/opam" init --reinit -ni
 fi
 
-WHICH=$(command -v opam || echo notfound)
+echo "DONE DONE DONE"
 
-case "$WHICH" in
-    "$BINDIR/opam") ;;
-    notfound) echo "## Remember to add $BINDIR to your PATH";;
-    *)
-        echo "## WARNING: 'opam' command found in PATH does not match the installed one:"
-        echo "   - Installed: '$BINDIR/opam'"
-        echo "   - Found:     '$WHICH'"
-        echo "Make sure to remove the second or fix your PATH to use the new opam"
-        echo
-esac
-
-if [ ! "$NOBACKUP" = 1 ]; then
-    echo "## Run this script again with '--restore $EXISTING_OPAMV' to revert."
-fi
-
-rm -f $TMP/$OPAM_BIN
+#WHICH=$(command -v opam || echo notfound)
+#
+#case "$WHICH" in
+#    "$BINDIR/opam") ;;
+#    notfound) echo "## Remember to add $BINDIR to your PATH";;
+#    *)
+#        echo "## WARNING: 'opam' command found in PATH does not match the installed one:"
+#        echo "   - Installed: '$BINDIR/opam'"
+#        echo "   - Found:     '$WHICH'"
+#        echo "Make sure to remove the second or fix your PATH to use the new opam"
+#        echo
+#esac
+#
+#if [ ! "$NOBACKUP" = 1 ]; then
+#    echo "## Run this script again with '--restore $EXISTING_OPAMV' to revert."
+#fi
+#
+#rm -f $TMP/$OPAM_BIN
