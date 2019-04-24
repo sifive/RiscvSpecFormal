@@ -1,79 +1,80 @@
-matrix:
-  include:
-  - language: haskell
-    ghc: "8.4.1"
+#matrix:
+#  include:
+#  - language: haskell
+#    ghc: "8.4.1"
+#
+#  - language: c++
+#    compiler: clang
+#
+#  - language: generic
+#    before_install:
+#    - git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure --prefix $HOME/binaries/verilator && make && make install
+#    - export PATH=$HOME/binaries/verilator/bin:$PATH
+#    cache:
+#    - $HOME/binaries/verilator
+#
+#  - language: generic
+#    before_install:
+#    - cd $HOME/binaries
+#    - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+#    - tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+#    - cd riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14
+#    - ./configure --prefix $HOME/binaries/riscv && make && make install
+#    cache:
+#    - $HOME/binaries/riscv
+#
+#  - language: generic
+#    before_install:
+#    - cd $HOME/binaries
+#    - git clone https://github.com/riscv/riscv-tests.git
+#    - cd riscv-tests
+#    - git submodule update --init --recursive
+#    - autoconf
+#    - ./configure --prefix=$HOME/binaries/target
+#    - make && make install
+#    cache:
+#    - $HOME/binaries/target
+#
+#  - language: generic
+#    before_install:
+#    - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+#    - yes | opam init --disable-sandboxing --reinit
+#    - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
+#    - opam switch create ocaml --yes
+#    - opam install coq.8.9.0 --yes
+#    - eval $(opam env)
+#    cache:
+#    - $HOME/.opam
+#    script:
+#    - cd $HOME/build/sifive/RiscvSpecFormal
+#    - ./runTests.sh -v -x 32 -p $HOME/riscv-tests/isa
+#    - ./runTests.sh -v -x 64 -p $HOME/riscv-tests/isa
 
-  - language: c++
-    compiler: clang
-
-  - language: generic
-    before_install:
-    - git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure --prefix $HOME/binaries/verilator && make && make install
-    - export PATH=$HOME/binaries/verilator/bin:$PATH
-    cache:
-    - $HOME/binaries/verilator
-
-  - language: generic
-    before_install:
-    - cd $HOME/binaries
-    - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-    - tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-    - cd riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14
-    - ./configure --prefix $HOME/binaries/riscv && make && make install
-    cache:
-    - $HOME/binaries/riscv
-
-  - language: generic
-    before_install:
-    - cd $HOME/binaries
-    - git clone https://github.com/riscv/riscv-tests.git
-    - cd riscv-tests
-    - git submodule update --init --recursive
-    - autoconf
-    - ./configure --prefix=$HOME/binaries/target
-    - make && make install
-    cache:
-    - $HOME/binaries/target
-
-  - language: generic
-    before_install:
-    - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
-    - yes | opam init --disable-sandboxing --reinit
-    - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
-    - opam switch create ocaml --yes
-    - opam install coq.8.9.0 --yes
-    - eval $(opam env)
-    cache:
-    - $HOME/.opam
-    script:
-    - cd $HOME/build/sifive/RiscvSpecFormal
-    - ./runTests.sh -v -x 32 -p $HOME/riscv-tests/isa
-    - ./runTests.sh -v -x 64 -p $HOME/riscv-tests/isa
-
-#language: haskell
-#sudo: enabled
-#before_install:
-#  - ls
-#  - pwd
-#  # - sudo apt update -qq
-#  - sudo apt install clang
-#  # - wget https://downloads.haskell.org/~ghc/8.6.4/ghc-8.6.4-x86_64-deb9-linux.tar.xz && tar -xf ghc-8.6.4-x86_64-deb9-linux.tar.xz && cd ghc-8.6.4 && ./configure && sudo make install
-#  - cabal update
-#  - cabal install mtl-2.2.2
-#  - cd ~
-#  - git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure && sudo make install
-#  - cd ~
-#  - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
-#  - yes | opam init --disable-sandboxing --reinit
-#  - opam --version
-#  - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
-#  - opam switch create ocaml --yes
-#  - eval $(opam env)
-#  - opam install coq.8.9.0 --yes
-#  - eval $(opam env)
-#  - cd /home/travis/build/sifive/RiscvSpecFormal
-#install:
-#  - make 
-#script:
-#  - ./runTests.sh -v -x 32 -p riscv-tests
-#  - ./runTests.sh -v -x 64 -p riscv-tests
+language: haskell
+sudo: enabled
+before_install:
+  - ls
+  - pwd
+  # - sudo apt update -qq
+  - sudo apt install clang
+  # - wget https://downloads.haskell.org/~ghc/8.6.4/ghc-8.6.4-x86_64-deb9-linux.tar.xz && tar -xf ghc-8.6.4-x86_64-deb9-linux.tar.xz && cd ghc-8.6.4 && ./configure && sudo make install
+  - cabal update
+  - cabal install mtl-2.2.2
+  - cd ~
+  - git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure && sudo make install
+  - cd ~
+  # - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+  # - yes | opam init --disable-sandboxing --reinit
+  # - opam --version
+  # - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
+  # - opam switch create ocaml --yes
+  # - eval $(opam env)
+  # - opam install coq.8.9.0 --yes
+  # - eval $(opam env)
+  - sudo apt install coq
+  - cd /home/travis/build/sifive/RiscvSpecFormal
+install:
+  - make 
+script:
+  - ./runTests.sh -v -x 32 -p riscv-tests
+  - ./runTests.sh -v -x 64 -p riscv-tests
