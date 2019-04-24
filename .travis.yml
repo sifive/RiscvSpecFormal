@@ -1,27 +1,38 @@
 language: c++
 compiler: clang
 dist: xenial
+cache:
+  directories:
+  - $TRAVIS_BUILD_DIR/binaries
 jobs:
   include:
   - stage: RiscvFormalDependencies
     script:
-    - cd $TRAVIS_BUILD_DIR
-    - git clone http://git.veripool.org/git/verilator
-    - unset VERILATOR_ROOT
-    - cd verilator
-    - autoconf
-    - ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/verilator && make && make install
+    - if [[ ! -d $TRAVIS_BUILD_DIR/binaries/verilator ]]
+      then
+        cd $TRAVIS_BUILD_DIR &&
+        git clone http://git.veripool.org/git/verilator &&
+        unset VERILATOR_ROOT &&
+        cd verilator &&
+        autoconf &&
+        ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/verilator && make && make install
+      fi
   - script:
-    - cd $TRAVIS_BUILD_DIR
-    - wget https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-deb9-linux.tar.xz
-    - tar xf ghc-8.6.5-x86_64-deb9-linux.tar.xz
-    - cd ghc-8.6.5
-    - ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/haskell
+    - if [[ ! -d $TRAVIS_BUILD_DIR/binaries/haskell ]]
+      then
+        cd $TRAVIS_BUILD_DIR &&
+        wget https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-deb9-linux.tar.xz &&
+        tar xf ghc-8.6.5-x86_64-deb9-linux.tar.xz &&
+        cd ghc-8.6.5 &&
+        ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/haskell && make install
+      fi
 
-  - stage: arbitrarynameb 
-    install:
+  - stage: RiscvFormalFinal
+    script:
     - export PATH=$TRAVIS_BUILD_DIR/binaries/haskell/bin:$TRAVIS_BUILD_DIR/binaries/verilator/bin:$PATH
     - echo $PATH
+    - ghc --version
+    - verilator --version
     
 
 #
