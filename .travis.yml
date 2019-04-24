@@ -17,7 +17,7 @@ jobs:
         export PATH=$PATH:$(pwd)/bin
     - script:
         cd $TRAVIS_BUILD_DIR &&
-        (echo -e '\nY' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)) &&
+        (echo -e "\nY" | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)) &&
         (yes | opam init --disable-sandboxing --reinit) &&
         opam --version &&
         (yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default) &&
