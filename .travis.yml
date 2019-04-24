@@ -17,13 +17,13 @@ jobs:
         export PATH=$PATH:$(pwd)/bin
     - script:
         cd $TRAVIS_BUILD_DIR &&
-        wget https://github.com/llee454/opam-coq/archive/master.zip &&
-        unzip -qq master.zip &&
-        cp -rf opam-coq-master/opam ~/.opam &&
         (yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)) &&
-        echo "INSTALLED OPAM" &&
-        (yes | opam init --disable-sandboxing --reinit) &&
-        eval $(opam env)
+        yes | opam init --disable-sandboxing --reinit &&
+        opam --version &&
+        (yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default) &&
+        opam switch create ocaml --yes &&
+        eval $(opam env) &&
+        opam install coq.8.9.0 --yes
     - script:
         sudo apt update &&
         sudo apt install clang-3.5 &&
