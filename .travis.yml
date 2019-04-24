@@ -1,4 +1,4 @@
-language: haskell
+language: generic
 sudo: enabled
 cache:
   directories:
@@ -25,6 +25,7 @@ jobs:
         eval $(opam env)
       script:
         sudo apt install clang
+        sudo apt install ghc
 
     - stage: arbitrarynameb 
       install:
