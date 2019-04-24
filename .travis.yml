@@ -1,9 +1,9 @@
 language: c++
 compiler: clang
 dist: xenial
-#cache:
-#  directories:
-#  - $TRAVIS_BUILD_DIR/binaries
+cache:
+  directories:
+  - $TRAVIS_BUILD_DIR/binaries
 jobs:
   include:
   - stage: RiscvFormalDependencies
