@@ -66,7 +66,7 @@ before_install:
   - cd ~
   - wget https://github.com/llee454/verilator/archive/compiled.zip
   - unzip compiled.zip
-  - cd compiled
+  - cd verilator-compiled
   - tar --bzip2 -xvf bin-042419.tar.bz2
   - chmod a+x -R bin
   - export PATH=$PATH:$(pwd)/bin
