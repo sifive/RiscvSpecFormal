@@ -30,6 +30,9 @@ jobs:
 
     - stage: arbitrarynameb 
       install:
+        - export PATH=$PATH:$TRAVIS_BUILD_DIR/verilator-compiled/bin
+        - eval $(opam env)
+        - echo $PATH
         - cd /home/travis/build/sifive/RiscvSpecFormal
         - make 
       script:
