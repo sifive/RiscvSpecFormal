@@ -6,11 +6,7 @@ cache:
     - ~/.opam
 jobs:
   include:
-    - stage: dependencies
-      script:
-        # cabal update &&
-        # cabal install mtl-2.2.2 &&
-        sudo apt install clang
+    - stage: arbitrarynamea
       script:
         cd $TRAVIS_BUILD_DIR &&
         wget https://github.com/llee454/verilator/archive/compiled.zip &&
@@ -27,8 +23,10 @@ jobs:
         yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh) &&
         yes | opam init --disable-sandboxing --reinit &&
         eval $(opam env)
+      script:
+        sudo apt install clang
 
-    - stage: test 
+    - stage: arbitrarynameb 
       install:
         - cd /home/travis/build/sifive/RiscvSpecFormal
         - make 
