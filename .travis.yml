@@ -56,13 +56,13 @@ before_install:
   - ls
   - pwd
   # - sudo apt update -qq
-  - sudo apt install clang
+  ## - sudo apt install clang
   # - wget https://downloads.haskell.org/~ghc/8.6.4/ghc-8.6.4-x86_64-deb9-linux.tar.xz && tar -xf ghc-8.6.4-x86_64-deb9-linux.tar.xz && cd ghc-8.6.4 && ./configure && sudo make install
   - cabal update
   - cabal install mtl-2.2.2
   - cd ~
-  - git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure && sudo make install
-  - cd ~
+  ##- git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure && sudo make install
+  ##- cd ~
   # - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
   # - yes | opam init --disable-sandboxing --reinit
   # - opam --version
@@ -73,6 +73,7 @@ before_install:
   # - eval $(opam env)
   - sudo apt install coq
   - cd /home/travis/build/sifive/RiscvSpecFormal
+  - rm -v coq-record-update/src/{RegressionTests.v,RecordSetTests.v,ReadmeExampleTests.v,ListNotationTests.v}
 install:
   - make 
 script:
