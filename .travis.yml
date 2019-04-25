@@ -1,7 +1,7 @@
 language: generic
 jobs:
   include:
-  - stage: rv32tests
+  - stage: rvtests
     before_install:
       - sudo apt update
 
@@ -27,6 +27,7 @@ jobs:
       - eval $(opam env)
 
       # Verilator
+      - cd ~
       - wget https://github.com/llee454/verilator/archive/compiled.zip
       - unzip compiled.zip
       - cd verilator-compiled
@@ -35,8 +36,44 @@ jobs:
       - export PATH=$PATH:$(pwd)/bin
       - cd $TRAVIS_BUILD_DIR
     install:
-      - echo $TRAVIS_BUILD_DIR
-      - ls
       - make
     script:
       - ./runTests.sh -v -x 32 -p riscv-tests
+  - stage: rvtests
+    before_install:
+      - sudo apt update
+
+      # Clang
+      - sudo apt install clang-3.5
+
+      # GHC
+      - sudo apt install ghc
+      - sudo apt install cabal-install
+      - cabal update
+      - cabal install mtl-2.2.2
+
+      # Opam
+      - sudo apt install opam
+      - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+      - yes | opam init --disable-sandboxing --reinit
+      - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
+      - opam switch create ocaml --yes
+      - eval $(opam env)
+
+      # Coq
+      - opam install coq.8.9.0 --yes
+      - eval $(opam env)
+
+      # Verilator
+      - cd ~
+      - wget https://github.com/llee454/verilator/archive/compiled.zip
+      - unzip compiled.zip
+      - cd verilator-compiled
+      - tar --bzip2 -xvf bin-042419.tar.bz2
+      - chmod a+x -R bin
+      - export PATH=$PATH:$(pwd)/bin
+      - cd $TRAVIS_BUILD_DIR
+    install:
+      - make
+    script:
+      - ./runTests.sh -v -x 64 -p riscv-tests
