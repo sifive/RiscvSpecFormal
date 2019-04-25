@@ -24,17 +24,17 @@ jobs:
         cd $TRAVIS_BUILD_DIR &&
         wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz &&
         tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz &&
-        mv riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14 $TRAVIS_BUILD_DIR/binaries/riscv-gcc
-        #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-tests ]];
-        #then
+        mv riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14 $TRAVIS_BUILD_DIR/binaries/riscv-gcc &&
+        if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-tests ]];
+        then
           mkdir -p $TRAVIS_BUILD_DIR/binaries &&
           cd $TRAVIS_BUILD_DIR &&
           git clone https://github.com/riscv/riscv-tests.git &&
           cd riscv-tests &&
           git submodule update --init --recursive &&
           sed -i -e"s/0x80000000/0x00000000/g" env/p/link.ld &&
-          autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/target && make -j && make -j install
-        #fi;
+          autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/target && make -j && make -j install;
+        fi;
     #fi
 #  - script:
 #    - if [[ ! -d $TRAVIS_BUILD_DIR/binaries/verilator ]];
