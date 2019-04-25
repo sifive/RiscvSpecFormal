@@ -142,7 +142,7 @@ fi
 
 if [[ $travis == 1 ]]
 then
-  travisflags="-v +RTS -K128m -RTS"
+  travisflags="-v +RTS -K128m -RTS -rtsopts"
 fi
 
 notice "Compiling the Verilog generator."
