@@ -57,7 +57,7 @@ jobs:
 
     script:
       - cd ~/coq-object-files
-      - ./runTests.sh -v -x 32 -p riscv-tests
+      - ./runTests.sh -v -k -x 32 -p riscv-tests
 
   - stage: rvtests
     before_install:
@@ -91,4 +91,4 @@ jobs:
 
     script:
       - cd ~/coq-object-files
-      - ./runTests.sh -v -x 64 -p riscv-tests
+      - ./runTests.sh -v -k -x 64 -p riscv-tests

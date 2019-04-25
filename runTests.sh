@@ -7,10 +7,11 @@ source common.sh
 
 result=0
 verbose=0
+skip_kami=0
 
 xlen=32
 
-options=$(getopt --options="hvx:p:" --longoptions="help,verbose,version,xlen:,path:" -- "$@")
+options=$(getopt --options="hkvx:p:" --longoptions="help,skip-kami,verbose,version,xlen:,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -29,12 +30,15 @@ If all of these selected tests complete successfully, this
 script returns 0.
 
 Arguments:
+  --path location
+  Path to the directory where all the tests are located.
+
+  -k|--skip-kami
+  Skip compiling the Coq/Kami source files.
+
   --xlen 32|64
   Specifies whether we are running 32-bit or 64-bit tests.
   Default 32.
-
-  --path location
-  Path to the directory where all the tests are located.
 
 Options:
 
@@ -62,6 +66,9 @@ EOF
     -v|--verbose)
       verbose=1
       shift;;
+    -k|--skip-kami)
+      skip_kami=1
+      shift;;
     --version)
       echo "version: 1.0.0"
       exit 0;;
@@ -86,8 +93,13 @@ then
   verboseflag="-v"
 fi
 
+if [[ $skip_kami == 1 ]]
+then
+  skipflag="-k"
+fi
+
 notice "Generating model".
-./doGenerate.sh $verboseflag --xlen $xlen
+./doGenerate.sh $verboseflag $skipflag --xlen $xlen
 
 notice "Running tests in $path."
 for file in $(ls $path/rv${xlen}u?-p-*)
