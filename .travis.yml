@@ -47,13 +47,11 @@ jobs:
 
       # Verilator
       - cd ~
-      - wget https://github.com/llee454/verilator/archive/compiled.zip
-      - unzip compiled.zip
-      - cd verilator-compiled
-      - tar --bzip2 -xvf bin-042419.tar.bz2
-      - chmod a+x -R bin
-      - export PATH=$PATH:$(pwd)/bin
-      - cd $TRAVIS_BUILD_DIR
+      - git clone http://git.veripool.org/git/verilator
+      - cd verilator
+      - autoconf
+      - ./configure
+      - make install
 
     script:
       - cd ~/coq-object-files
@@ -81,13 +79,11 @@ jobs:
 
       # Verilator
       - cd ~
-      - wget https://github.com/llee454/verilator/archive/compiled.zip
-      - unzip compiled.zip
-      - cd verilator-compiled
-      - tar --bzip2 -xvf bin-042419.tar.bz2
-      - chmod a+x -R bin
-      - export PATH=$PATH:$(pwd)/bin
-      - cd $TRAVIS_BUILD_DIR
+      - git clone http://git.veripool.org/git/verilator
+      - cd verilator
+      - autoconf
+      - ./configure
+      - make install
 
     script:
       - cd ~/coq-object-files
