@@ -5,6 +5,13 @@ jobs:
     before_install:
       - sudo apt update
 
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
+
       # Clang
       - sudo apt install clang-3.5
 
@@ -42,6 +49,13 @@ jobs:
   - stage: rvtests
     before_install:
       - sudo apt update
+
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
 
       # Clang
       - sudo apt install clang-3.5
