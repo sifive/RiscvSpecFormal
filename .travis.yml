@@ -1,6 +1,30 @@
 language: generic
+cache:
+  directories:
+    - ~/coq-object-files
 jobs:
   include:
+  - stage: coqcompile
+    before_install:
+      - sudo apt update
+
+      # Opam
+      - sudo apt install opam
+      - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+      - yes | opam init --disable-sandboxing --reinit
+      - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
+      - opam switch create ocaml --yes
+      - eval $(opam env)
+
+      # Coq
+      - opam install coq.8.9.0 --yes
+      - eval $(opam env)
+
+    script:
+      - make
+      - rm -rf ~/coq-object-files
+      - cp -rf TRAVIS_BUILD_DIR ~/coq-object-files
+
   - stage: rvtests
     before_install:
       - sudo apt update
@@ -21,18 +45,6 @@ jobs:
       - cabal update
       - cabal install mtl-2.2.2
 
-      # Opam
-      - sudo apt install opam
-      - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
-      - yes | opam init --disable-sandboxing --reinit
-      - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
-      - opam switch create ocaml --yes
-      - eval $(opam env)
-
-      # Coq
-      - opam install coq.8.9.0 --yes
-      - eval $(opam env)
-
       # Verilator
       - cd ~
       - wget https://github.com/llee454/verilator/archive/compiled.zip
@@ -42,10 +54,11 @@ jobs:
       - chmod a+x -R bin
       - export PATH=$PATH:$(pwd)/bin
       - cd $TRAVIS_BUILD_DIR
-    install:
-      - make
+
     script:
+      - cd ~/coq-object-files
       - ./runTests.sh -v -x 32 -p riscv-tests
+
   - stage: rvtests
     before_install:
       - sudo apt update
@@ -66,18 +79,6 @@ jobs:
       - cabal update
       - cabal install mtl-2.2.2
 
-      # Opam
-      - sudo apt install opam
-      - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
-      - yes | opam init --disable-sandboxing --reinit
-      - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
-      - opam switch create ocaml --yes
-      - eval $(opam env)
-
-      # Coq
-      - opam install coq.8.9.0 --yes
-      - eval $(opam env)
-
       # Verilator
       - cd ~
       - wget https://github.com/llee454/verilator/archive/compiled.zip
@@ -87,7 +88,7 @@ jobs:
       - chmod a+x -R bin
       - export PATH=$PATH:$(pwd)/bin
       - cd $TRAVIS_BUILD_DIR
-    install:
-      - make
+
     script:
+      - cd ~/coq-object-files
       - ./runTests.sh -v -x 64 -p riscv-tests
