@@ -10,6 +10,7 @@ jobs:
 
       # GHC
       - sudo apt install ghc
+      - sudo apt install cabal-install
       - cabal update
       - cabal install mtl-2.2.2
 
