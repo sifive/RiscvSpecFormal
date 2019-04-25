@@ -8,10 +8,11 @@ source common.sh
 result=0
 verbose=0
 skip_kami=0
+tune_ghc=1
 
 xlen=32
 
-options=$(getopt --options="hkvx:p:" --longoptions="help,skip-kami,verbose,version,xlen:,path:" -- "$@")
+options=$(getopt --options="hgkvx:p:" --longoptions="help,generic-ghc,skip-kami,verbose,version,xlen:,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -35,6 +36,9 @@ Arguments:
 
   -k|--skip-kami
   Skip compiling the Coq/Kami source files.
+
+  -g|--generic-ghc
+  Omit tuning GHC compiler flags.
 
   --xlen 32|64
   Specifies whether we are running 32-bit or 64-bit tests.
@@ -69,6 +73,9 @@ EOF
     -k|--skip-kami)
       skip_kami=1
       shift;;
+    -g|--generic-ghc)
+      tune_ghc=0
+      shift;;
     --version)
       echo "version: 1.0.0"
       exit 0;;
@@ -98,8 +105,13 @@ then
   skipflag="-k"
 fi
 
+if [[ $tune_ghc == 1 ]]
+then
+  ghcflag="-g"
+fi
+
 notice "Generating model".
-./doGenerate.sh $verboseflag $skipflag --xlen $xlen
+./doGenerate.sh $verboseflag $skipflag $ghcflag --xlen $xlen
 
 notice "Running tests in $path."
 for file in $(ls $path/rv${xlen}u?-p-*)

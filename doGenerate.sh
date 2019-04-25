@@ -8,10 +8,11 @@ source common.sh
 verbose=0
 rebuild=0 # indicates whether or not to recompile source files that Make thinks have not changed.
 skip_kami=0
+tune_ghc=1
 
 xlen=32
 
-options=$(getopt --options="hrkvx:" --longoptions="help,rebuild,skip-kami,verbose,version,xlen:" -- "$@")
+options=$(getopt --options="hgrkvx:" --longoptions="help,generic-ghc,rebuild,skip-kami,verbose,version,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -51,6 +52,9 @@ Options:
   -k|--skip-kami
   Skip compiling the Coq/Kami source files.
 
+  -g|--generic-ghc
+  Omit tuning GHC compiler flags.
+
   -v|--verbose
   Enables verbose output.
 
@@ -78,6 +82,9 @@ EOF
       shift;;
     -k|--skip-kami)
       skip_kami=1
+      shift;;
+    -g|--generic-ghc)
+      tune_ghc=0
       shift;;
     --version)
       echo "version: 1.0.0"
@@ -125,8 +132,13 @@ then
   verboseflag="-v"
 fi
 
+if [[ $tune_ghc == 1 ]]
+then
+  ghcflags="-j +RTS -A128m -n4m -s -RTS"
+fi
+
 notice "Compiling the Verilog generator."
-execute "time ghc $verboseflag -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
+execute "time ghc $verboseflag $tuneghc -O0 --make Kami/PrettyPrintVerilog.hs"
 
 notice "Generating the Verilog model."
 execute "time Kami/PrettyPrintVerilog > System.sv"
