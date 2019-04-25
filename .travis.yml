@@ -23,7 +23,7 @@ jobs:
     script:
       - make
       - rm -rf ~/coq-object-files
-      - cp -rf TRAVIS_BUILD_DIR ~/coq-object-files
+      - cp -rf $TRAVIS_BUILD_DIR ~/coq-object-files
 
   - stage: rvtests
     before_install:
