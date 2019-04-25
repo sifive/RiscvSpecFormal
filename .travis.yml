@@ -6,49 +6,48 @@ dist: xenial
 #  - $TRAVIS_BUILD_DIR/binaries
 jobs:
   include:
-  - stage: RiscvFormalDependencies
+  - stage: Riscv_Formal_Dependencies
     script:
-    - #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/haskell ]]
-      #then
+    - if [[ ! -d $TRAVIS_BUILD_DIR/binaries/haskell ]];
+      then
         mkdir -p $TRAVIS_BUILD_DIR/binaries &&
         cd $TRAVIS_BUILD_DIR &&
         wget https://downloads.haskell.org/~ghc/8.6.5/ghc-8.6.5-x86_64-deb9-linux.tar.xz &&
         tar xf ghc-8.6.5-x86_64-deb9-linux.tar.xz &&
         cd ghc-8.6.5 &&
-        ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/haskell && make -j install
-      #fi
+        ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/haskell && make -j install;
+      fi
   - script:
-    - #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-gcc ]]
-      #then
+    - if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-gcc ]];
+      then
         mkdir -p $TRAVIS_BUILD_DIR/binaries &&
         cd $TRAVIS_BUILD_DIR &&
         wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz &&
         tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz &&
         mv riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14 $TRAVIS_BUILD_DIR/binaries/riscv-gcc
-        #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-tests ]]
-        #then
-        #  echo HELLOWORLD
-        #  #mkdir -p $TRAVIS_BUILD_DIR/binaries &&
-        #  #cd $TRAVIS_BUILD_DIR &&
-        #  #git clone https://github.com/riscv/riscv-tests.git &&
-        #  #cd riscv-tests &&
-        #  #git submodule update --init --recursive &&
-        #  #sed -i -e"s/0x80000000/0x00000000/g" env/p/link.ld &&
-        #  #autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/target && make -j && make -j install
-        #fi
-    #fi
+        if [[ ! -d $TRAVIS_BUILD_DIR/binaries/riscv-tests ]];
+        then
+          mkdir -p $TRAVIS_BUILD_DIR/binaries &&
+          cd $TRAVIS_BUILD_DIR &&
+          git clone https://github.com/riscv/riscv-tests.git &&
+          cd riscv-tests &&
+          git submodule update --init --recursive &&
+          sed -i -e"s/0x80000000/0x00000000/g" env/p/link.ld &&
+          autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/target && make -j && make -j install;
+        fi;
+    fi
   - script:
-    - #if [[ ! -d $TRAVIS_BUILD_DIR/binaries/verilator ]]
-      #then
+    - if [[ ! -d $TRAVIS_BUILD_DIR/binaries/verilator ]];
+      then
         mkdir -p $TRAVIS_BUILD_DIR/binaries &&
         cd $TRAVIS_BUILD_DIR &&
         git clone http://git.veripool.org/git/verilator &&
         unset VERILATOR_ROOT &&
         cd verilator &&
-        autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/verilator && make -j && make -j install
-      #fi
+        autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/binaries/verilator && make -j && make -j install;
+      fi
 
-  - stage: RiscvFormalRun
+  - stage: Riscv_Formal_Run
     script:
     - export PATH=$TRAVIS_BUILD_DIR/binaries/riscv-gcc/bin:$TRAVIS_BUILD_DIR/binaries/haskell/bin:$TRAVIS_BUILD_DIR/binaries/verilator/bin:$PATH
     - echo $PATH
