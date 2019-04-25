@@ -9,10 +9,11 @@ verbose=0
 rebuild=0 # indicates whether or not to recompile source files that Make thinks have not changed.
 skip_kami=0
 tune_ghc=1
+travis=0
 
 xlen=32
 
-options=$(getopt --options="hgrkvx:" --longoptions="help,generic-ghc,rebuild,skip-kami,verbose,version,xlen:" -- "$@")
+options=$(getopt --options="hgrktvx:" --longoptions="help,generic-ghc,rebuild,skip-kami,travis,verbose,version,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -55,6 +56,9 @@ Options:
   -g|--generic-ghc
   Omit tuning GHC compiler flags.
 
+  -t|--travis
+  Tune GHC to run in a Travis environment.
+
   -v|--verbose
   Enables verbose output.
 
@@ -82,6 +86,10 @@ EOF
       shift;;
     -k|--skip-kami)
       skip_kami=1
+      shift;;
+    -t|--travis)
+      travis=1
+      tune_ghc=0
       shift;;
     -g|--generic-ghc)
       tune_ghc=0
@@ -137,8 +145,13 @@ then
   ghcflags="-j +RTS -A128m -n4m -s -RTS"
 fi
 
+if [[ $travis == 1 ]]
+then
+  travisflags="+RTS -K128m -RTS"
+fi
+
 notice "Compiling the Verilog generator."
-execute "time ghc $verboseflag $tuneghc -O0 --make Kami/PrettyPrintVerilog.hs"
+execute "time ghc $verboseflag $ghcflags $travisflags -O0 --make Kami/PrettyPrintVerilog.hs"
 
 notice "Generating the Verilog model."
 execute "time Kami/PrettyPrintVerilog > System.sv"

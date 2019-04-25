@@ -9,10 +9,11 @@ result=0
 verbose=0
 skip_kami=0
 tune_ghc=1
+travis=0
 
 xlen=32
 
-options=$(getopt --options="hgkvx:p:" --longoptions="help,generic-ghc,skip-kami,verbose,version,xlen:,path:" -- "$@")
+options=$(getopt --options="hgktvx:p:" --longoptions="help,generic-ghc,skip-kami,travis,verbose,version,xlen:,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -34,12 +35,6 @@ Arguments:
   --path location
   Path to the directory where all the tests are located.
 
-  -k|--skip-kami
-  Skip compiling the Coq/Kami source files.
-
-  -g|--generic-ghc
-  Omit tuning GHC compiler flags.
-
   --xlen 32|64
   Specifies whether we are running 32-bit or 64-bit tests.
   Default 32.
@@ -48,6 +43,15 @@ Options:
 
   -h|--help
   Displays this message.
+
+  -k|--skip-kami
+  Skip compiling the Coq/Kami source files.
+
+  -g|--generic-ghc
+  Omit tuning GHC compiler flags.
+
+  -t|--travis
+  Tune GHC to run in a Travis environment.
 
   -v|--verbose
   Enables verbose output.
@@ -74,6 +78,10 @@ EOF
       skip_kami=1
       shift;;
     -g|--generic-ghc)
+      tune_ghc=0
+      shift;;
+    -t|--travis)
+      travis=1
       tune_ghc=0
       shift;;
     --version)
@@ -110,8 +118,13 @@ then
   ghcflag="-g"
 fi
 
+if [[ $travis == 1 ]]
+then
+  travisflag="-t"
+fi
+
 notice "Generating model".
-./doGenerate.sh $verboseflag $skipflag $ghcflag --xlen $xlen
+./doGenerate.sh $verboseflag $skipflag $ghcflag $travisflag --xlen $xlen
 
 notice "Running tests in $path."
 for file in $(ls $path/rv${xlen}u?-p-*)
