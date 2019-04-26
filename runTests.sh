@@ -140,13 +140,16 @@ fi
 cmd='ls $path/rv${xlen}u?-p-*'
 if [ ! -z $test_offset ]
 then
-  cmd=$cmd' | tail --lines $test_offset'
+  cmd=$cmd' | tail --lines +$test_offset'
 fi
 if [ ! -z $test_num ]
 then
   cmd=$cmd' | head --lines $test_num'
 fi
+echo "$cmd"
 tests=$(eval "$cmd")
+echo "$tests"
+exit 0 
 
 notice "Generating model".
 ./doGenerate.sh $verboseflag $skipflag $ghcflag $travisflag --xlen $xlen
