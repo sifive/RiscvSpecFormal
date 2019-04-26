@@ -2,6 +2,7 @@ language: generic
 cache:
   directories:
     - ~/coq-object-files
+    - ~/verilator-object-files
 jobs:
   include:
   - stage: coqcompile
@@ -25,6 +26,18 @@ jobs:
       - rm -rf ~/coq-object-files
       - cp -rf $TRAVIS_BUILD_DIR ~/coq-object-files
 
+  - stage: verilatorcompile
+    before_install:
+      - cd ~
+      - git clone http://git.veripool.org/git/verilator
+      - cd verilator
+      - autoconf
+      - ./configure
+      - make
+      - cd ..
+      - rm -rf ~/verilator-object-files
+      - cp -rf verilator ~/verilator-object-files
+
   - stage: rvtests
     before_install:
       - sudo apt update
@@ -46,11 +59,7 @@ jobs:
       - cabal install mtl-2.2.2
 
       # Verilator
-      - cd ~
-      - git clone http://git.veripool.org/git/verilator
-      - cd verilator
-      - autoconf
-      - ./configure
+      - cd ~/verilator-object-files
       - sudo make install
 
     script:
@@ -78,11 +87,7 @@ jobs:
       - cabal install mtl-2.2.2
 
       # Verilator
-      - cd ~
-      - git clone http://git.veripool.org/git/verilator
-      - cd verilator
-       autoconf
-      - ./configure
+      - cd ~/verilator-object-files
       - sudo make install
 
     script:
