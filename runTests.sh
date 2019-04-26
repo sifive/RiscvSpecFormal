@@ -10,10 +10,12 @@ verbose=0
 skip_kami=0
 tune_ghc=1
 travis=0
+test_offset=
+test_num=
 
 xlen=32
 
-options=$(getopt --options="hgktvx:p:" --longoptions="help,generic-ghc,skip-kami,travis,verbose,version,xlen:,path:" -- "$@")
+options=$(getopt --options="hgktvx:p:o:n:" --longoptions="help,generic-ghc,skip-kami,travis,verbose,version,xlen:,path:,test-offset:,test-num:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -52,6 +54,12 @@ Options:
 
   -t|--travis
   Tune GHC to run in a Travis environment.
+
+  -s|--test-offset OFFSET
+  Instruct this script to skip the first OFFSET tests.
+
+  -e|--test-num NUM
+  Instruct this script to stop after NUM test.
 
   -v|--verbose
   Enables verbose output.
@@ -93,6 +101,12 @@ EOF
     -p|--path)
       path=$2
       shift 2;;
+    -o|--test-offset)
+      test_offset=$2
+      shift 2;;
+    -n|--test-num)
+      test_num=$2
+      shift 2;;
     --)
       shift
       break;;
@@ -123,11 +137,22 @@ then
   travisflag="-t"
 fi
 
+cmd='ls $path/rv${xlen}u?-p-*'
+if [ ! -z $test_offset ]
+then
+  cmd=$cmd' | tail --lines $test_offset'
+fi
+if [ ! -z $test_num ]
+then
+  cmd=$cmd' | head --lines $test_num'
+fi
+tests=$(eval "$cmd")
+
 notice "Generating model".
 ./doGenerate.sh $verboseflag $skipflag $ghcflag $travisflag --xlen $xlen
 
 notice "Running tests in $path."
-for file in $(ls $path/rv${xlen}u?-p-*)
+for file in $tests
 do
   file $file | grep -iq elf
   if [[ $? == 0 ]]

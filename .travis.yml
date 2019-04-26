@@ -66,7 +66,7 @@ jobs:
       - cd ~/coq-object-files
       - ./doGenerate.sh -v -k -g -t -x 32
 
-  - stage: rvtests
+  - stage: rvtests32
     before_install:
       - sudo apt update
 
@@ -92,9 +92,9 @@ jobs:
 
     script:
       - cd ~/coq-object-files
-      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests
+      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -n 50
 
-  - stage: rvtests
+  - stage: rvtests32
     before_install:
       - sudo apt update
 
@@ -120,4 +120,60 @@ jobs:
 
     script:
       - cd ~/coq-object-files
-      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests
+      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -o 50
+
+  - stage: rvtests64
+    before_install:
+      - sudo apt update
+
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
+
+      # Clang
+      - sudo apt install clang-3.5
+
+      # GHC
+      - sudo apt install ghc
+      - sudo apt install cabal-install
+      - cabal update
+      - cabal install mtl-2.2.2
+
+      # Verilator
+      - cd ~/verilator-object-files
+      - sudo make install
+
+    script:
+      - cd ~/coq-object-files
+      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -n 50
+
+  - stage: rvtests64
+    before_install:
+      - sudo apt update
+
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
+
+      # Clang
+      - sudo apt install clang-3.5
+
+      # GHC
+      - sudo apt install ghc
+      - sudo apt install cabal-install
+      - cabal update
+      - cabal install mtl-2.2.2
+
+      # Verilator
+      - cd ~/verilator-object-files
+      - sudo make install
+
+    script:
+      - cd ~/coq-object-files
+      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -o 50
