@@ -51,7 +51,7 @@ jobs:
       - cd verilator
       - autoconf
       - ./configure
-      - make install
+      - sudo make install
 
     script:
       - cd ~/coq-object-files
@@ -81,9 +81,9 @@ jobs:
       - cd ~
       - git clone http://git.veripool.org/git/verilator
       - cd verilator
-      - autoconf
+       autoconf
       - ./configure
-      - make install
+      - sudo make install
 
     script:
       - cd ~/coq-object-files
