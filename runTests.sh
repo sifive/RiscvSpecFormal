@@ -146,10 +146,7 @@ if [ ! -z $test_num ]
 then
   cmd=$cmd' | head --lines $test_num'
 fi
-echo "$cmd"
 tests=$(eval "$cmd")
-echo "$tests"
-exit 0 
 
 notice "Generating model".
 ./doGenerate.sh $verboseflag $skipflag $ghcflag $travisflag --xlen $xlen
