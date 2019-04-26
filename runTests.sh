@@ -157,7 +157,7 @@ fi
 tests=$(eval "$cmd")
 
 notice "Generating model".
-#./doGenerate.sh $verboseflag $skipflag $ghcflag $travisflag --xlen $xlen
+./doGenerate.sh $verboseflag $skipflag $ghcflag $travisflag --xlen $xlen
 
 notice "Running tests in $path."
 if [[ $run_parallel == 1 ]]
