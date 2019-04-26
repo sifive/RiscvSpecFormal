@@ -69,6 +69,7 @@ jobs:
   - stage: rvtests32
     before_install:
       - sudo apt update
+      - sudo apt install parallel
 
       # RISC-V compiler
       - cd ~
@@ -92,11 +93,12 @@ jobs:
 
     script:
       - cd ~/coq-object-files
-      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -n 50
+      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -n 50 --parallel
 
   - stage: rvtests32
     before_install:
       - sudo apt update
+      - sudo apt install parallel
 
       # RISC-V compiler
       - cd ~
@@ -120,11 +122,12 @@ jobs:
 
     script:
       - cd ~/coq-object-files
-      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -o 50
+      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -o 50 --parallel
 
   - stage: rvtests64
     before_install:
       - sudo apt update
+      - sudo apt install parallel
 
       # RISC-V compiler
       - cd ~
@@ -148,11 +151,12 @@ jobs:
 
     script:
       - cd ~/coq-object-files
-      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -n 50
+      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -n 50 --parallel
 
   - stage: rvtests64
     before_install:
       - sudo apt update
+      - sudo apt install parallel
 
       # RISC-V compiler
       - cd ~
@@ -176,4 +180,4 @@ jobs:
 
     script:
       - cd ~/coq-object-files
-      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -o 50
+      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -o 50 --parallel
