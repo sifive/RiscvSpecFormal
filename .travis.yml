@@ -66,7 +66,7 @@ jobs:
       - cd ~/coq-object-files
       - ./doGenerate.sh -v -k -g -t -x 32
 
-  - stage: rvtestsfirst
+  - stage: rvtests32
     before_install:
       - sudo apt update
 
@@ -94,7 +94,7 @@ jobs:
       - cd ~/coq-object-files
       - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -n 50
 
-  - stage: rvtestsfirst
+  - stage: rvtests32
     before_install:
       - sudo apt update
 
@@ -122,7 +122,7 @@ jobs:
       - cd ~/coq-object-files
       - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -o 50
 
-  - stage: rvtestssecond
+  - stage: rvtests64
     before_install:
       - sudo apt update
 
@@ -150,7 +150,7 @@ jobs:
       - cd ~/coq-object-files
       - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -n 50
 
-  - stage: rvtestssecond
+  - stage: rvtests64
     before_install:
       - sudo apt update
 
