@@ -1,7 +1,13 @@
 language: generic
+services:
+- docker
 before_install:
 - docker pull vmurali/riscv_spec_formal:v2
 script:
-- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "./runTests --xlen 32 --path /target/share/riscv-tests/isa"
-- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "./runTests --xlen 64 --path /target/share/riscv-tests/isa"
+- echo `pwd`
+- ls `pwd`
+- echo $TRAVIS_BUILD_DIR
+- ls $TRAVIS_BUILD_DIR
+- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "cd $TRAVIS_BUILD_DIR; ./runTests --xlen 32 --path /target/share/riscv-tests/isa"
+- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "cd $TRAVIS_BUILD_DIR; ./runTests --xlen 64 --path /target/share/riscv-tests/isa"
 
