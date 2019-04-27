@@ -23,59 +23,40 @@ do
     -h | --help)
       cat <<- EOF
 Usage: ./doGenerate.sh [ARGUMENTS] [OPTIONS]
-
 This script generates the RISC-V processor simulator from the
 Gallina and Verilog source files.
-
 By default this simulator program is ./obj_dir/Vsystem. It will
 execute any program whose object code is stored in the hex file
 MemoryInit.hex.
-
 When run, the simulator outputs trace messages describing the state
 of its registers and actions during each clock cycle.
-
 The simulator also outputs a VCD trace file, named trace.vcd,
 that can be viewed using programs such as GTKWave.
-
 Arguments:
   --xlen 32|64
   Specifies whether or not the generator should produce a 32 or 64
   bit RISC-V processor model. Default is 32.
-
 Options:
-
   -h|--help
   Displays this message.
-
   -r|--rebuild
   Recompile source files that Make believes have not changed.
-
   -k|--skip-kami
   Skip compiling the Coq/Kami source files.
-
   -g|--generic-ghc
   Omit tuning GHC compiler flags.
-
   -t|--travis
   Tune GHC to run in a Travis environment.
-
   -v|--verbose
   Enables verbose output.
-
   --version
   Displays the current version of this program.
-
 Example
-
 ./doGenerate.sh --xlen 32 --verbose
-
 Generates the RISC-V 32-bit processor simulator.
-
 Authors
-
-1. Kade Phillips
-2. Murali Vijayaraghavan
-3. Larry Lee
+Murali Vijayaraghavan
+Larry Lee
 EOF
       exit 0;;
     -v|--verbose)
@@ -122,7 +103,6 @@ fi
 
 cat > Target.hs <<- EOF
 module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, rtlMod) where
-
 import EclecticLib
 import PeanoNat
 import Fin
@@ -130,7 +110,6 @@ import Instance
 import Rtl
 import Syntax hiding (unsafeCoerce)
 import Word
-
 rtlMod :: RtlModule
 rtlMod = model$xlen
 EOF
@@ -164,3 +143,4 @@ fi
 execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
 
 notice "Done."
+
