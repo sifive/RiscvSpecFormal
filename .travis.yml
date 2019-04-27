@@ -1,9 +1,14 @@
 language: generic
 services:
 - docker
-before_install:
-- docker pull vmurali/riscv_spec_formal:v2
+jobs:
+  include:
+  - stage: riscv_spec_formal_install
+    script:
+    - docker pull vmurali/riscv_spec_formal:v2
+  - stage: riscv_spec_formal_run
+    
 script:
-- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "cd /RiscvSpecFormal && ./runTests --xlen 32 --path /target/share/riscv-tests/isa"
-- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "cd /RiscvSpecFormal && ./runTests --xlen 64 --path /target/share/riscv-tests/isa"
+- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "cd /RiscvSpecFormal && ./runTests.sh --xlen 32 --path /target/share/riscv-tests/isa"
+- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "cd /RiscvSpecFormal && ./runTests.sh --xlen 64 --path /target/share/riscv-tests/isa"
 
