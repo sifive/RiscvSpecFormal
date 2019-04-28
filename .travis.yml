@@ -1,14 +1,81 @@
 language: generic
-services:
-- docker
+sudo: true
+dist: xenial
+
+cache:
+  directories:
+  - $HOME/haskell-files
+  - $HOME/riscv-tests-binaries
+  - $HOME/haskell-binary
+  - $HOME/generate-verilog
+
 jobs:
   include:
-  - stage: riscv_spec_formal_install
-    script:
-    - docker pull vmurali/riscv_spec_formal:v2
-  - stage: riscv_spec_formal_run
-    
-script:
-- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "cd /RiscvSpecFormal && ./runTests.sh --xlen 32 --path /target/share/riscv-tests/isa"
-- docker run -v $TRAVIS_BUILD_DIR:/RiscvSpecFormal -it --rm --name=test vmurali/riscv_spec_formal:v2 /bin/bash -c "cd /RiscvSpecFormal && ./runTests.sh --xlen 64 --path /target/share/riscv-tests/isa"
+  # Generate Haskell Files by compiling Coq source code
+  - stage: coqobjectfiles
+    before_install:
+    - curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh > install.sh
+    - yes '' | bash install.sh && rm install.sh
+    - opam init --auto-setup --yes --jobs=2 --compiler=4.07.1+flambda --disable-sandboxing
+    - eval $(opam env)
+    - echo 'eval $(opam env)' >> ~/.bashrc
+    - opam repository add --all-switches --set-default coq-released https://coq.inria.fr/opam/released
+    - opam update -y
+    - opam install -y -j 1 opam-depext
+    - opam install -j 2 coq.8.9.0 --yes
 
+    script:
+    - make
+    - rm -rf $HOME/haskell-files
+    - cp ./*.hs $HOME/haskell-files
+
+
+  # Generate riscv-tests binaries
+  - before_install:
+    - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+    - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+    - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+    - git clone https://github.com/riscv/riscv-tests.git
+
+    script:
+    - cd riscv-tests
+    - git submodule update --init --recursive
+    - autoconf
+    - rm -rf $HOME/riscv-tests-binaries
+    - ./configure --prefix=$HOME/riscv-tests-binaries
+    - make
+    - make install
+
+
+  # Install verilator
+  - before_install:
+    - git clone http://git.veripool.org/git/verilator
+
+    script:
+    - cd verilator
+    - autoconf
+    - rm -rf $HOME/verilator-binary
+    - ./configure --prefix=$HOME/verilator-binary
+    - make
+    - make install
+
+
+  # Compile Haskell files into a Binary
+  - stage: compilehaskell
+    before_install:
+    - sudo apt-get install ghc
+    - sudo apt-get install cabal-install
+    - cabal install mtl-2.2.2
+    - cp $HOME/haskell-files ./
+
+    script:
+    - ghc -v +RTS -K128m -RTS -rtsopts -O0 --make --static ./Kami/PrettyPrintVerilog.hs
+    - rm -rf $HOME/haskell-binary
+    - cp ./PrettyPrintVerilog $HOME/haskell-binary
+
+
+  # Generate Verilog file from Haskell Binary
+  - stage: generateverilog
+    script:
+    - rm -rf $HOME/verilog-file
+    - $HOME/haskell-binary/PrettyPrintVerilog > $HOME/verilog-file/System.sv
