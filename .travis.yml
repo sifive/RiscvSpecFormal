@@ -63,7 +63,7 @@ jobs:
     - sudo apt-get install cabal-install
     - cabal update
     - cabal install mtl-2.2.2
-    - cp $HOME/haskell-files ./
+    - cp $HOME/haskell-files/* ./
     - rm -rf $HOME/haskell-binary
 
     script:
