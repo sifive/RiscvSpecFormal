@@ -16,13 +16,13 @@ jobs:
     before_install:
     - curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh > install.sh
     - yes '' | bash install.sh && rm install.sh
-    - opam init --auto-setup --yes --jobs=2 --compiler=4.07.1+flambda --disable-sandboxing
+    - opam init --auto-setup --yes --jobs=8 --compiler=4.07.1+flambda --disable-sandboxing
     - eval $(opam env)
     - echo 'eval $(opam env)' >> ~/.bashrc
     - opam repository add --all-switches --set-default coq-released https://coq.inria.fr/opam/released
     - opam update -y
-    - opam install -y -j 1 opam-depext
-    - opam install -j 2 coq.8.9.0 --yes
+    - opam install -y -j 8 opam-depext
+    - opam install -j 8 coq.8.9.0 --yes
 
     script:
     - make
@@ -43,7 +43,8 @@ jobs:
     - autoconf
     - rm -rf $HOME/riscv-tests-binaries
     - ./configure --prefix=$HOME/riscv-tests-binaries
-    - make
+    - sed -i -e "s/0x80000000/0x00000000/g" ./env/p/link.ld
+    - make -j
     - make install
 
 
@@ -56,7 +57,7 @@ jobs:
     - autoconf
     - rm -rf $HOME/verilator-binary
     - ./configure --prefix=$HOME/verilator-binary
-    - make
+    - make -j
     - make install
 
 
@@ -69,7 +70,7 @@ jobs:
     - cp $HOME/haskell-files ./
 
     script:
-    - ghc -v +RTS -K128m -RTS -rtsopts -O0 --make --static ./Kami/PrettyPrintVerilog.hs
+    - ghc -j -v +RTS -K128m -RTS -rtsopts -O0 --make --static ./Kami/PrettyPrintVerilog.hs
     - rm -rf $HOME/haskell-binary
     - cp ./PrettyPrintVerilog $HOME/haskell-binary
 
