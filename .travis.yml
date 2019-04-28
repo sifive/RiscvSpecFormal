@@ -22,7 +22,7 @@ jobs:
     - opam repository add --all-switches --set-default coq-released https://coq.inria.fr/opam/released
     - opam update -y
     - opam install -y -j 8 opam-depext
-    - opam install -j 8 coq.8.9.0 --yes
+    - travis_wait 60 opam install -j 8 coq.8.9.0 --yes
 
     script:
     - make
@@ -68,15 +68,22 @@ jobs:
     - sudo apt-get install cabal-install
     - cabal install mtl-2.2.2
     - cp $HOME/haskell-files ./
+    - rm -rf $HOME/haskell-binary
 
     script:
-    - ghc -j -v +RTS -K128m -RTS -rtsopts -O0 --make --static ./Kami/PrettyPrintVerilog.hs
-    - rm -rf $HOME/haskell-binary
-    - cp ./PrettyPrintVerilog $HOME/haskell-binary
+    - echo "  model32" >> Target.hs
+    - ghc -j -v +RTS -K128m -RTS -rtsopts -O0 --make --static -o $HOME/haskell-binary/Print32 ./Kami/PrettyPrintVerilog.hs
+    script:
+    - echo "  model64" >> Target.hs
+    - ghc -j -v +RTS -K128m -RTS -rtsopts -O0 --make --static -o $HOME/haskell-binary/Print64 ./Kami/PrettyPrintVerilog.hs
+
 
 
   # Generate Verilog file from Haskell Binary
   - stage: generateverilog
     script:
     - rm -rf $HOME/verilog-file
-    - $HOME/haskell-binary/PrettyPrintVerilog > $HOME/verilog-file/System.sv
+    - $HOME/haskell-binary/Print32 > $HOME/verilog-file/System32.sv
+    script:
+    - rm -rf $HOME/verilog-file
+    - $HOME/haskell-binary/Print64 > $HOME/verilog-file/System64.sv
