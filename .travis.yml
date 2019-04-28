@@ -21,6 +21,7 @@ jobs:
     script:
     - make
     - rm -rf $HOME/haskell-files
+    - mkdir $HOME/haskell-files
     - cp ./*.hs $HOME/haskell-files
 
 
