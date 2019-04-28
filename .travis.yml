@@ -19,7 +19,7 @@ jobs:
     - sudo apt-get install coq-8.9.0
 
     script:
-    - make
+    - make -j 4
     - rm -rf $HOME/haskell-files
     - mkdir $HOME/haskell-files
     - cp ./*.hs $HOME/haskell-files
