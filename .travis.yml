@@ -14,7 +14,7 @@ jobs:
   # Generate Haskell Files by compiling Coq source code
   - stage: generatehaskell
     before_install:
-    - sudo add-apt-repository ppa:jgross-h/many-coq-versions
+    - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
     - sudo apt-get update
     - sudo apt-get install coq-8.9.0
 

@@ -10,3 +10,4 @@ rtlMod :: RtlModule
 rtlMod =
   model32
   model32
+  model32
