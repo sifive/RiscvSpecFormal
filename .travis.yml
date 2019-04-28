@@ -61,6 +61,7 @@ jobs:
     before_install:
     - sudo apt-get install ghc
     - sudo apt-get install cabal-install
+    - cabal update
     - cabal install mtl-2.2.2
     - cp $HOME/haskell-files ./
     - rm -rf $HOME/haskell-binary
