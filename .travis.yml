@@ -14,15 +14,9 @@ jobs:
   # Generate Haskell Files by compiling Coq source code
   - stage: generatehaskell
     before_install:
-    - curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh > install.sh
-    - yes '' | bash install.sh && rm install.sh
-    - opam init --auto-setup --yes --jobs=8 --compiler=4.07.1+flambda --disable-sandboxing
-    - eval $(opam env)
-    - echo 'eval $(opam env)' >> ~/.bashrc
-    - opam repository add --all-switches --set-default coq-released https://coq.inria.fr/opam/released
-    - opam update -y
-    - opam install -y -j 8 opam-depext
-    - travis_wait 60 opam install -j 8 coq.8.9.0 --yes
+    - sudo add-apt-repository ppa:jgross-h/many-coq-versions
+    - sudo apt-get update
+    - sudo apt-get install coq-8.9.0
 
     script:
     - make
@@ -81,6 +75,7 @@ jobs:
 
   # Generate Verilog file from Haskell Binary
   - stage: generateverilog
+
     script:
     - rm -rf $HOME/verilog-file
     - $HOME/haskell-binary/Print32 > $HOME/verilog-file/System32.sv

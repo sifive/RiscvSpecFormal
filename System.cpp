@@ -64,7 +64,7 @@ int main(int argc, char ** argv, char **env) {
 	fprintf(stderr, "Passed\n");
         finished = true;
       }	else if(hasfail && system->proc_core_pc__024_argument == fail_address) {
-	fprintf(stderr, "FAILED\n");
+	fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED\n");
         finished = true;
         result=1;
       }

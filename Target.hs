@@ -8,3 +8,5 @@ import Syntax hiding (unsafeCoerce)
 import Word
 rtlMod :: RtlModule
 rtlMod =
+  model32
+  model32

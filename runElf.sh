@@ -14,30 +14,20 @@ do
     -h | --help)
       cat <<- EOF
 Usage: ./runElf.sh [OPTIONS] PATH
-
 This script reads the RISC-V binary referenced by PATH and executes
 it within the RISC-V processor simulator.
-
 Options:
-
   -h|--help
   Displays this message.
-
   -v|--verbose
   Enables verbose output.
-
   --version
   Displays the current version of this program.
-
 Example
-
 ./runELF.sh -v rv32ui-p-and
-
 Simulates the rv32ui-p-and test suite program in the RISC-V
 processor simulator.
-
 Authors
-
 1. Kade Phillips
 2. Murali Vijayaraghavan
 3. Larry Lee
