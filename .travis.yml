@@ -1,113 +1,183 @@
 language: generic
-sudo: true
-dist: xenial
-
-env:
-  global:
-    # include $HOME/.local/bin for `aws`
-    - PATH=$HOME/.local/bin:$PATH
-
-before_install:
-  # set up awscli packages
-  - pip install --user awscli
-  - mkdir -p ~/$TRAVIS_BUILD_NUMBER
-  - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_BUILD_NUMBER
-
+cache:
+  directories:
+    - ~/coq-object-files
+    - ~/verilator-object-files
 jobs:
   include:
-    - stage: setup files
-      script: echo one | tee > ~/$TRAVIS_BUILD_NUMBER/one
-    - stage: setup files
-      script: echo two | tee > ~/$TRAVIS_BUILD_NUMBER/two
-    - stage: use shared files
-      script:
-        - cat ~/$TRAVIS_BUILD_NUMBER/*
-      after_success:
-        - aws s3 rm --recursive s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER # clean up after ourselves
+  - stage: coqcompile
+    before_install:
+      - sudo apt update
 
-after_success:
-  - aws s3 sync ~/$TRAVIS_BUILD_NUMBER s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER
+      # Opam
+      - sudo apt install opam
+      - yes '' | sh <(curl -sL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)
+      - yes | opam init --disable-sandboxing --reinit
+      - yes | opam repo add coq-released http://coq.inria.fr/opam/released --set-default
+      - opam switch create ocaml --yes
+      - eval $(opam env)
 
+      # Coq
+      - opam install coq.8.9.0 --yes
+      - eval $(opam env)
 
-#cache:
-#  directories:
-#  - $HOME/haskell-files
-#  - $HOME/riscv-tests-binaries
-#  - $HOME/haskell-binary
-#  - $HOME/generate-verilog
-#
-#jobs:
-#  include:
-#  # Generate Haskell Files by compiling Coq source code
-#  - stage: generatehaskell
-#    before_install:
-#    - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
-#    - sudo apt-get update
-#    - sudo apt-get install coq-8.9.0
-#
-#    script:
-#    - make -j 4
-#    - rm -rf $HOME/haskell-files
-#    - mkdir $HOME/haskell-files
-#    - cp ./*.hs $HOME/haskell-files
-#
-#
-#  # Generate riscv-tests binaries
-#  - before_install:
-#    - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-#    - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-#    - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
-#    - git clone https://github.com/riscv/riscv-tests.git
-#
-#    script:
-#    - cd riscv-tests
-#    - git submodule update --init --recursive
-#    - autoconf
-#    - rm -rf $HOME/riscv-tests-binaries
-#    - ./configure --prefix=$HOME/riscv-tests-binaries
-#    - sed -i -e "s/0x80000000/0x00000000/g" ./env/p/link.ld
-#    - make -j
-#    - make install
-#
-#
-#  # Install verilator
-#  - before_install:
-#    - git clone http://git.veripool.org/git/verilator
-#
-#    script:
-#    - cd verilator
-#    - autoconf
-#    - rm -rf $HOME/verilator-binary
-#    - ./configure --prefix=$HOME/verilator-binary
-#    - make -j 4
-#    - make install
-#
-#
-#  # Compile Haskell files into a Binary
-#  - stage: compilehaskell
-#    before_install:
-#    - sudo apt-get install ghc
-#    - sudo apt-get install cabal-install
-#    - cabal update
-#    - cabal install mtl-2.2.2
-#    - cp $HOME/haskell-files/* ./
-#    - rm -rf $HOME/haskell-binary
-#
-#    script:
-#    - echo "  model32" >> Target.hs
-#    - ghc -j -v +RTS -K128m -RTS -rtsopts -O0 --make --static -o $HOME/haskell-binary/Print32 ./Kami/PrettyPrintVerilog.hs
-#    script:
-#    - echo "  model64" >> Target.hs
-#    - ghc -j -v +RTS -K128m -RTS -rtsopts -O0 --make --static -o $HOME/haskell-binary/Print64 ./Kami/PrettyPrintVerilog.hs
-#
-#
-#
-#  # Generate Verilog file from Haskell Binary
-#  - stage: generateverilog
-#
-#    script:
-#    - rm -rf $HOME/verilog-file
-#    - $HOME/haskell-binary/Print32 > $HOME/verilog-file/System32.sv
-#    script:
-#    - rm -rf $HOME/verilog-file
-#    - $HOME/haskell-binary/Print64 > $HOME/verilog-file/System64.sv
+    script:
+      - make
+      - rm -rf ~/coq-object-files
+      - cp -rf $TRAVIS_BUILD_DIR ~/coq-object-files
+
+  - stage: verilatorcompile
+    before_install:
+      - cd ~
+      - git clone http://git.veripool.org/git/verilator
+      - cd verilator
+      - autoconf
+      - ./configure
+      - make
+      - cd ..
+      - rm -rf ~/verilator-object-files
+      - cp -rf verilator ~/verilator-object-files
+
+  - stage: modelcompile
+    before_install:
+      - sudo apt update
+
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
+
+      # Clang
+      - sudo apt install clang-3.5
+
+      # GHC
+      - sudo apt install ghc
+      - sudo apt install cabal-install
+      - cabal update
+      - cabal install mtl-2.2.2
+
+      # Verilator
+      - cd ~/verilator-object-files
+      - sudo make install
+
+    script:
+      - cd ~/coq-object-files
+      - ./doGenerate.sh -v -k -g -t -x 32
+
+  - stage: rvtests32
+    before_install:
+      - sudo apt update
+      - sudo apt install parallel
+
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
+
+      # Clang
+      - sudo apt install clang-3.5
+
+      # GHC
+      - sudo apt install ghc
+      - sudo apt install cabal-install
+      - cabal update
+      - cabal install mtl-2.2.2
+
+      # Verilator
+      - cd ~/verilator-object-files
+      - sudo make install
+
+    script:
+      - cd ~/coq-object-files
+      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -n 50 --parallel
+
+  - stage: rvtests32
+    before_install:
+      - sudo apt update
+      - sudo apt install parallel
+
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
+
+      # Clang
+      - sudo apt install clang-3.5
+
+      # GHC
+      - sudo apt install ghc
+      - sudo apt install cabal-install
+      - cabal update
+      - cabal install mtl-2.2.2
+
+      # Verilator
+      - cd ~/verilator-object-files
+      - sudo make install
+
+    script:
+      - cd ~/coq-object-files
+      - ./runTests.sh -v -k -g -t -x 32 -p riscv-tests -o 50 --parallel
+
+  - stage: rvtests64
+    before_install:
+      - sudo apt update
+      - sudo apt install parallel
+
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
+
+      # Clang
+      - sudo apt install clang-3.5
+
+      # GHC
+      - sudo apt install ghc
+      - sudo apt install cabal-install
+      - cabal update
+      - cabal install mtl-2.2.2
+
+      # Verilator
+      - cd ~/verilator-object-files
+      - sudo make install
+
+    script:
+      - cd ~/coq-object-files
+      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -n 50 --parallel
+
+  - stage: rvtests64
+    before_install:
+      - sudo apt update
+      - sudo apt install parallel
+
+      # RISC-V compiler
+      - cd ~
+      - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - tar -xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+      - export PATH=$PATH:$(pwd)/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin
+      - cd $TRAVIS_BUILD_DIR
+
+      # Clang
+      - sudo apt install clang-3.5
+
+      # GHC
+      - sudo apt install ghc
+      - sudo apt install cabal-install
+      - cabal update
+      - cabal install mtl-2.2.2
+
+      # Verilator
+      - cd ~/verilator-object-files
+      - sudo make install
+
+    script:
+      - cd ~/coq-object-files
+      - ./runTests.sh -v -k -g -t -x 64 -p riscv-tests -o 50 --parallel
