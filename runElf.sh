@@ -49,8 +49,10 @@ shift $((OPTIND - 1))
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
 path=$1
 
+hexfile=$(mktemp)
+
 notice "Generating a hex file from the binary program."
-execute "riscv64-unknown-elf-objcopy -O verilog '$path' ./MemoryInit.hex"
+execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
 
 pass_address=$(riscv64-unknown-elf-readelf -a $path | grep pass | awk '{print $2}')
 fail_address=$(riscv64-unknown-elf-readelf -a $path | grep fail | awk '{print $2}')
@@ -64,7 +66,7 @@ notice "Running $(basename $path)"
 notice "pass: $pass_address"
 notice "fail: $fail_address"
 
-cmd="./obj_dir/Vsystem +sign_size=8192 +signature=signature +testfile=./MemoryInit.hex +pass_address=$pass_address"
+cmd="./obj_dir/Vsystem +sign_size=8192 +signature=signature +testfile=$hexfile +pass_address=$pass_address"
 if [[ $fail_address ]]
 then
   cmd="$cmd +fail_address=$fail_address"

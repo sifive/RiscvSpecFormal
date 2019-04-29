@@ -55,8 +55,9 @@ Example
 ./doGenerate.sh --xlen 32 --verbose
 Generates the RISC-V 32-bit processor simulator.
 Authors
-Murali Vijayaraghavan
-Larry Lee
+1. Kade Phillips
+2. Murali Vijayaraghavan
+3. Larry Lee
 EOF
       exit 0;;
     -v|--verbose)
@@ -101,7 +102,18 @@ else
   execute "$cmd"
 fi
 
-echo "  model$xlen" >> Target.hs
+cat > Target.hs <<- EOF
+module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, rtlMod) where
+import EclecticLib
+import PeanoNat
+import Fin
+import Instance
+import Rtl
+import Syntax hiding (unsafeCoerce)
+import Word
+rtlMod :: RtlModule
+rtlMod = model$xlen
+EOF
 
 if [[ $tune_ghc == 1 ]]
 then
@@ -132,3 +144,16 @@ fi
 execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
 
 notice "Done."
+© 2019 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+
