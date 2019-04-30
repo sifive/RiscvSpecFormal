@@ -9,7 +9,7 @@ cache:
 
 env:
   global:
-  - PATH=$HOME/verilator-binary/bin:$TRAVIS_BUILD_DIR/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
+  - PATH=/opt/ghc/bin:$HOME/verilator-binary/bin:$TRAVIS_BUILD_DIR/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
 
 jobs:
   include:
