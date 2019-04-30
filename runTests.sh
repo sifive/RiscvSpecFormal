@@ -68,16 +68,14 @@ then
   verboseflag="-v"
 fi
 
-tests=$(eval "ls $path")
-
 notice "Generating model".
 ./doGenerate.sh $verboseflag --xlen $xlen
 
 notice "Running tests in $path."
-for file in $tests
+for file in $path/*
 do
   notice "Examining $file"
-  file $file | grep -iq elf
+  file $file | grep -i elf
   if [[ $? == 0 ]]
   then
     notice "Running test $(basename $file)."
