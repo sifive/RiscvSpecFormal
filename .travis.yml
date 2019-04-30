@@ -6,43 +6,44 @@ cache:
   directories:
   - $HOME/haskell-files
   - $HOME/verilator-binary
-  - $HOME/riscv
 
 env:
   global:
   - PATH=$HOME/verilator-binary/bin:$TRAVIS_BUILD_DIR/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
 
-before_install:
-  - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
-  - sudo add-apt-repository ppa:hvr/ghc --yes
-  - sudo apt-get update
-  - sudo apt-get install coq-8.9.0 ghc-8.6.5 clang --yes
-  - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz && tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-  - git clone https://github.com/riscv/riscv-tests && cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$HOME/riscv && sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld && make -j && make install && cd .. && rm -rf riscv-tests
-
 jobs:
   include:
-  - stage: generate_haskell_files
+  - stage: generate_verilator_binary_and_haskell_files
+
     script:
     - git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure --prefix=$HOME/verilator-binary && make -j 4 && make install && cd .. && rm -rf verilator
+
   - script:
+    - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
+    - sudo apt-get update
+    - sudo apt-get install coq-8.9.0 --yes
     - make -j 4
     - rm -rf $HOME/haskell-files/*
     - mkdir -p $HOME/haskell-files
     - cp *.hs $HOME/haskell-files/
-  - stage: runTests
+
+  - stage: run_tests
+    before_install:
+    - sudo add-apt-repository ppa:hvr/ghc --yes
+    - sudo apt-get update
+    - sudo apt-get install ghc-8.6.5 clang --yes
+    - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz && tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+    - git clone https://github.com/riscv/riscv-tests && cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$HOME/riscv && sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld && make -j && make install && cd .. && rm -rf riscv-tests
     script:
     - echo $PATH
     - ls $HOME/haskell-files
     - ls $HOME/verilator-binary
     - ls $HOME/riscv
-    - ls $HOME/riscv/target/share/riscv-tests/isa/
-  - script:
-    - cp $HOME/haskell-files/*.hs .
-    - ./createObjDir.sh 32 
-    - ./runElf.sh $HOME/riscv/target/share/riscv-tests/isa/rv32ui-p-add
-  - script:
-    - cp $HOME/haskell-files/*.hs .
-    - ./createObjDir.sh 64
-    - ./runElf.sh $HOME/riscv/target/share/riscv-tests/isa/rv64ui-p-add
+    - ls $HOME/riscv/share/riscv-tests/isa/
+    - which ghc
+    - ghc --version
+    - which verilator
+    - verilator --version
+  - script: cp $HOME/haskell-files/*.hs . && ./createObjDir.sh 32 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv32ui-p-add
+  - script: cp $HOME/haskell-files/*.hs . && ./createObjDir.sh 64 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv64ui-p-add
 
