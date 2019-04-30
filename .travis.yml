@@ -17,13 +17,13 @@ jobs:
     script:
     - echo "HELLO WORLD"
 
-    script:
+  - script:
     - echo "HELLO WORLD2"
 
   - stage: test2
     script: eval $DUMB && echo "d1"
-    script: eval $DUMB && echo "d2"
-    script: eval $DUMB && echo "d3"
+  - script: eval $DUMB && echo "d2"
+  - script: eval $DUMB && echo "d3"
 
 
 #env:
