@@ -14,7 +14,7 @@ before_install:
   - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
   - tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
   - git clone https://github.com/riscv/riscv-tests
-  - cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/riscv && sed -i -e "s/0x80000000/00000000/g ./env/p/link.ld && "make && make install
+  - cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/riscv && sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld && make && make install
   - git clone http://git.veripool.org/git/verilator
   - cd verilator && autoconf && ./configure && make -j 4 && sudo make install && cd ..
 
