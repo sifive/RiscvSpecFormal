@@ -23,12 +23,9 @@ before_install:
 
 jobs:
   include:
-  - stage: test
-    script: echo hello
-#  include:
-#  - stage: generate_haskell_files
-#    script:
-#    echo "Generating haskell files"
+  - stage: generate_haskell_files
+    script:
+    echo "Generating haskell files"
 #  - script:
 #    - git clone http://git.veripool.org/git/verilator
 #    - rm -rf ~/verilator-binary
