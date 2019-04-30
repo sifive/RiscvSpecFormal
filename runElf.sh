@@ -4,7 +4,7 @@
 
 source common.sh
 
-options=$(getopt --options="hv" --longoptions="help,verbose,version" -- "$@")
+options=$(getopt --options="hv" --longoptions="help,verbose" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -21,24 +21,18 @@ Options:
   Displays this message.
   -v|--verbose
   Enables verbose output.
-  --version
-  Displays the current version of this program.
 Example
 ./runELF.sh -v rv32ui-p-and
 Simulates the rv32ui-p-and test suite program in the RISC-V
 processor simulator.
 Authors
-1. Kade Phillips
-2. Murali Vijayaraghavan
-3. Larry Lee
+Murali Vijayaraghavan
+Larry Lee
 EOF
       exit 0;;
     -v|--verbose)
       verbose=1
       shift;;
-    --version)
-      echo "version: 1.0.0"
-      exit 0;;
     --)
       shift
       break;;
