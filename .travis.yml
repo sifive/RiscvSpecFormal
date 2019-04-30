@@ -27,7 +27,7 @@ jobs:
     script:
     - git clone http://git.veripool.org/git/verilator
     - rm -rf $HOME/verilator-binary
-    - cd verilator && autoconf && ./configure --prefix=$HOME/verilator-binary && make -j 4 && sudo make install && cd .. && rm -rf verilator
+    - cd verilator && autoconf && ./configure --prefix=$HOME/verilator-binary && make -j 4 && make install && cd .. && rm -rf verilator
   - script:
     - make -j 4
     - rm -rf $HOME/haskell-files/*
