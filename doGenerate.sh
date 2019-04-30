@@ -89,7 +89,7 @@ notice "Compiling the Verilog generator."
 execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
 
 notice "Generating the Verilog model."
-execute "time Kami/PrettyPrintVerilog $travisflags > System.sv"
+execute "time Kami/PrettyPrintVerilog > System.sv"
 
 notice "Generating the simulator source code (i.e. C files)."
 execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"

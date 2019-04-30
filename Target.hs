@@ -7,7 +7,4 @@ import Rtl
 import Syntax hiding (unsafeCoerce)
 import Word
 rtlMod :: RtlModule
-rtlMod =
-  model32
-  model32
-  model32
+rtlMod = model32

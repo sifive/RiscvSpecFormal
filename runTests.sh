@@ -68,8 +68,7 @@ then
   verboseflag="-v"
 fi
 
-cmd='find $path -executable -type f -name "rv${xlen}u?-p-*" | sort'
-tests=$(eval "$cmd")
+tests=$(eval "ls $path")
 
 notice "Generating model".
 ./doGenerate.sh $verboseflag --xlen $xlen
@@ -77,10 +76,11 @@ notice "Generating model".
 notice "Running tests in $path."
 for file in $tests
 do
+  notice "Examining $file"
   file $file | grep -iq elf
   if [[ $? == 0 ]]
   then
-    notic "Running test $(basename $file)."
+    notice "Running test $(basename $file)."
     ./runElf.sh "$file"
     if [[ $? != 0 ]]
     then
