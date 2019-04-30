@@ -72,7 +72,7 @@ notice "Generating model".
 ./doGenerate.sh $verboseflag --xlen $xlen
 
 notice "Running tests in $path."
-for file in $path/*
+for file in $path/rv32u?-p-*
 do
   notice "Examining $file"
   file $file | grep -iq elf
