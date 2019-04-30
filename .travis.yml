@@ -8,7 +8,7 @@ env:
 
 before_install:
   - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
-  - sudo add-apt-repository ppa:hvr/ghc
+  - sudo add-apt-repository ppa:hvr/ghc --yes
   - sudo apt-get update
   - sudo apt-get install coq-8.9.0 ghc-8.6.5 clang --yes
   - git clone http://git.veripool.org/git/verilator
