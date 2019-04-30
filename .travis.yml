@@ -4,8 +4,8 @@ dist: xenial
 
 cache:
   directories:
-  - ~/haskell-files
-  - ~/verilator-binary
+  - $HOME/haskell-files
+  - $HOME/verilator-binary
 
 env:
   global:
@@ -24,25 +24,24 @@ before_install:
 jobs:
   include:
   - stage: generate_haskell_files
-    script: echo "Generating haskell files"
-  - script:
+    script:
     - git clone http://git.veripool.org/git/verilator
-    - rm -rf ~/verilator-binary
-    - cd verilator && autoconf && ./configure --prefix=~/verilator-binary && make -j 4 && sudo make install && cd .. && rm -rf verilator
+    - rm -rf $HOME/verilator-binary
+    - cd verilator && autoconf && ./configure --prefix=$HOME/verilator-binary && make -j 4 && sudo make install && cd .. && rm -rf verilator
   - script:
     - make
-    - rm -rf ~/haskell-files
-    - cp *.hs ~/haskell-files/
+    - rm -rf $HOME/haskell-files
+    - cp *.hs $HOME/haskell-files/
   - stage: runTests
     script: echo "Starting"
   - script:
-    - cp ~/haskell-files *.hs
-    - export PATH=~/verilator-binary/bin:$PATH
+    - cp $HOME/haskell-files *.hs
+    - export PATH=$HOME/verilator-binary/bin:$PATH
     - ./createObjDir.sh 32 
     - ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add
   - script:
-    - cp ~/haskell-files *.hs
-    - export PATH=~/verilator-binary/bin:$PATH
+    - cp $HOME/haskell-files *.hs
+    - export PATH=$HOME/verilator-binary/bin:$PATH
     - ./createObjDir.sh 64
     - ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add
 
