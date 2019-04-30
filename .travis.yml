@@ -35,7 +35,7 @@ jobs:
 
   - stage: run_tests
     script:
-    - $RISVC_SPEC_FORMAL
+    - eval $RISVC_SPEC_FORMAL
     - echo $PATH
     - ls $HOME/haskell-files
     - ls $HOME/verilator-binary
@@ -45,6 +45,6 @@ jobs:
     - ghc --version
     - which verilator
     - verilator --version
-    script: $RISCV_SPEC_FORMAL && ./createObjDir.sh 32 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv32ui-p-add
-    script: $RISCV_SPEC_FORMAL && ./createObjDir.sh 64 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv64ui-p-add
+  - script: eval $RISCV_SPEC_FORMAL && ./createObjDir.sh 32 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv32ui-p-add
+  - script: eval $RISCV_SPEC_FORMAL && ./createObjDir.sh 64 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv64ui-p-add
 
