@@ -25,24 +25,24 @@ jobs:
   include:
   - stage: generate_haskell_files
     script: echo "Generating haskell files"
-#  - script:
-#    - git clone http://git.veripool.org/git/verilator
-#    - rm -rf ~/verilator-binary
-#    - cd verilator && autoconf && ./configure --prefix=~/verilator-binary && make -j 4 && sudo make install && cd .. && rm -rf verilator
-#  - script:
-#    - make
-#    - rm -rf ~/haskell-files
-#    - cp *.hs ~/haskell-files/
-#  - stage: runTests
-#    script: echo "Starting"
-#  - script:
-#    - cp ~/haskell-files *.hs
-#    - export PATH=~/verilator-binary/bin:$PATH
-#    - ./createObjDir.sh 32 
-#    - ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add
-#  - script:
-#    - cp ~/haskell-files *.hs
-#    - export PATH=~/verilator-binary/bin:$PATH
-#    - ./createObjDir.sh 64
-#    - ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add
-#
+  - script:
+    - git clone http://git.veripool.org/git/verilator
+    - rm -rf ~/verilator-binary
+    - cd verilator && autoconf && ./configure --prefix=~/verilator-binary && make -j 4 && sudo make install && cd .. && rm -rf verilator
+  - script:
+    - make
+    - rm -rf ~/haskell-files
+    - cp *.hs ~/haskell-files/
+  - stage: runTests
+    script: echo "Starting"
+  - script:
+    - cp ~/haskell-files *.hs
+    - export PATH=~/verilator-binary/bin:$PATH
+    - ./createObjDir.sh 32 
+    - ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add
+  - script:
+    - cp ~/haskell-files *.hs
+    - export PATH=~/verilator-binary/bin:$PATH
+    - ./createObjDir.sh 64
+    - ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add
+
