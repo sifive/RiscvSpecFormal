@@ -19,6 +19,7 @@ before_install:
   - cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/riscv && sed -i -e "s/0x80000000/00000000/g ./env/p/link.ld && "make && make install
 
 install:
+  - make -j
   - cat Target.raw > Target.hs
   - echo 'model = model32' >> Target.hs
   - ghc -j + RTS -A128m -n4m -O0 --make -o Print32 Kami/PrettyPrintVerilog.hs
@@ -34,8 +35,8 @@ install:
   - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
   - mv obj_dir obj_dir64
 
-#jobs:
-#  include:
-#  - mv obj_dir32 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add && mv obj_dir obj_dir32
-#  - mv obj_dir64 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add && mv obj_dir obj_dir64
-#
+jobs:
+  include:
+  - mv obj_dir32 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add && mv obj_dir obj_dir32
+  - mv obj_dir64 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add && mv obj_dir obj_dir64
+
