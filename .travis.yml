@@ -18,19 +18,19 @@ before_install:
   - git clone https://github.com/riscv/riscv-tests
   - cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/riscv && sed -i -e "s/0x80000000/00000000/g ./env/p/link.ld && "make && make install
 
-#install:
-#  - cat > Target.hs <<- EOF \
-#  module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, rtlMod) where\
-#  import EclecticLib\
-#  import PeanoNat\
-#  import Fin\
-#  import Instance\
-#  import Rtl\
-#  import Syntax hiding (unsafeCoerce)\
-#  import Word\
-#  rtlMod :: RtlModule\
-#  rtlMod = model32\
-#  EOF
+install:
+  - cat > Target.hs <<- EOF \
+  module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, rtlMod) where\
+  import EclecticLib\
+  import PeanoNat\
+  import Fin\
+  import Instance\
+  import Rtl\
+  import Syntax hiding (unsafeCoerce)\
+  import Word\
+  rtlMod :: RtlModule\
+  rtlMod = model32\
+  EOF
 #  - ghc -j + RTS -A128m -n4m -O0 --make -o Print32 Kami/PrettyPrintVerilog.hs
 #  - ./Print32 > System.sv
 #  - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
