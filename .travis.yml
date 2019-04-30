@@ -31,7 +31,12 @@ jobs:
     - mkdir -p $HOME/haskell-files
     - cp *.hs $HOME/haskell-files/
   - stage: runTests
-    script: echo "Starting"
+    script:
+    - echo $PATH
+    - ls $HOME/haskell-files
+    - ls $HOME/verilator-binary
+    - ls $HOME/riscv
+    - ls $HOME/riscv/target/share/riscv-tests/isa/
   - script:
     - cp $HOME/haskell-files/*.hs .
     - ./createObjDir.sh 32 
