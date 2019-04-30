@@ -8,4 +8,4 @@ import Syntax hiding (unsafeCoerce)
 import Word
 rtlMod :: RtlModule
 
-model = model$xlen
+rtlMod = model64

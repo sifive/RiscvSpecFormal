@@ -73,7 +73,7 @@ fi
 execute "$cmd"
 
 cat Target.raw > Target.hs
-echo 'model = model$xlen' >> Target.hs
+echo "rtlMod = model$xlen" >> Target.hs
 
 notice "Compiling the Verilog generator."
 execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
