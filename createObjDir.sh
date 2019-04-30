@@ -3,7 +3,7 @@
 echo $1
 
 cat Target.raw > Target.hs
-echo 'rtlMod = model$1' >> Target.hs
+echo "rtlMod = model$1" >> Target.hs
 #ghc -j + RTS -A128m -n4m -O0 --make Kami/PrettyPrintVerilog.hs
 ghc -O0 --make Kami/PrettyPrintVerilog.hs
 ./Kami/PrettyPrintVerilog > System.sv
