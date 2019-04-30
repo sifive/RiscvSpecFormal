@@ -37,6 +37,7 @@ install:
 
 jobs:
   include:
-  - mv obj_dir32 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add && mv obj_dir obj_dir32
-  - mv obj_dir64 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add && mv obj_dir obj_dir64
+  - stage: runall
+    - mv obj_dir32 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add && mv obj_dir obj_dir32
+    - mv obj_dir64 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add && mv obj_dir obj_dir64
 
