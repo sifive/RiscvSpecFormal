@@ -72,18 +72,8 @@ then
 fi
 execute "$cmd"
 
-cat > Target.hs <<- EOF
-module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, rtlMod) where
-import EclecticLib
-import PeanoNat
-import Fin
-import Instance
-import Rtl
-import Syntax hiding (unsafeCoerce)
-import Word
-rtlMod :: RtlModule
-rtlMod = model$xlen
-EOF
+cat Target.raw > Target.hs
+echo 'model = model$xlen' >> Target.hs
 
 notice "Compiling the Verilog generator."
 execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"

@@ -75,10 +75,9 @@ notice "Running tests in $path."
 for file in $path/*
 do
   notice "Examining $file"
-  file $file | grep -i elf
+  file $file | grep -iq elf
   if [[ $? == 0 ]]
   then
-    notice "Running test $(basename $file)."
     ./runElf.sh "$file"
     if [[ $? != 0 ]]
     then

@@ -45,7 +45,7 @@ path=$1
 
 hexfile=$(mktemp)
 
-notice "Generating a hex file from the binary program."
+notice "Generating a hex file $hexfile from the binary program."
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
 
 pass_address=$(riscv64-unknown-elf-readelf -a $path | grep pass | awk '{print $2}')
