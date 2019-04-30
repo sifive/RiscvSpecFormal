@@ -14,29 +14,15 @@ before_install:
   - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
   - tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
   - git clone https://github.com/riscv/riscv-tests
-  - cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/riscv && sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld && make && make install
+  - cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$TRAVIS_BUILD_DIR/riscv && sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld && make -j && make install && cd ..
   - git clone http://git.veripool.org/git/verilator
   - cd verilator && autoconf && ./configure && make -j 4 && sudo make install && cd ..
 
 install:
   - make -j
-  - cat Target.raw > Target.hs
-  - echo 'model = model32' >> Target.hs
-  - ghc -j + RTS -A128m -n4m -O0 --make -o Print32 Kami/PrettyPrintVerilog.hs
-  - ./Print32 > System.sv
-  - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
-  - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
-  - mv obj_dir obj_dir32
-  - cat Target.raw > Target.hs
-  - echo 'model = model64' >> Target.hs
-  - ghc -j + RTS -A128m -n4m -O0 --make -o Print64 Kami/PrettyPrintVerilog.hs
-  - ./Print64 > System.sv
-  - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
-  - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
-  - mv obj_dir obj_dir64
 
 jobs:
   include:
-  - script: mv obj_dir32 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add && mv obj_dir obj_dir32
-  - script: mv obj_dir64 obj_dir && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add && mv obj_dir obj_dir64
+  - script: ./createObjDir.sh 32 && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add
+  - script: ./createObjDir.sh 64 && ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add
 
