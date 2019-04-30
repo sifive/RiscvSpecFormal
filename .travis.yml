@@ -36,12 +36,12 @@ jobs:
   - stage: runTests
     script: echo "Starting"
   - script:
-    - cp $HOME/haskell-files *.hs
+    - cp $HOME/haskell-files/*.hs .
     - export PATH=$HOME/verilator-binary/bin:$PATH
     - ./createObjDir.sh 32 
     - ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv32ui-p-add
   - script:
-    - cp $HOME/haskell-files *.hs
+    - cp $HOME/haskell-files/*.hs .
     - export PATH=$HOME/verilator-binary/bin:$PATH
     - ./createObjDir.sh 64
     - ./runElf.sh $TRAVIS_BUILD_DIR/riscv/target/share/riscv-tests/isa/rv64ui-p-add
