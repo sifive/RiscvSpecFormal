@@ -28,15 +28,18 @@ jobs:
   include:
   - stage: generate_haskell_files
     script:
-    - make
-    - rm -rf ~/haskell-files
-    - cp *.hs ~/haskell-files
+    echo "Generating haskell files"
   - script:
     - git clone http://git.veripool.org/git/verilator
     - rm -rf ~/verilator-binary
     - cd verilator && autoconf && ./configure --prefix=~/verilator-binary && make -j 4 && sudo make install && cd .. && rm -rf verilator
+  - script:
+    - make
+    - rm -rf ~/haskell-files
+    - cp *.hs ~/haskell-files
   - stage: runTests
-    script:
+    script: echo "Starting"
+  - script:
     - cp ~/haskell-files *.hs
     - export PATH=~/verilator-binary/bin:$PATH
     - ./createObjDir.sh 32 
