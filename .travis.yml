@@ -75,8 +75,13 @@ jobs:
 
   - stage: run_tests
     script:
+    - sudo apt-get install parallel --yes
+
     - mv $HOME/obj_dir/obj_dir32 ./obj_dir
     - ls $HOME/riscv/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
+
   - script:
+    - sudo apt-get install parallel --yes
+
     - mv $HOME/obj_dir/obj_dir64 ./obj_dir
     - ls $HOME/riscv/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
