@@ -28,7 +28,8 @@ jobs:
     - cp *.hs $HOME/haskell-files/
 
   - stage: run_tests
-    script: .travis.sh 32
+    script:
+    - .travis.sh 32
     - echo $PATH
     - ls $HOME/haskell-files
     - ls $HOME/verilator-binary
