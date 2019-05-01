@@ -6,7 +6,7 @@ sudo apt-get install ghc-8.6.5 clang --ye
 
 wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz && tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
 
-git clone https://github.com/riscv/riscv-tests && cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$HOME/riscv && sed -i -e \"s/0x80000000/00000000/g\" ./env/p/link.ld && make -j && make install && cd .. && rm -rf riscv-tests
+git clone https://github.com/riscv/riscv-tests && cd riscv-tests && git submodule update --init --recursive && autoconf && ./configure --prefix=$HOME/riscv && sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld && make -j && make install && cd .. && rm -rf riscv-tests
 
 cp $HOME/haskell-files/*.hs ."
 
