@@ -72,19 +72,21 @@ notice "Generating model".
 ./doGenerate.sh $verboseflag --xlen $xlen
 
 notice "Running tests in $path."
-for file in $path/rv${xlen}u?-p-*
-do
-  notice "Examining $file"
-  file $file | grep -iq elf
-  if [[ $? == 0 ]]
-  then
-    ./runElf.sh "$file"
-    if [[ $? != 0 ]]
-    then
-      result=1
-    fi
-  fi
-done
+for file in $path/rv${xlen}u?-p-*; do file $file | (grep -iq elf && (./runElf.sh "$file" || result=1)); done
+#for file in $path/rv${xlen}u?-p-*
+#do
+#  notice "Examining $file"
+#  file $file | grep -iq elf
+#  if [[ $? == 0 ]]
+#  then
+#    ./runElf.sh "$file"
+#    if [[ $? != 0 ]]
+#    then
+#      result=1
+#    fi
+#  fi
+#done
+
 
 if [[ $result == 0 ]]
 then
