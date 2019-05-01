@@ -41,11 +41,15 @@ jobs:
     - ls $HOME/haskell-files
     - ls $HOME/verilator-binary
     - ls $HOME/riscv
-    - ls $HOME/riscv/share/riscv-tests/isa/
-    - which ghc
     - ghc --version
-    - which verilator
-    - verilator --version
-  - script: echo ${RISCV_SPEC_FORMAL} && eval ${RISCV_SPEC_FORMAL} && ./createObjDir.sh 32 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv32ui-p-add
-  - script: echo ${RISCV_SPEC_FORMAL} && eval ${RISCV_SPEC_FORMAL} && ./createObjDir.sh 64 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv64ui-p-add
+  - script:
+    - echo ${RISCV_SPEC_FORMAL}
+    - eval ${RISCV_SPEC_FORMAL}
+    - ./createObjDir.sh 32
+    - ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv32ui-p-add
+  - script:
+    - echo ${RISCV_SPEC_FORMAL}
+    - eval ${RISCV_SPEC_FORMAL}
+    - ./createObjDir.sh 64
+    - ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv64ui-p-add
 
