@@ -4,6 +4,7 @@ dist: xenial
 
 cache:
   directories:
+  - $HOME/riscv
   - $HOME/verilator-binary
   - $HOME/haskell-files
   - $HOME/verilog-file
@@ -15,8 +16,23 @@ env:
 
 jobs:
   include:
-  - stage: generate_verilator_binary_and_haskell_files
+  - stage: generate_riscv_tests_with_verilator_binary_and_haskell_files
     script:
+    - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+    - tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+
+    - git clone https://github.com/riscv/riscv-tests
+    - cd riscv-tests
+    - git submodule update --init --recursive
+    - autoconf
+    - ./configure --prefix=$HOME/riscv
+    - sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld
+    - make -j
+    - make install
+    - cd ..
+    - rm -rf riscv-tests
+
+  - script:
     - git clone http://git.veripool.org/git/verilator
     - cd verilator
     - autoconf
@@ -80,10 +96,10 @@ jobs:
     - sudo apt-get install parallel --yes
 
     - mv $HOME/obj_dir/obj_dir32 ./obj_dir
-    - ls $HOME/riscv/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
+    - ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
 
   - script:
     - sudo apt-get install parallel --yes
 
     - mv $HOME/obj_dir/obj_dir64 ./obj_dir
-    - ls $HOME/riscv/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
+    - ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
