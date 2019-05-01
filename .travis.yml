@@ -79,7 +79,7 @@ jobs:
     - sudo apt-get install clang --yes
 
     - cp $HOME/verilog-file/System32.sv ./System.sv
-    - cat System.sv
+    - grep system System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
     - mv obj_dir $HOME/obj_dir/obj_dir32
@@ -88,7 +88,7 @@ jobs:
     - sudo apt-get install clang --yes
 
     - cp $HOME/verilog-file/System64.sv ./System.sv
-    - cat System.sv
+    - grep system System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
     - mv obj_dir $HOME/obj_dir/obj_dir64
