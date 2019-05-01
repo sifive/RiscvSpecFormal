@@ -4,6 +4,7 @@ dist: xenial
 
 cache:
   directories:
+  - $HOME/riscv64-gcc
   - $HOME/riscv
   - $HOME/verilator-binary
   - $HOME/haskell-files
@@ -12,7 +13,7 @@ cache:
 
 env:
   global:
-  - PATH=/opt/ghc/bin:$HOME/verilator-binary/bin:$TRAVIS_BUILD_DIR/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
+  - PATH=/opt/ghc/bin:$HOME/verilator-binary/bin:$HOME/riscv64-gcc/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
 
 jobs:
   include:
@@ -20,6 +21,7 @@ jobs:
     script:
     - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
     - tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+    - mv riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/ $HOME/riscv64-gcc/
 
     - git clone https://github.com/riscv/riscv-tests
     - cd riscv-tests
@@ -30,7 +32,6 @@ jobs:
     - make -j
     - make install
     - cd ..
-    - rm -rf riscv-tests
 
   - script:
     - git clone http://git.veripool.org/git/verilator
