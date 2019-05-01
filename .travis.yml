@@ -21,6 +21,7 @@ jobs:
     script:
     - wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
     - tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+    - rm -rf $HOME/riscv64-gcc/*
     - mv riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/ $HOME/riscv64-gcc/
 
     - git clone https://github.com/riscv/riscv-tests
@@ -86,6 +87,7 @@ jobs:
     - grep system System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
+    - rm -rf $HOME/obj_dir/*
     - mv obj_dir $HOME/obj_dir/obj_dir32
 
   - script:
@@ -96,6 +98,7 @@ jobs:
     - grep system System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
+    - rm -rf $HOME/obj_dir/*
     - mv obj_dir $HOME/obj_dir/obj_dir64
 
   - stage: run_tests
