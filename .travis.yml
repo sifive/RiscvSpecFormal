@@ -29,6 +29,7 @@ jobs:
     - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
     - sudo apt-get update
     - sudo apt-get install coq-8.9.0 --yes
+
     - make -j 4
     - rm -rf $HOME/haskell-files/*
     - mkdir -p $HOME/haskell-files
