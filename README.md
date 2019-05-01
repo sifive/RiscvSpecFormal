@@ -8,8 +8,8 @@ RISC-V ISA Spec in Kami
 
 ## Authors
 
-1. Murali Vijayaraghavan (SiFive)
-2. Larry Lee (SiFive) 
+Murali Vijayaraghavan (SiFive)
+Larry Lee (SiFive) 
 
 ## Spec sources snapshot
 

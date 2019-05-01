@@ -4,8 +4,10 @@ dist: xenial
 
 cache:
   directories:
-  - $HOME/haskell-files
   - $HOME/verilator-binary
+  - $HOME/haskell-files
+  - $HOME/verilog-file
+  - $HOME/obj_dir
 
 env:
   global:
@@ -14,9 +16,14 @@ env:
 jobs:
   include:
   - stage: generate_verilator_binary_and_haskell_files
-
     script:
-    - git clone http://git.veripool.org/git/verilator && cd verilator && autoconf && ./configure --prefix=$HOME/verilator-binary && make -j 4 && make install && cd .. && rm -rf verilator
+    - git clone http://git.veripool.org/git/verilator
+    - cd verilator
+    - autoconf
+    - ./configure --prefix=$HOME/verilator-binary
+    - make -j 4
+    - make install 
+    - cd ..
 
   - script:
     - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
@@ -27,13 +34,48 @@ jobs:
     - mkdir -p $HOME/haskell-files
     - cp *.hs $HOME/haskell-files/
 
+  - stage: generate_verilog-file
+    script:
+    - sudo add-apt-repository ppa:hvr/ghc --yes
+    - sudo apt-get update
+    - sudo apt-get install ghc-8.6.5 --yes
+
+    - cat Target.raw > Target.hs
+    - echo "rtlMod = model32" >> Target.hs
+    - ghc -O0 --make Kami/PrettyPrintVerilog.hs
+    - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
+
+  - script:
+    - sudo add-apt-repository ppa:hvr/ghc --yes
+    - sudo apt-get update
+    - sudo apt-get install ghc-8.6.5 --yes
+
+    - cat Target.raw > Target.hs
+    - echo "rtlMod = model64" >> Target.hs
+    - ghc -O0 --make Kami/PrettyPrintVerilog.hs
+    - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System64.sv
+
+  - stage: generate_obj_dir
+    script:
+    - sudo apt-get install clang --yes
+
+    - cp $HOME/verilog-file/System32.sv ./System.sv
+    - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
+    - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
+    - mv obj_dir $HOME/obj_dir/obj_dir32
+
+  - script:
+    - sudo apt-get install clang --yes
+
+    - cp $HOME/verilog-file/System64.sv ./System.sv
+    - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
+    - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
+    - mv obj_dir $HOME/obj_dir/obj_dir64
+
   - stage: run_tests
     script:
-    - ./.travis.sh 32
-    - echo $PATH
-    - ls $HOME/haskell-files
-    - ls $HOME/verilator-binary
-    - ls $HOME/riscv
-    - ghc --version
-  - script: ./.travis.sh 32
-  - script: ./.travis.sh 64
+    - mv $HOME/obj_dir/obj_dir32 ./obj_dir
+    - ls $HOME/riscv/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
+  - script:
+    - mv $HOME/obj_dir/obj_dir64 ./obj_dir
+    - ls $HOME/riscv/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
