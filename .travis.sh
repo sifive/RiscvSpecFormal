@@ -12,10 +12,19 @@ cp $HOME/haskell-files/*.hs .
 
 cat Target.raw > Target.hs
 echo "rtlMod = model$1" >> Target.hs
-cat Target.hs
 ghc -O0 --make Kami/PrettyPrintVerilog.hs
 ./Kami/PrettyPrintVerilog > System.sv
 
 verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
 make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
 
+ls $HOME/riscv/rv${1}u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
+result=$?
+
+if [[ $result == 0 ]]
+then
+  notice "All tests passed."
+else
+  error "The test suite failed."
+fi
+exit $result

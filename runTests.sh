@@ -7,10 +7,11 @@ source common.sh
 
 result=0
 verbose=0
+parallel=0
 
 xlen=32
 
-options=$(getopt --options="hvx:p:" --longoptions="help,verbose,xlen:,path:" -- "$@")
+options=$(getopt --options="hvcx:p:" --longoptions="help,verbose,parallel,xlen:,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -47,6 +48,9 @@ EOF
     -v|--verbose)
       verbose=1
       shift;;
+    -c|--parallel)
+      parallel=1
+      shift;;
     -x|--xlen)
       xlen=$2
       shift 2;;
@@ -72,21 +76,13 @@ notice "Generating model".
 ./doGenerate.sh $verboseflag --xlen $xlen
 
 notice "Running tests in $path."
-for file in $path/rv${xlen}u?-p-*; do file $file | (grep -iq elf && (./runElf.sh "$file" || result=1)); done
-#for file in $path/rv${xlen}u?-p-*
-#do
-#  notice "Examining $file"
-#  file $file | grep -iq elf
-#  if [[ $? == 0 ]]
-#  then
-#    ./runElf.sh "$file"
-#    if [[ $? != 0 ]]
-#    then
-#      result=1
-#    fi
-#  fi
-#done
-
+if [[ $parallel == 0 ]]
+then
+  for file in $path/rv${xlen}u?-p-*; do file $file | (grep -iq elf && (./runElf.sh "$file" || result=1)); done
+else
+  ls $path/rv${xlen}u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
+  result=$?
+fi
 
 if [[ $result == 0 ]]
 then

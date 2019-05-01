@@ -35,5 +35,5 @@ jobs:
     - ls $HOME/verilator-binary
     - ls $HOME/riscv
     - ghc --version
-  - script: ./.travis.sh 32 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv32ui-p-add
-  - script: ./.travis.sh 64 && ./runElf.sh $HOME/riscv/share/riscv-tests/isa/rv64ui-p-add
+  - ./.travis.sh 32
+  - ./.travis.sh 64
