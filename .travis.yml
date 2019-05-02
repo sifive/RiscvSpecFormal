@@ -9,7 +9,6 @@ cache:
   - $HOME/verilator-binary
   - $HOME/haskell-files
   - $HOME/verilog-file
-  - $HOME/obj_dir
 
 env:
   global:
@@ -80,34 +79,20 @@ jobs:
 
   - stage: generate_obj_dir
     script:
-    - sudo apt-get install clang --yes
+    - sudo apt-get install clang parallel --yes
 
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/System32.sv ./System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
-    - rm -rf $HOME/obj_dir/obj_dir32
-    - mv obj_dir $HOME/obj_dir/obj_dir32
+    - ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
 
   - script:
-    - sudo apt-get install clang --yes
+    - sudo apt-get install clang parallel --yes
 
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/System64.sv ./System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
-    - rm -rf $HOME/obj_dir/obj_dir64
-    - mv obj_dir $HOME/obj_dir/obj_dir64
-
-  - stage: run_tests
-    script:
-    - sudo apt-get install parallel --yes
-
-    - mv $HOME/obj_dir/obj_dir32 ./obj_dir
-    - ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
-
-  - script:
-    - sudo apt-get install parallel --yes
-
-    - mv $HOME/obj_dir/obj_dir64 ./obj_dir
     - ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
+
