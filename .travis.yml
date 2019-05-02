@@ -77,7 +77,7 @@ jobs:
     - ghc -O0 --make Kami/PrettyPrintVerilog.hs
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System64.sv
 
-  - stage: generate_obj_dir
+  - stage: generate_obj_dir_and_run_tests
     script:
     - sudo apt-get install clang parallel --yes
 
