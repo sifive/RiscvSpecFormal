@@ -78,9 +78,10 @@ notice "Generating model".
 notice "Running tests in $path."
 if [[ $parallel == 0 ]]
 then
-  for file in $path/rv${xlen}u?-p-*; do file $file | (grep -iq elf && (./runElf.sh "$file" || result=1)); done
+  for file in $path/rv${xlen}u?-p-*; do ((file $file | (grep -iq elf && ./runElf.sh $file)) || (file $file | grep -viq elf)); result=$(( $? | $result )); done
+  #for file in $path/rv${xlen}u?-p-*; do file $file | (grep -iq elf && (./runElf.sh "$file" || result=1)); done
 else
-  ls $path/rv${xlen}u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && (./runElf.sh {} || exit 1))) || (file {} | grep -viq elf)"
+  ls $path/rv${xlen}u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh {})) || (file {} | grep -viq elf)"
   result=$?
 fi
 
