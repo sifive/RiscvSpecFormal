@@ -10,7 +10,9 @@ rebuild=0 # indicates whether or not to recompile source files that Make thinks 
 
 xlen=32
 
-options=$(getopt --options="hrvx:" --longoptions="help,rebuild,verbose,xlen:" -- "$@")
+haskell=0
+
+options=$(getopt --options="hrvsx:" --longoptions="help,rebuild,verbose,haskell,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -37,9 +39,11 @@ Options:
   -h|--help
   Displays this message.
   -r|--rebuild
-  Recompile source files that Make believes have not changed.
+  Recompiles source files that Make believes have not changed.
   -v|--verbose
   Enables verbose output.
+  -s|--haskell
+  Builds the haskell simulator.
 Example
 ./doGenerate.sh --xlen 32 --verbose
 Generates the RISC-V 32-bit processor simulator.
@@ -53,6 +57,9 @@ EOF
       shift;;
     -r|--rebuild)
       rebuild=1
+      shift;;
+    -s|--haskell)
+      haskell=1
       shift;;
     -x|--xlen)
       xlen=$2
@@ -72,25 +79,36 @@ then
 fi
 execute "$cmd"
 
-cat Target.raw > Target.hs
-echo "rtlMod = model$xlen" >> Target.hs
+if [[ $haskell == 0 ]]
+then
+  cat Target.raw > Target.hs
+  echo "rtlMod = model$xlen" >> Target.hs
 
-notice "Compiling the Verilog generator."
-execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
-
-notice "Generating the Verilog model."
-execute "time Kami/PrettyPrintVerilog > System.sv"
-
-notice "Generating the simulator source code (i.e. C files)."
-execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
-
-if [ -x "$(command -v clang)" ]; then
-  compiler=clang
+  notice "Compiling the Verilog generator."
+  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
+  
+  notice "Generating the Verilog model."
+  execute "time Kami/PrettyPrintVerilog > System.sv"
+  
+  notice "Generating the simulator source code (i.e. C files)."
+  execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
+  
+  if [ -x "$(command -v clang)" ]; then
+    compiler=clang
+  else
+    compiler=g++
+  fi
+  
+  notice "Compiling the simulation program."
+  execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+  
 else
-  compiler=g++
-fi
+  cat HaskellTarget.raw > HaskellTarget.hs
+  echo "kami_model = (kami_model$xlen, $xlen)" >> HaskellTarget.hs
 
-notice "Compiling the simulation program."
-execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+  notice "Compiling the Haskell generator."
+  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iKami Main.hs"
+  
+fi
 
 notice "Done."

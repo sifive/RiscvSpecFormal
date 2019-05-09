@@ -17,4 +17,5 @@ Processor.sv
 System.sv
 system.out
 signature
+Main
 *~
