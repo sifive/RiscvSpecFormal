@@ -95,11 +95,11 @@ else
   compiler=g++
 fi
 
+notice "Compiling the simulation program."
+execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+    
 if [[ $haskell == 1 ]]
 then 
-  notice "Compiling the simulation program."
-  execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
-    
   cat HaskellTarget.raw > HaskellTarget.hs
   echo "kami_model = (kami_model$xlen, $xlen)" >> HaskellTarget.hs
   
