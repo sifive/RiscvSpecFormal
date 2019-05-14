@@ -10,6 +10,8 @@ rebuild=0 # indicates whether or not to recompile source files that Make thinks 
 
 xlen=32
 
+haskell=0 # Do not create haskell simulator
+
 options=$(getopt --options="hrvsx:" --longoptions="help,rebuild,verbose,haskell,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
@@ -54,6 +56,9 @@ EOF
     -r|--rebuild)
       rebuild=1
       shift;;
+    -s|--haskell)
+      haskell=1
+      shift;;
     -x|--xlen)
       xlen=$2
       shift 2;;
@@ -89,16 +94,19 @@ if [ -x "$(command -v clang)" ]; then
 else
   compiler=g++
 fi
-  
+
 notice "Compiling the simulation program."
 execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+    
+if [[ $haskell == 1 ]]
+then 
+  cat HaskellTarget.raw > HaskellTarget.hs
+  echo "kami_model = (kami_model$xlen, $xlen)" >> HaskellTarget.hs
   
-cat HaskellTarget.raw > HaskellTarget.hs
-echo "kami_model = (kami_model$xlen, $xlen)" >> HaskellTarget.hs
-
-cp Main.raw Main.hs
-
-notice "Compiling the Haskell generator."
-execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iKami Main.hs"
+  cp Main.raw Main.hs
+  
+  notice "Compiling the Haskell generator."
+  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iKami Main.hs"
+fi
 
 notice "Done."
