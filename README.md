@@ -10,6 +10,7 @@ RISC-V ISA Spec in Kami
 
 Murali Vijayaraghavan (SiFive)
 Larry Lee (SiFive) 
+Evan Marzion (SiFive)
 
 ## Spec sources snapshot
 
