@@ -13,7 +13,7 @@ handle :: Handle
 handle = stdout
 
 timeout :: Int
-timeout = 1000
+timeout = 50000
 
 isa_size :: Int
 isa_size = snd T.kami_model
@@ -27,25 +27,23 @@ basemod = snd $ fst T.kami_model
 meths :: IORef Int -> [(String, Val -> IO Val)]
 meths counter = [("proc_core_pc", proc_core_meth counter)]
 
---from riscv-tests/rv65ui-p-add.dump
-passaddr :: Val
-passaddr = BitvectorVal $ hex_to_bv isa_size "60c"
-
-failaddr :: Val
-failaddr = BitvectorVal $ hex_to_bv isa_size "5f8"
-
 proc_core_meth :: IORef Int -> Val -> IO Val
 proc_core_meth counter v = do
+    passaddr <- getPass isa_size
+    failaddr <- getFail isa_size
     n <- readIORef counter
     when (n > timeout) $ do
-        hPutStrLn handle "TIMEOUT"
+        hPutStrLn handle "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
+        hPutStrLn stderr "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
         exitFailure
     writeIORef counter (n+1)
     if v == passaddr then do
-        hPutStrLn handle "Pass"
+        hPutStrLn handle "Passed"
+        hPutStrLn stderr "Passed"
         exitSuccess
-    else if v == failaddr then do
-        hPutStrLn handle "Fail"
+    else if Just v == failaddr then do
+        hPutStrLn handle "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+        hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
         exitFailure
     else return tt
 
