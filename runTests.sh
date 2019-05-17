@@ -73,15 +73,23 @@ then
 fi
 
 notice "Generating model".
-./doGenerate.sh $verboseflag --xlen $xlen
+# ./doGenerate.sh $verboseflag --xlen $xlen
 
 notice "Running tests in $path."
+files=$(ls $path/rv${xlen}u?-p-*)
+files=${files/$path\/rv32uf-p-structural/}
+files=${files/$path\/rv32ui-p-simple/}
+files=${files/$path\/rv64ud-p-structural/}
+files=${files/$path\/rv64ui-p-simple/}
 if [[ $parallel == 0 ]]
 then
-  for file in $path/rv${xlen}u?-p-*; do ((file $file | (grep -iq elf && ./runElf.sh $file)) || (file $file | grep -viq elf)); result=$(( $? | $result )); done
-  #for file in $path/rv${xlen}u?-p-*; do file $file | (grep -iq elf && (./runElf.sh "$file" || result=1)); done
+  for file in $files
+  do
+    ((file $file | (grep -iq elf && ./runElf.sh $file)) || (file $file | grep -viq elf));
+    result=$(( $? | $result ));
+  done
 else
-  ls $path/rv${xlen}u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh {})) || (file {} | grep -viq elf)"
+  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh {})) || (file {} | grep -viq elf)"
   result=$?
 fi
 
