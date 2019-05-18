@@ -54,6 +54,7 @@ if [[ ! $pass_address ]]
 then
   pass_address=$(tail -n 1 $path.dump | awk '{print $1}')
 fi
+pass_address=${pass_address/:/}
 
 notice "Running $(basename $path)"
 
@@ -62,6 +63,7 @@ if [[ $fail_address ]]
 then
   cmd="$cmd +fail_address=$fail_address"
 fi
+fail_address=${fail_address/:/}
 cmd="$cmd > system.out"
 execute "$cmd"
 result=$?

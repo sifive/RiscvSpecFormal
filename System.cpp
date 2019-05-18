@@ -51,29 +51,36 @@ int main(int argc, char ** argv, char **env) {
   
   while(!Verilated::gotFinish() && main_time < timeout && !finished){
     printf("MainTime = %lu\n", main_time);
-    system->CLK = main_time%2;
-    if(main_time < 10)
-      system->RESET = 1;
-    else system->RESET = 0;
 
+    system->CLK = 1;
+    system->RESET = main_time < 10;
     system->eval();
-    tfp->dump(main_time);
 
-    if(system->proc_core_pc__024_enable) {
-      if(system->proc_core_pc__024_argument == pass_address) {
-	fprintf(stderr, "Passed\n");
-        finished = true;
-      }	else if(hasfail && system->proc_core_pc__024_argument == fail_address) {
-	fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED\n");
-        finished = true;
-        result=1;
+    if (!system->RESET) {
+      if(system->proc_core_pc__024_enable) {
+        if(system->proc_core_pc__024_argument == pass_address) {
+          fprintf(stdout, "Passed\n");
+	        fprintf(stderr, "Passed\n");
+          finished = true;
+        }	else if(hasfail && system->proc_core_pc__024_argument == fail_address) {
+          fprintf(stdout, "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED\n");
+          fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED\n");
+          finished = true;
+          result=1;
+        }
       }
-      fflush(stdout);
     }
-    main_time++;
+    
+    tfp->dump(main_time++);
+    system->CLK = 0;
+    system->eval();
+    tfp->dump(main_time++);
+
+    fflush(stdout);
   }
 
   if (main_time >= timeout) {
+    fprintf(stdout, "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT\n");
     fprintf(stderr, "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT\n");
     result=1;
   }

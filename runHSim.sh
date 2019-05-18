@@ -54,18 +54,13 @@ if [[ ! $pass_address ]]
 then
   pass_address=$(tail -n 1 $path.dump | awk '{print $1}')
 fi
-
 pass_address=${pass_address/:/}
 base=$(basename $path)
-
-#execute "time ./runElf.sh $path"
-#execute "grep -v "MainTime" system.out > dump/$base.verilogdump"
-#rm system.out
-
 notice "Running Haskell $base"
 
 mkdir -p dump
 
+#cmd="./obj_dir/Vsystem +sign_size=8192 +signature=signature +testfile=$hexfile +pass_address=$pass_address"
 cmd="time ./Main testfile=$hexfile pass:$pass_address"
 if [[ $fail_address ]]
 then
@@ -75,6 +70,10 @@ fail_address=${fail_address/:/}
 cmd="$cmd > dump/$base.haskelldump"
 execute "$cmd"
 result=$?
+
+execute "time ./runElf.sh $path"
+execute "grep -v "MainTime" system.out > dump/$base.verilogdump"
+rm system.out
 
 rm $hexfile
 exit $result
