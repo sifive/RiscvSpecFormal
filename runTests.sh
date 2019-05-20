@@ -73,25 +73,25 @@ then
 fi
 
 notice "Generating model".
-# ./doGenerate.sh $verboseflag --xlen $xlen
+./doGenerate.sh $verboseflag --xlen $xlen
 
 notice "Running tests in $path."
-files=$(ls $path/rv${xlen}{u,m}?-p-*)
-for file in '
-  rv32ui-p-simple
-  rv64ud-p-structural
-  rv64ui-p-simple
-  rv64mi-p-access
-  rv64mi-p-csr
-  rv64mi-p-illegal
-  rv64mi-p-scall
-  rv32mi-p-illegal
-  rv32mi-p-shamt
-  rv32mi-p-scall
-  rv32mi-p-csr
-  rv32mi-p-sbreak'
+files=$(ls $path/rv${xlen}u?-p-*)
+for file in \
+  rv32ui-p-simple \
+  rv64ud-p-structural \
+  rv64ui-p-simple \
+  rv64mi-p-access \
+  rv64mi-p-csr \
+  rv64mi-p-illegal \
+  rv64mi-p-scall \
+  rv32mi-p-illegal \
+  rv32mi-p-shamt \
+  rv32mi-p-scall \
+  rv32mi-p-csr \
+  rv32mi-p-sbreak
 do
-files=${files/$path\/$file/}
+  files=${files/$path\/$file/}
 done
 
 if [[ $verbose == 1 ]]
