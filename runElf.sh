@@ -43,7 +43,11 @@ shift $((OPTIND - 1))
 [[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
 path=$1
 
-hexfile=$(mktemp)
+base=$(basename $path)
+
+mkdir -p dump
+
+hexfile=dump/$base.hex
 
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
 
@@ -56,17 +60,16 @@ then
 fi
 pass_address=${pass_address/:/}
 
-notice "Running $(basename $path)"
+notice "Running $base"
 
-cmd="./obj_dir/Vsystem +sign_size=8192 +signature=signature +testfile=$hexfile +pass_address=$pass_address"
+cmd="./obj_dir/Vsystem +sign_size=8192 +signature=dump/$base.signature +testfile=$hexfile +pass_address=$pass_address"
 if [[ $fail_address ]]
 then
   cmd="$cmd +fail_address=$fail_address"
 fi
 fail_address=${fail_address/:/}
-cmd="$cmd > system.out"
+cmd="$cmd > dump/$base.out"
 execute "$cmd"
 result=$?
 
-rm $hexfile
 exit $result
