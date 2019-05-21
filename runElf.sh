@@ -52,7 +52,6 @@ hexfile=dump/$base.hex
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
 
 tohost_address=$(riscv64-unknown-elf-readelf -a $path | grep '[^\.]\<tohost\>' | awk '{print $2}')
-echo $tohost_address
 
 notice "Running $base"
 
