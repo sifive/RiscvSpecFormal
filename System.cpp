@@ -23,6 +23,7 @@ int main(int argc, char ** argv, char **env) {
   int result = 0;
   uint32_t timeout = 50000;
 
+  uint32_t tohost_address, tohost_val;
   uint32_t pass_address, fail_address = 0, sign_size;
   bool hasfail, finished;
   std::string testfile, signature;
@@ -49,12 +50,20 @@ int main(int argc, char ** argv, char **env) {
     hasfail = false;
   }
   
+  VL_VALUEPLUSARGS_INI(32, "tohost_address=%h", tohost_address);
+  
   while(!Verilated::gotFinish() && main_time < timeout && !finished){
     printf("MainTime = %lu\n", main_time);
 
     system->CLK = 1;
     system->RESET = main_time < 10;
     system->eval();
+
+    tohost_val = 0;
+    for(int j = 3; j >= 0; j--) {
+      uint32_t val = system->system->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[tohost_address+j];
+      tohost_val = (tohost_val << 8) | val;
+    }
 
     if (!system->RESET) {
       if(system->proc_core_pc__024_enable) {

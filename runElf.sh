@@ -53,6 +53,7 @@ execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
 
 pass_address=$(riscv64-unknown-elf-readelf -a $path | grep pass | awk '{print $2}')
 fail_address=$(riscv64-unknown-elf-readelf -a $path | grep fail | awk '{print $2}')
+tohost_address=$(riscv64-unknown-elf-readelf -a $path | grep "[^\.]\<tohost\>" | awk '{print $2}')
 
 if [[ ! $pass_address ]]
 then
@@ -62,7 +63,7 @@ pass_address=${pass_address/:/}
 
 notice "Running $base"
 
-cmd="./obj_dir/Vsystem +sign_size=8192 +signature=dump/$base.signature +testfile=$hexfile +pass_address=$pass_address"
+cmd="./obj_dir/Vsystem +sign_size=8192 +signature=dump/$base.signature +testfile=$hexfile +pass_address=$pass_address +tohost_address=$tohost_address"
 if [[ $fail_address ]]
 then
   cmd="$cmd +fail_address=$fail_address"
