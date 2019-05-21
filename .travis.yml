@@ -85,7 +85,7 @@ jobs:
     - cp $HOME/verilog-file/System32.sv ./System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
-    - ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh {})) || (file {} | grep -viq elf)"
+    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh {})) || (file {} | grep -viq elf)"
 
   - script:
     - sudo apt-get install clang parallel --yes
@@ -94,5 +94,5 @@ jobs:
     - cp $HOME/verilog-file/System64.sv ./System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
-    - ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh {})) || (file {} | grep -viq elf)"
+    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh {})) || (file {} | grep -viq elf)"
 
