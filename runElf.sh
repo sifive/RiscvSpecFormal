@@ -51,25 +51,12 @@ hexfile=dump/$base.hex
 
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
 
-pass_address=$(riscv64-unknown-elf-readelf -a $path | grep pass | awk '{print $2}')
-fail_address=$(riscv64-unknown-elf-readelf -a $path | grep fail | awk '{print $2}')
-tohost_address=$(riscv64-unknown-elf-readelf -a $path | grep "[^\.]\<tohost\>" | awk '{print $2}')
-
-if [[ ! $pass_address ]]
-then
-  pass_address=$(tail -n 1 $path.dump | awk '{print $1}')
-fi
-pass_address=${pass_address/:/}
+tohost_address=$(riscv64-unknown-elf-readelf -a $path | grep '[^\.]\<tohost\>' | awk '{print $2}')
+echo $tohost_address
 
 notice "Running $base"
 
-cmd="./obj_dir/Vsystem +sign_size=8192 +signature=dump/$base.signature +testfile=$hexfile +pass_address=$pass_address +tohost_address=$tohost_address"
-if [[ $fail_address ]]
-then
-  cmd="$cmd +fail_address=$fail_address"
-fi
-fail_address=${fail_address/:/}
-cmd="$cmd > dump/$base.out"
+cmd="./obj_dir/Vsystem +sign_size=8192 +signature=dump/$base.signature +testfile=$hexfile +tohost_address=$tohost_address > dump/$base.out"
 execute "$cmd"
 result=$?
 
