@@ -24,8 +24,8 @@ int main(int argc, char ** argv, char **env) {
   uint32_t timeout = 50000;
 
   uint32_t tohost_address, tohost_val;
-  uint32_t pass_address, fail_address = 0, sign_size;
-  bool hasfail, finished;
+  uint32_t  sign_size;
+  bool finished;
   std::string testfile, signature;
 
   uint64_t numBlockBytes = (1<<20)-1;
@@ -43,13 +43,6 @@ int main(int argc, char ** argv, char **env) {
   
   VL_VALUEPLUSARGS_INI(32, "sign_size=%d", sign_size);
   
-  VL_VALUEPLUSARGS_INI(32, "pass_address=%h", pass_address);
-  if(VL_VALUEPLUSARGS_INI(32, "fail_address=%h", fail_address)) {
-    hasfail = true;
-  } else {
-    hasfail = false;
-  }
-  
   VL_VALUEPLUSARGS_INI(32, "tohost_address=%h", tohost_address);
   
   while(!Verilated::gotFinish() && main_time < timeout && !finished){
@@ -61,22 +54,18 @@ int main(int argc, char ** argv, char **env) {
 
     tohost_val = 0;
     for(int j = 3; j >= 0; j--) {
-      uint32_t val = system->system->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[tohost_address+j];
-      tohost_val = (tohost_val << 8) | val;
+      tohost_val = (tohost_val << 8) | system->system->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[tohost_address+j];
     }
-
     if (!system->RESET) {
-      if(system->proc_core_pc__024_enable) {
-        if(system->proc_core_pc__024_argument == pass_address) {
-          fprintf(stdout, "Passed\n");
-	        fprintf(stderr, "Passed\n");
-          finished = true;
-        }	else if(hasfail && system->proc_core_pc__024_argument == fail_address) {
-          fprintf(stdout, "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED\n");
-          fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED\n");
-          finished = true;
-          result=1;
-        }
+      if(tohost_val == 1) {
+        fprintf(stdout, "Passed\n");
+        fprintf(stderr, "Passed\n");
+        finished = true;
+      } else if(tohost_val != 0) {
+        fprintf(stdout, "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED\n");
+        fprintf(stderr, "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED\n");
+        finished = true;
+        result=1;
       }
     }
     
