@@ -30,6 +30,6 @@ function execute () {
     echo -e "\033[93mNotice:\033[0m $cmd" >&2
   fi
   eval $cmd
-  # [ $? == 0 ] || error "An error occured while trying to execute the following command: \"$cmd\"."
+  [ $? == 0 ] || error "An error occured while trying to execute the following command: \"$cmd\"."
 }
 
