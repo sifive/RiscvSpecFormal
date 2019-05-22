@@ -72,8 +72,8 @@ then
   verboseflag="-v"
 fi
 
-notice "Generating model".
-./doGenerate.sh $verboseflag --xlen $xlen
+#notice "Generating model".
+#./doGenerate.sh $verboseflag --xlen $xlen
 
 notice "Running tests in $path."
 if [[ $parallel == 0 ]]
