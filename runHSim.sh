@@ -47,33 +47,32 @@ hexfile=$(mktemp)
 
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
 
-pass_address=$(riscv64-unknown-elf-readelf -a $path | grep pass | awk '{print $2}')
-fail_address=$(riscv64-unknown-elf-readelf -a $path | grep fail | awk '{print $2}')
+# pass_address=$(riscv64-unknown-elf-readelf -a $path | grep pass | awk '{print $2}')
+# fail_address=$(riscv64-unknown-elf-readelf -a $path | grep fail | awk '{print $2}')
 
-if [[ ! $pass_address ]]
-then
-  pass_address=$(tail -n 1 $path.dump | awk '{print $1}')
-fi
-pass_address=${pass_address/:/}
+# if [[ ! $pass_address ]]
+# then
+#   pass_address=$(tail -n 1 $path.dump | awk '{print $1}')
+# fi
+# pass_address=${pass_address/:/}
+
+tohost_address=$(riscv64-unknown-elf-readelf -a $path | grep '[^\.]\<tohost\>' | awk '{print $2}')
+
 base=$(basename $path)
 notice "Running Haskell $base"
 
 mkdir -p dump
 
 #cmd="./obj_dir/Vsystem +sign_size=8192 +signature=signature +testfile=$hexfile +pass_address=$pass_address"
-cmd="time ./Main testfile=$hexfile pass:$pass_address"
-if [[ $fail_address ]]
-then
-  cmd="$cmd +fail:$fail_address"
-fi
-fail_address=${fail_address/:/}
+cmd="time ./Main testfile=$hexfile tohost_address:$tohost_address"
+
 cmd="$cmd > dump/$base.haskelldump"
 execute "$cmd"
 result=$?
 
-execute "time ./runElf.sh $path"
-execute "grep -v "MainTime" system.out > dump/$base.verilogdump"
-rm system.out
+#execute "time ./runElf.sh $path"
+#execute "grep -v "MainTime" system.out > dump/$base.verilogdump"
+#rm system.out
 
 rm $hexfile
 exit $result

@@ -4,6 +4,10 @@ module Main where
 import Simulator.All
 import HaskellTarget as T
 
+import qualified Data.HashMap as M
+import qualified Data.Vector as V
+import qualified Data.BitVector as BV
+
 import Control.Monad
 import Data.IORef
 import System.Exit
@@ -24,28 +28,34 @@ regfiles = fst $ fst T.kami_model
 basemod :: T.BaseModule
 basemod = snd $ fst T.kami_model
 
-meths :: IORef Int -> [(String, Val -> IO Val)]
+file :: String
+file = "proc_core_mem_reg_file"
+
+meths :: IORef Int -> [(String, Val -> FileState -> M.Map String Val -> IO Val)]
 meths counter = [("proc_core_pc", proc_core_meth counter)]
 
-proc_core_meth :: IORef Int -> Val -> IO Val
-proc_core_meth counter v = do
-    passaddr <- getPass isa_size
-    failaddr <- getFail isa_size
+proc_core_meth :: IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
+proc_core_meth counter v filestate regstate = do
+    tohost_addr <- getArgVal "tohost_address" isa_size
     n <- readIORef counter
     when (n > timeout) $ do
         hPutStrLn handle "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
         hPutStrLn stderr "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
         exitFailure
     writeIORef counter (n+1)
-    if v == passaddr then do
-        hPutStrLn handle "Passed"
-        hPutStrLn stderr "Passed"
-        exitSuccess
-    else if Just v == failaddr then do
-        hPutStrLn handle "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
-        hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
-        exitFailure
-    else return tt
+    case M.lookup file (arrs filestate) of
+        Nothing -> error $ "File " ++ file ++ " not found."
+        Just v -> let val = v V.! (fromIntegral $ BV.nat $ bvCoerce tohost_addr) in 
+            if bvCoerce val == 1 then do
+                hPutStrLn handle "Passed"
+                hPutStrLn stderr "Passed"
+                exitSuccess
+
+            else if bvCoerce val > 1 then do
+                    hPutStrLn handle "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+                    hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+                    exitFailure
+            else return tt
 
 main :: IO()
 main = do
