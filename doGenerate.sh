@@ -77,36 +77,82 @@ then
 fi
 execute "$cmd"
 
-cat Target.raw > Target.hs
-echo "rtlMod = model$xlen" >> Target.hs
+for file in *.hs
+do
+  case "$file" in
+    FixLits.hs*) continue;;
+    *) mv $file Haskell
+  esac
+done
 
-notice "Compiling the Verilog generator."
-execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
-  
-notice "Generating the Verilog model."
-execute "time Kami/PrettyPrintVerilog > System.sv"
-  
-notice "Generating the simulator source code (i.e. C files)."
-execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
-  
-if [ -x "$(command -v clang)" ]; then
-  compiler=clang
-else
-  compiler=g++
-fi
+cat Haskell/Target.raw > Haskell/Target.hs
+echo "rtlMod = model$xlen" >> Haskell/Target.hs
 
-notice "Compiling the simulation program."
-execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+unameOut="$(uname -s)"
+case "${unameOut}" in
+  Darwin*) SED=gsed;;
+  *)       SED=sed
+esac
+
+ghc Kami/FixLits.hs -o fixlits
+
+notice "Fixing Literals"
+for file in Haskell/*.hs
+do
+  ./fixlits $file
+  echo "$file fixed."
+done
+
+notice "Adding missing imports"
+for file in \
+  Haskell/Word.hs \
+  Haskell/Syntax.hs \
+  Haskell/HexNotation.hs \
+  Haskell/Definitions.hs \
+  Haskell/Jump.hs \
+  Haskell/Branch.hs \
+  Haskell/Round.hs \
+  Haskell/NFToIN.hs \
+  Haskell/Fpu.hs \
+  Haskell/MulAdd.hs \
+  Haskell/ModDivSqrt.hs \
+  Haskell/Div.hs
+do
+  $SED -i -e '0,/^import/{s/^import/import qualified Data.Bits (testBit, setBit, shiftL, shiftR)\nimport qualified Data.Char(chr, ord)\nimport/}' $file
+done
+
+if [[ $haskell == 0 ]]
+then
+  notice "Compiling the Verilog generator."
+  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iHaskell Kami/PrettyPrintVerilog.hs"
+  #execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
+
+  notice "Generating the Verilog model."
+  execute "time Kami/PrettyPrintVerilog > System.sv"
     
+  notice "Generating the simulator source code (i.e. C files)."
+  execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
+    
+  if [ -x "$(command -v clang)" ]; then
+    compiler=clang
+  else
+    compiler=g++
+  fi
+
+  notice "Compiling the simulation program."
+  execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+fi    
+
 if [[ $haskell == 1 ]]
 then 
-  cat HaskellTarget.raw > HaskellTarget.hs
-  echo "kami_model = (kami_model$xlen, $xlen)" >> HaskellTarget.hs
+  cat Haskell/HaskellTarget.raw > Haskell/HaskellTarget.hs
+  echo "kami_model = (kami_model$xlen, $xlen)" >> Haskell/HaskellTarget.hs
   
   cp Main.raw Main.hs
   
   notice "Compiling the Haskell generator."
-  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iKami Main.hs"
+  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iHaskell -iKami Main.hs"
+#  execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O0 --make -iKami Main.hs"
 fi
 
 notice "Done."
