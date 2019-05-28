@@ -72,8 +72,8 @@ then
   verboseflag="-v"
 fi
 
-#notice "Generating model".
-#./doGenerate.sh $verboseflag --xlen $xlen
+notice "Generating model".
+./doGenerate.sh $verboseflag --xlen $xlen --haskell
 
 notice "Running tests in $path."
 files=$(ls $path/rv${xlen}{u,m}?-p-*)
