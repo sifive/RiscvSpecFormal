@@ -94,7 +94,7 @@ case "${unameOut}" in
   *)       SED=sed
 esac
 
-ghc Kami/FixLits.hs -o fixlits
+ghc -iKami Kami/FixLits.hs -o fixlits
 
 notice "Fixing Literals"
 for file in Haskell/*.hs
@@ -104,27 +104,40 @@ do
 done
 
 notice "Adding missing imports"
-for file in \
-  Haskell/Word.hs \
-  Haskell/Syntax.hs \
-  Haskell/HexNotation.hs \
-  Haskell/Definitions.hs \
-  Haskell/Jump.hs \
-  Haskell/Branch.hs \
-  Haskell/Round.hs \
-  Haskell/NFToIN.hs \
-  Haskell/Fpu.hs \
-  Haskell/MulAdd.hs \
-  Haskell/ModDivSqrt.hs \
-  Haskell/Div.hs
+
+for file in $(grep -l "CustomExtract" Haskell/*.hs)
 do
-  $SED -i -e '0,/^import/{s/^import/import qualified Data.Bits (testBit, setBit, shiftL, shiftR)\nimport qualified Data.Char(chr, ord)\nimport/}' $file
+  grep -q "import qualified CustomExtract" $file
+  if [ $? -ne 0 ]
+  then
+    $SED -i -e '0,/^import/{s/^import/import qualified CustomExtract\nimport/}' $file
+  fi
 done
+
+for file in $(grep -l "Data\.Char" Haskell/*.hs)
+do
+  grep -q "import qualified Data\.Char" $file
+  if [ $? -ne 0 ]
+  then
+    $SED -i -e '0,/^import/{s/^import/import qualified Data.Char\nimport/}' $file
+  fi
+done
+
+for file in $(grep -l "Data\.Bits" Haskell/*.hs)
+do
+  grep -q "import qualified Data\.Bits" $file
+  if [ $? -ne 0 ]
+  then
+    $SED -i -e '0,/^import/{s/^import/import qualified Data.Bits\nimport/}' $file
+  fi
+done
+
+
 
 if [[ $haskell == 0 ]]
 then
   notice "Compiling the Verilog generator."
-  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iHaskell Kami/PrettyPrintVerilog.hs"
+  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs"
   #execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
 
   notice "Generating the Verilog model."
