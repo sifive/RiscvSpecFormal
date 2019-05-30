@@ -40,12 +40,14 @@ jobs:
     - ./configure --prefix=$HOME/verilator-binary
     - make -j 4
     - make install 
+    - verilator --version
     - cd ..
 
   - script:
     - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
     - sudo apt-get update
     - sudo apt-get install coq-8.9.0 --yes
+    - coq --version
 
     - make -j 4
     - rm -rf $HOME/haskell-files/*
@@ -57,6 +59,7 @@ jobs:
     - sudo add-apt-repository ppa:hvr/ghc --yes
     - sudo apt-get update
     - sudo apt-get install ghc-8.6.5 --yes
+    - ghc --version
 
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
@@ -74,6 +77,7 @@ jobs:
     - sudo add-apt-repository ppa:hvr/ghc --yes
     - sudo apt-get update
     - sudo apt-get install ghc-8.6.5 --yes
+    - ghc --version
 
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
@@ -90,6 +94,7 @@ jobs:
   - stage: generate_obj_dir_and_run_tests
     script:
     - sudo apt-get install clang parallel --yes
+    - clang --version
 
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/System32.sv ./System.sv
@@ -99,6 +104,7 @@ jobs:
 
   - script:
     - sudo apt-get install clang parallel --yes
+    - clang --version
 
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/System64.sv ./System.sv
