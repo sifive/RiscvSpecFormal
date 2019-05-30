@@ -67,7 +67,7 @@ jobs:
     - for file in $(grep -l "CustomExtract" Haskell/*.hs); do grep -q "import qualified CustomExtract" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified CustomExtract\nimport/}' $file; fi; done
     - for file in $(grep -l "Data\.Char" Haskell/*.hs); do grep -q "import qualified Data\.Char" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Char\nimport/}' $file; fi; done
     - for file in $(grep -l "Data\.Bits" Haskell/*.hs); do grep -q "import qualified Data\.Bits" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Bits\nimport/}' $file; fi; done
-    - ghc -O0 --make -iHaskell Kami/PrettyPrintVerilog.hs
+    - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
 
   - script:
@@ -84,7 +84,7 @@ jobs:
     - for file in $(grep -l "CustomExtract" Haskell/*.hs); do grep -q "import qualified CustomExtract" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified CustomExtract\nimport/}' $file; fi; done
     - for file in $(grep -l "Data\.Char" Haskell/*.hs); do grep -q "import qualified Data\.Char" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Char\nimport/}' $file; fi; done
     - for file in $(grep -l "Data\.Bits" Haskell/*.hs); do grep -q "import qualified Data\.Bits" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Bits\nimport/}' $file; fi; done
-    - ghc -O0 --make -iHaskell Kami/PrettyPrintVerilog.hs
+    - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System64.sv
 
   - stage: generate_obj_dir_and_run_tests
