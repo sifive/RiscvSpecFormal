@@ -20,3 +20,4 @@ signature
 Main
 *~
 dump
+fixlits

@@ -59,10 +59,15 @@ jobs:
     - sudo apt-get install ghc-8.6.5 --yes
 
     - ls $HOME/haskell-files
-    - cp $HOME/haskell-files/* ./
-    - cat Target.raw > Target.hs
-    - echo "rtlMod = model32" >> Target.hs
-    - ghc -O0 --make Kami/PrettyPrintVerilog.hs
+    - cp $HOME/haskell-files/* ./Haskell
+    - cat Haskell/Target.raw > Haskell/Target.hs
+    - echo "rtlMod = model32" >> Haskell/Target.hs
+    - ghc -iKami Kami/FixLits.hs -o fixlits
+    - for file in Haskell/*.hs; do ./fixlits $file; echo "$file fixed"; done
+    - for file in $(grep -l "CustomExtract" Haskell/*.hs); do grep -q "import qualified CustomExtract" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified CustomExtract\nimport/}' $file; fi; done
+    - for file in $(grep -l "Data\.Char" Haskell/*.hs); do grep -q "import qualified Data\.Char" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Char\nimport/}' $file; fi; done
+    - for file in $(grep -l "Data\.Bits" Haskell/*.hs); do grep -q "import qualified Data\.Bits" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Bits\nimport/}' $file; fi; done
+    - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
 
   - script:
@@ -71,10 +76,15 @@ jobs:
     - sudo apt-get install ghc-8.6.5 --yes
 
     - ls $HOME/haskell-files
-    - cp $HOME/haskell-files/* ./
-    - cat Target.raw > Target.hs
-    - echo "rtlMod = model64" >> Target.hs
-    - ghc -O0 --make Kami/PrettyPrintVerilog.hs
+    - cp $HOME/haskell-files/* ./Haskell
+    - cat Haskell/Target.raw > Haskell/Target.hs
+    - echo "rtlMod = model64" >> Haskell/Target.hs
+    - ghc -iKami Kami/FixLits.hs -o fixlits
+    - for file in Haskell/*.hs; do ./fixlits $file; echo "$file fixed"; done
+    - for file in $(grep -l "CustomExtract" Haskell/*.hs); do grep -q "import qualified CustomExtract" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified CustomExtract\nimport/}' $file; fi; done
+    - for file in $(grep -l "Data\.Char" Haskell/*.hs); do grep -q "import qualified Data\.Char" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Char\nimport/}' $file; fi; done
+    - for file in $(grep -l "Data\.Bits" Haskell/*.hs); do grep -q "import qualified Data\.Bits" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Bits\nimport/}' $file; fi; done
+    - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System64.sv
 
   - stage: generate_obj_dir_and_run_tests

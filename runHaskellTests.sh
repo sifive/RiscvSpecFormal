@@ -72,13 +72,30 @@ then
   verboseflag="-v"
 fi
 
-#notice "Generating model".
-#./doGenerate.sh $verboseflag --xlen $xlen
+notice "Generating model".
+./doGenerate.sh $verboseflag --xlen $xlen --haskell
+
+notice "Running tests in $path."
+files=$(ls $path/rv${xlen}{u,m}?-p-*)
+for file in \
+  rv64mi-p-access \
+  rv64mi-p-csr \
+  rv64mi-p-illegal \
+  rv64mi-p-sbreak \
+  rv64mi-p-scall \
+  rv32mi-p-illegal \
+  rv32mi-p-shamt \
+  rv32mi-p-csr \
+  rv32mi-p-sbreak
+do
+  files=${files/$path\/$file/}
+done
+
 
 notice "Running tests in $path."
 if [[ $parallel == 0 ]]
 then
-  for file in $path/rv${xlen}u?-p-*; do ((file $file | (grep -iq elf && ./runHSim.sh $file)) || (file $file | grep -viq elf)); result=$(( $? | $result )); done
+  for file in $files; do ((file $file | (grep -iq elf && ./runHSim.sh $file)) || (file $file | grep -viq elf)); result=$(( $? | $result )); done
   #for file in $path/rv${xlen}u?-p-*; do file $file | (grep -iq elf && (./runElf.sh "$file" || result=1)); done
 else
   ls $path/rv${xlen}u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runHSim.sh {})) || (file {} | grep -viq elf)"
