@@ -103,21 +103,23 @@ $ cd ..
 
 === Installing the model.
 
-==== Cloning and building the 32-bit model
+==== Cloning the model
 [souce,shell]
 ----
 $ git clone https://github.com/sifive/RiscvSpecFormal.git
 $ cd RiscvSpecFormal
 $ git submodule update --init
+----
+
+==== Building the 32-bit model
+[source,shell]
+----
 $ ./doGenerate.sh --xlen 32
 ----
 
-==== Cloning and building the 64-bit model
+==== Building the 64-bit model
 [souce,shell]
 ----
-$ git clone https://github.com/sifive/RiscvSpecFormal.git
-$ cd RiscvSpecFormal
-$ git submodule update --init
 $ ./doGenerate.sh --xlen 64
 ----
 
