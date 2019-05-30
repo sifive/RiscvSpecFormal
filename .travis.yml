@@ -59,7 +59,7 @@ jobs:
     - sudo apt-get install ghc-8.6.5 --yes
 
     - ls $HOME/haskell-files
-    - cp $HOME/haskell-files/* ./
+    - cp $HOME/haskell-files/* ./Haskell
     - cat Haskell/Target.raw > Haskell/Target.hs
     - echo "rtlMod = model32" >> Haskell/Target.hs
     - ghc -iKami Kami/FixLits.hs -o fixlits
@@ -76,7 +76,7 @@ jobs:
     - sudo apt-get install ghc-8.6.5 --yes
 
     - ls $HOME/haskell-files
-    - cp $HOME/haskell-files/* ./
+    - cp $HOME/haskell-files/* ./Haskell
     - cat Haskell/Target.raw > Haskell/Target.hs
     - echo "rtlMod = model64" >> Haskell/Target.hs
     - ghc -iKami Kami/FixLits.hs -o fixlits
