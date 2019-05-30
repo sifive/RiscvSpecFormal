@@ -2,14 +2,18 @@
 
 = Installation Instructions
 
-== Dependencies for building the verilog files corresponding to the model
+== Dependencies
+=== Dependencies for building the verilog files corresponding to the model
 . Coq 8.9.0
 . GHC 8.6.5 or newer
 
-== Dependencies for running the model on riscv-tests
-. Clang 10.0.0 or newer
+=== Dependencies for running the model on riscv-tests
+. Clang 3.8.0 or newer
 . RISCV GCC 8.2.0-2019.02.0
 . Verilator master branch (4.015 devel rev UNKNOWN_REV)
+
+Note that the versions mentioned above are known to work. Try other versions at your own peril. In particular, I believe Coq 8.9.1 works; GHC 8.2.2 or newer works; Clang 10.0.0 or newer works *but Clang 8.0.0 does not work*; Verilator 4.013 devel rev UNKNOWN_REV or newer works.
+
 
 == Repositories needed to build the model
 .RiscvSpecFormal: The top level repository containing the actual model in sub repositories along with several scripts for building and running https://github.com/sifive/RiscvSpecFormal
@@ -22,6 +26,7 @@
 
 == Repository needed to run riscv-tests
 .riscv-tests: https://github.com/riscv/riscv-tests
+
 
 == Ubuntu-specific instructions
 Note that in the following set of instructions `sudo` permission is needed to install the tools from Ubuntu's official repositories and other PPAs. One can also install these packages directly from sources without `sudo` permission. Please refer to the specific packages websites for instructions on how to do it. If the following instructions are followed one after the other, one should be able to build the model and run most of the tests in riscv-tests (the instructions for running the tests are also provided).
@@ -38,11 +43,13 @@ $ coqc --version
 ----
 
 ==== Installing GHC
+Note that this PPA installs `ghc` in a non-standard location (`/opt/ghc/bin`) so as to not clobber your existing `ghc` installation.
 [source,shell]
 ----
 $ sudo add-apt-repository ppa:hvr/ghc --yes
 $ sudo apt-get update
 $ sudo apt-get install ghc-8.6.5 --yes
+$ export PATH=/opt/ghc/bin:$PATH
 $ ghc --version
 ----
 
@@ -59,7 +66,7 @@ These instructions install RISCV GCC on the current directory and adds that dire
 ----
 $ wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
 $ tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-$ export PATH=`pwd`/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14:$PATH # Sets the path so that it is available for later commands
+$ export PATH=`pwd`/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
 $ riscv64-unknown-elf-gcc --version
 ----
 
@@ -79,7 +86,7 @@ $ cd ..
 
 
 ==== Installing RISCV tests
-Note that we change the linker script to start the addresses from `0x00000000` instead of `0x80000000`. `riscv-tests` will be installed in riscv-tests-install.
+Note that we change the linker script to start the addresses from `0x00000000` instead of `0x80000000`. `riscv-tests` will be installed in `riscv-tests-install`.
 [source,shell]
 ----
 $ git clone https://github.com/riscv/riscv-tests
@@ -116,6 +123,7 @@ $ ./doGenerate.sh --xlen 64
 
 === Running the riscv-tests on the model
 Note that the following `runTests.sh` command internally calls `doGenerate.sh`, though if the instructions are followed and the model is built, this command will finish fast. (The previous invokation of `doGenerate.sh` can be skipped if `runTests.sh` is invoked. `runTests.sh` requires the path of the directory where `riscv-tests` are installed.
+
 ==== Running the 32-bit tests
 [souce,shell]
 ----
