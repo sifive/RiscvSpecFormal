@@ -1,0 +1,129 @@
+:toc:
+
+= Installation Instructions
+
+== Dependencies for building the verilog files corresponding to the model
+. Coq 8.9.0
+. GHC 8.6.5 or newer
+
+== Dependencies for running the model on riscv-tests
+. Clang 10.0.0 or newer
+. RISCV GCC 8.2.0-2019.02.0
+. Verilator master branch (4.015 devel rev UNKNOWN_REV)
+
+== Repositories needed to build the model
+.RiscvSpecFormal: The top level repository containing the actual model in sub repositories along with several scripts for building and running https://github.com/sifive/RiscvSpecFormal
+. FpuKami: The formal specification of IEEE floating point standard (IEEE 754) in Kami and an implementation in Kami https://github.com/sifive/FpuKami
+. Kami: The Coq-based DSL + tactics + theorems to write and prove hardware in Coq https://github.com/sifive/Kami
+. ProcKami: The formal specification of RISCV-ISA written in Kami https://github.com/sifive/ProcKami
+. StdLibKami: The standard library of useful Kami modules https://github.com/sifive/StdLibKami
+. bbv: The bitvector library from MIT (stands for Bedrock Bit Vectors) https://github.com/mit-plv/bbv
+. coq-record-updates: Utility library for in-place updates of Coq (Gallina) records https://github.com/tchajed/coq-record-update
+
+== Repository needed to run riscv-tests
+.riscv-tests: https://github.com/riscv/riscv-tests
+
+== Ubuntu-specific instructions
+Note that in the following set of instructions `sudo` permission is needed to install the tools from Ubuntu's official repositories and other PPAs. One can also install these packages directly from sources without `sudo` permission. Please refer to the specific packages websites for instructions on how to do it. If the following instructions are followed one after the other, one should be able to build the model and run most of the tests in riscv-tests (the instructions for running the tests are also provided).
+
+=== One time installation
+
+==== Installing Coq
+[source,shell]
+----
+$ sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
+$ sudo apt-get update
+$ sudo apt-get install coq-8.9.0 --yes
+$ coqc --version
+----
+
+==== Installing GHC
+[source,shell]
+----
+$ sudo add-apt-repository ppa:hvr/ghc --yes
+$ sudo apt-get update
+$ sudo apt-get install ghc-8.6.5 --yes
+$ ghc --version
+----
+
+==== Installing Clang
+[source,shell]
+----
+$ sudo apt-get install clang --yes
+$ clang --version
+----
+
+==== Installing RISCV GCC
+These instructions install RISCV GCC on the current directory and adds that directory to the path for later commands to execute correctly.
+[source,shell]
+----
+$ wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+$ tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+$ export PATH=`pwd`/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14:$PATH # Sets the path so that it is available for later commands
+$ riscv64-unknown-elf-gcc --version
+----
+
+==== Installing Verilator
+Verilator will be install inside the directory `verilator-binary`, which will be added to the path.
+[source,shell]
+----
+$ git clone http://git.veripool.org/git/verilator
+$ cd verilator
+$ autoconf
+$ ./configure --prefix=`pwd`/../verilator-binary
+$ make -j 4 && make install
+$ export PATH=`pwd`/../verilator-binary/bin:$PATH
+$ verilator --version
+$ cd ..
+----
+
+
+==== Installing RISCV tests
+Note that we change the linker script to start the addresses from `0x00000000` instead of `0x80000000`. `riscv-tests` will be installed in riscv-tests-install.
+[source,shell]
+----
+$ git clone https://github.com/riscv/riscv-tests
+$ cd riscv-tests
+$ git submodule update --init --recursive
+$ autoconf
+$ ./configure --prefix=`pwd`/../riscv-tests-install
+$ sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld
+$ make -j && make install
+$ cd ..
+----
+
+
+
+=== Installing the model.
+
+==== Cloning and building the 32-bit model
+[souce,shell]
+----
+$ git clone https://github.com/sifive/RiscvSpecFormal.git
+$ cd RiscvSpecFormal
+$ git submodule update --init
+$ ./doGenerate.sh --xlen 32
+----
+
+==== Cloning and building the 64-bit model
+[souce,shell]
+----
+$ git clone https://github.com/sifive/RiscvSpecFormal.git
+$ cd RiscvSpecFormal
+$ git submodule update --init
+$ ./doGenerate.sh --xlen 64
+----
+
+=== Running the riscv-tests on the model
+Note that the following `runTests.sh` command internally calls `doGenerate.sh`, though if the instructions are followed and the model is built, this command will finish fast. (The previous invokation of `doGenerate.sh` can be skipped if `runTests.sh` is invoked. `runTests.sh` requires the path of the directory where `riscv-tests` are installed.
+==== Running the 32-bit tests
+[souce,shell]
+----
+$ ./runTests.sh --path `pwd`/../riscv-tests/isa --xlen 32
+----
+
+==== Running the 64-bit tests
+[souce,shell]
+----
+$ ./runTests.sh --path `pwd`/../riscv-tests/isa --xlen 64
+----
