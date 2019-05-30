@@ -64,7 +64,7 @@ jobs:
     - echo "rtlMod = model32" >> Haskell/Target.hs
     - sed -i -e '0,/^import/{s/^import/import qualified Data.Bits (testBit, setBit, shiftL, shiftR)\nimport qualified Data.Char(chr, ord)\nimport/}' *.hs
     - ghc -iKami Kami/FixLits.hs -o fixlits
-    - for file in Haskell/*.hs; do; ./fixlits $file; echo "$file fixed"; done
+    - for file in Haskell/*.hs; do ./fixlits $file; echo "$file fixed"; done
     - ghc -O0 --make -iHaskell Kami/PrettyPrintVerilog.hs
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
 
