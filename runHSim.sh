@@ -65,7 +65,7 @@ mkdir -p dump
 
 #cmd="./obj_dir/Vsystem +sign_size=8192 +signature=signature +testfile=$hexfile +pass_address=$pass_address"
 #cmd="time ./Main testfile=$hexfile tohost_address:$tohost_address +RTS -p"
-cmd="time ./Main testfile=$hexfile tohost_address:$tohost_address"
+cmd="./Main testfile=$hexfile tohost_address:$tohost_address"
 
 
 cmd="$cmd > dump/$base.haskelldump"
