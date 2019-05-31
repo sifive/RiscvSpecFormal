@@ -1,3 +1,4 @@
+:sectnums:
 :toc:
 
 = Installation Instructions
@@ -16,16 +17,16 @@ Note that the versions mentioned above are known to work. Try other versions at 
 
 
 == Repositories needed to build the model
-. RiscvSpecFormal: The top level repository containing the actual model in sub repositories along with several scripts for building and running https://github.com/sifive/RiscvSpecFormal
-.. FpuKami: The formal specification of IEEE floating point standard (IEEE 754) in Kami and an implementation in Kami https://github.com/sifive/FpuKami
-.. Kami: The Coq-based DSL + tactics + theorems to write and prove hardware in Coq https://github.com/sifive/Kami
-.. ProcKami: The formal specification of RISCV-ISA written in Kami https://github.com/sifive/ProcKami
-.. StdLibKami: The standard library of useful Kami modules https://github.com/sifive/StdLibKami
-.. bbv: The bitvector library from MIT (stands for Bedrock Bit Vectors) https://github.com/mit-plv/bbv
-.. coq-record-updates: Utility library for in-place updates of Coq (Gallina) records https://github.com/tchajed/coq-record-update
+* RiscvSpecFormal: The top level repository containing the actual model in sub repositories along with several scripts for building and running https://github.com/sifive/RiscvSpecFormal
+- FpuKami: The formal specification of IEEE floating point standard (IEEE 754) in Kami and an implementation in Kami https://github.com/sifive/FpuKami
+- Kami: The Coq-based DSL + tactics + theorems to write and prove hardware in Coq https://github.com/sifive/Kami
+- ProcKami: The formal specification of RISCV-ISA written in Kami https://github.com/sifive/ProcKami
+- StdLibKami: The standard library of useful Kami modules https://github.com/sifive/StdLibKami
+- bbv: The bitvector library from MIT (stands for Bedrock Bit Vectors) https://github.com/mit-plv/bbv
+- coq-record-updates: Utility library for in-place updates of Coq (Gallina) records https://github.com/tchajed/coq-record-update
 
 == Repository needed to run riscv-tests
-. riscv-tests: https://github.com/riscv/riscv-tests
+* riscv-tests: https://github.com/riscv/riscv-tests
 
 
 == Ubuntu-specific instructions
@@ -124,7 +125,7 @@ $ ./doGenerate.sh --xlen 64
 ----
 
 === Running the riscv-tests on the model
-Note that the following `runTests.sh` command internally calls `doGenerate.sh`, though if the instructions are followed and the model is built, this command will finish fast. (The previous invokation of `doGenerate.sh` can be skipped if `runTests.sh` is invoked. `runTests.sh` requires the path of the directory where `riscv-tests` are installed.
+Note that the following `runTests.sh` command internally calls `doGenerate.sh`, though if the instructions are followed and the model is built, this command will finish fast. (The previous invocation of `doGenerate.sh` can be skipped if `runTests.sh` is invoked. `runTests.sh` requires the path of the directory where `riscv-tests` are installed.
 
 ==== Running the 32-bit tests
 [souce,shell]
