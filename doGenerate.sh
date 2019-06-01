@@ -77,14 +77,6 @@ then
 fi
 execute "$cmd"
 
-for file in *.hs
-do
-  case "$file" in
-    FixLits.hs*) continue;;
-    *) mv $file Haskell
-  esac
-done
-
 cat Haskell/Target.raw > Haskell/Target.hs
 echo "rtlMod = model$xlen" >> Haskell/Target.hs
 
@@ -97,9 +89,10 @@ esac
 ghc -iKami Kami/FixLits.hs -o fixlits
 
 notice "Fixing Literals"
-for file in Haskell/*.hs
+for file in $(find . -maxdepth 1 -name "*.hs")
 do
   ./fixlits $file
+  mv $file Haskell
   echo "$file fixed."
 done
 
