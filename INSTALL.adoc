@@ -37,52 +37,52 @@ Note that in the following set of instructions `sudo` permission is needed to in
 ==== Installing Coq
 [source,shell]
 ----
-$ sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
-$ sudo apt-get update
-$ sudo apt-get install coq-8.9.0 --yes
-$ coqc --version
+sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
+sudo apt-get update
+sudo apt-get install coq-8.9.0 --yes
+coqc --version
 ----
 
 ==== Installing GHC
 Note that this PPA installs `ghc` in a non-standard location (`/opt/ghc/bin`) so as to not clobber your existing `ghc` installation.
 [source,shell]
 ----
-$ sudo add-apt-repository ppa:hvr/ghc --yes
-$ sudo apt-get update
-$ sudo apt-get install ghc-8.6.5 --yes
-$ export PATH=/opt/ghc/bin:$PATH
-$ ghc --version
+sudo add-apt-repository ppa:hvr/ghc --yes
+sudo apt-get update
+sudo apt-get install ghc-8.6.5 --yes
+export PATH=/opt/ghc/bin:$PATH
+ghc --version
 ----
 
 ==== Installing Clang
 [source,shell]
 ----
-$ sudo apt-get install clang --yes
-$ clang --version
+sudo apt-get install clang --yes
+clang --version
 ----
 
 ==== Installing RISCV GCC
 These instructions install RISCV GCC on the current directory and adds that directory to the path for later commands to execute correctly.
 [source,shell]
 ----
-$ wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-$ tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
-$ export PATH=`pwd`/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
-$ riscv64-unknown-elf-gcc --version
+wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+tar xzf riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz
+export PATH=`pwd`/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
+riscv64-unknown-elf-gcc --version
 ----
 
 ==== Installing Verilator
 Verilator will be install inside the directory `verilator-binary`, which will be added to the path.
 [source,shell]
 ----
-$ git clone http://git.veripool.org/git/verilator
-$ cd verilator
-$ autoconf
-$ ./configure --prefix=`pwd`/../verilator-binary
-$ make -j 4 && make install
-$ export PATH=`pwd`/../verilator-binary/bin:$PATH
-$ verilator --version
-$ cd ..
+git clone http://git.veripool.org/git/verilator
+cd verilator
+autoconf
+./configure --prefix=`pwd`/../verilator-binary
+make -j 4 && make install
+export PATH=`pwd`/../verilator-binary/bin:$PATH
+verilator --version
+cd ..
 ----
 
 
@@ -90,14 +90,14 @@ $ cd ..
 Note that we change the linker script to start the addresses from `0x00000000` instead of `0x80000000`. `riscv-tests` will be installed in `riscv-tests-install`.
 [source,shell]
 ----
-$ git clone https://github.com/riscv/riscv-tests
-$ cd riscv-tests
-$ git submodule update --init --recursive
-$ autoconf
-$ ./configure --prefix=`pwd`/../riscv-tests-install
-$ sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld
-$ make -j && make install
-$ cd ..
+git clone https://github.com/riscv/riscv-tests
+cd riscv-tests
+git submodule update --init --recursive
+autoconf
+./configure --prefix=`pwd`/../riscv-tests-install
+sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld
+make -j && make install
+cd ..
 ----
 
 
@@ -107,21 +107,21 @@ $ cd ..
 ==== Cloning the model
 [souce,shell]
 ----
-$ git clone https://github.com/sifive/RiscvSpecFormal.git
-$ cd RiscvSpecFormal
-$ git submodule update --init
+git clone https://github.com/sifive/RiscvSpecFormal.git
+cd RiscvSpecFormal
+git submodule update --init
 ----
 
 ==== Building the 32-bit model
 [source,shell]
 ----
-$ ./doGenerate.sh --xlen 32
+./doGenerate.sh --xlen 32
 ----
 
 ==== Building the 64-bit model
 [souce,shell]
 ----
-$ ./doGenerate.sh --xlen 64
+./doGenerate.sh --xlen 64
 ----
 
 === Running the riscv-tests on the model
@@ -130,11 +130,11 @@ Note that the following `runTests.sh` command internally calls `doGenerate.sh`, 
 ==== Running the 32-bit tests
 [souce,shell]
 ----
-$ ./runTests.sh --path `pwd`/../riscv-tests/isa --xlen 32
+./runTests.sh --path `pwd`/../riscv-tests/isa --xlen 32
 ----
 
 ==== Running the 64-bit tests
 [souce,shell]
 ----
-$ ./runTests.sh --path `pwd`/../riscv-tests/isa --xlen 64
+./runTests.sh --path `pwd`/../riscv-tests/isa --xlen 64
 ----
