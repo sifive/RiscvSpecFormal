@@ -4,6 +4,6 @@ import PeanoNat
 import Fin
 import Instance
 import Rtl
-import Syntax hiding (unsafeCoerce)
+import Syntax hiding (unsafeCoerce, __)
 import Word
 rtlMod :: RtlModule
