@@ -6,12 +6,11 @@
 source common.sh
 
 result=0
-verbose=0
 parallel=0
 
 xlen=32
 
-options=$(getopt --options="hvcx:p:" --longoptions="help,verbose,parallel,xlen:,path:" -- "$@")
+options=$(getopt --options="hvcsx:p:" --longoptions="help,verbose,parallel,haskell,xlen:,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -43,13 +42,17 @@ Generates the RISC-V processor simulator.
 Authors
 Murali Vijayaraghavan
 Larry Lee
+Evan Marzion
 EOF
       exit 0;;
     -v|--verbose)
-      verbose=1
+      verboseflag="-v"
       shift;;
     -c|--parallel)
       parallel=1
+      shift;;
+    -s|--haskell)
+      haskell="--haskell"
       shift;;
     -x|--xlen)
       xlen=$2
@@ -67,13 +70,8 @@ shift $((OPTIND - 1))
 
 [[ -z "$path" ]] && error "Invalid command line. The PATH argument is missing."
 
-if [[ $verbose == 1 ]]
-then
-  verboseflag="-v"
-fi
-
 notice "Generating model".
-./doGenerate.sh $verboseflag --xlen $xlen
+./doGenerate.sh $verboseflag $haskell --xlen $xlen
 
 notice "Running tests in $path."
 files=$(ls $path/rv${xlen}{u,m}?-p-*)
@@ -91,27 +89,21 @@ do
   files=${files/$path\/$file/}
 done
 
-if [[ $verbose == 1 ]]
-then
-  notice "Running the following tests:"
-  printf "$files"
-fi
-
 if [[ $parallel == 0 ]]
 then
   for file in $files
   do
-    ((file $file | (grep -iq elf && ./runElf.sh $file)) || (file $file | grep -viq elf));
+    ((file $file | (grep -iq elf && ./runElf.sh $verboseflag $haskell --path $file)) || (file $file | grep -viq elf));
     result=$(( $? | $result ));
   done
 else
-  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh {})) || (file {} | grep -viq elf)"
+  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh $verboseflag $haskell --path {})) || (file {} | grep -viq elf)"
   result=$?
 fi
 
 if [[ $result == 0 ]]
 then
-  notice "All tests passed."
+  notice "All the tests that ran passed."
 else
   error "The test suite failed."
 fi

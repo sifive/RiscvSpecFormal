@@ -10,7 +10,7 @@ rebuild=0 # indicates whether or not to recompile source files that Make thinks 
 
 xlen=32
 
-haskell=0 # Do not create haskell simulator
+haskell=0
 
 options=$(getopt --options="hrvsx:" --longoptions="help,rebuild,verbose,haskell,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
@@ -38,16 +38,19 @@ Arguments:
 Options:
   -h|--help
   Displays this message.
+  -s|--haskell
+  Generates the haskell simulator.
   -r|--rebuild
   Recompiles source files that Make believes have not changed.
   -v|--verbose
   Enables verbose output.
 Example
 ./doGenerate.sh --xlen 32 --verbose
-Generates the RISC-V 32-bit processor simulator.
+Generates the RISC-V 32-bit verilog simulator.
 Authors
 Murali Vijayaraghavan
 Larry Lee
+Evan Marzion
 EOF
       exit 0;;
     -v|--verbose)
@@ -76,9 +79,6 @@ then
   cmd="$cmd -B"
 fi
 execute "$cmd"
-
-cat Haskell/Target.raw > Haskell/Target.hs
-echo "rtlMod = model$xlen" >> Haskell/Target.hs
 
 unameOut="$(uname -s)"
 case "${unameOut}" in
@@ -129,6 +129,9 @@ done
 
 if [[ $haskell == 0 ]]
 then
+  cat Haskell/Target.raw > Haskell/Target.hs
+  echo "rtlMod = model$xlen" >> Haskell/Target.hs
+
   notice "Compiling the Verilog generator."
   execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs"
   #execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"

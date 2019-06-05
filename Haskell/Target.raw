@@ -1,5 +1,5 @@
 module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, rtlMod) where
-import EclecticLib
+import EclecticLib hiding (__)
 import PeanoNat
 import Fin
 import Instance

@@ -4,7 +4,9 @@
 
 source common.sh
 
-options=$(getopt --options="hv" --longoptions="help,verbose" -- "$@")
+haskell=0
+
+options=$(getopt --options="hvsp:" --longoptions="help,verbose,haskell,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -21,17 +23,28 @@ Options:
   Displays this message.
   -v|--verbose
   Enables verbose output.
+  --path location
+  Path to the directory where the test is located.
+  -s|--haskell
+  Runs the haskell simulator
 Example
-./runELF.sh -v rv32ui-p-and
+./runElf.sh -v rv32ui-p-and
 Simulates the rv32ui-p-and test suite program in the RISC-V
 processor simulator.
 Authors
 Murali Vijayaraghavan
 Larry Lee
+Evan Marzion
 EOF
       exit 0;;
     -v|--verbose)
       verbose=1
+      shift;;
+    -p|--path)
+      path=$2
+      shift 2;;
+    -s|--haskell)
+      haskell=1
       shift;;
     --)
       shift
@@ -40,14 +53,20 @@ EOF
 done
 shift $((OPTIND - 1))
 
-[[ $# < 1 ]] && error "Invalid command line. The PATH argument is missing."
-path=$1
+[[ -z "$path" ]] && error "Invalid command line. The PATH argument is missing."
 
 base=$(basename $path)
 
-mkdir -p dump
+if [[ $haskell == 0 ]]
+then
+    dump=verilogdump
+else
+    dump=haskelldump
+fi
 
-hexfile=dump/$base.hex
+mkdir -p $dump
+
+hexfile=$dump/$base.hex
 
 execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
 
@@ -55,8 +74,15 @@ tohost_address=$(riscv64-unknown-elf-readelf -a $path | grep '[^\.]\<tohost\>' |
 
 notice "Running $base"
 
-cmd="./obj_dir/Vsystem +sign_size=8192 +signature=dump/$base.signature +testfile=$hexfile +tohost_address=$tohost_address > dump/$base.out"
+if [[ $haskell == 0 ]]
+then
+    cmd="./obj_dir/Vsystem +sign_size=8192 +signature=$dump/$base.signature +testfile=$hexfile +tohost_address=$tohost_address > $dump/$base.out"
+else
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address > $dump/$base.out"
+fi
+
 execute "$cmd"
+
 result=$?
 
 exit $result
