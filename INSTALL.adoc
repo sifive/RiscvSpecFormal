@@ -4,13 +4,15 @@
 = Installation Instructions
 
 == Dependencies
-=== Dependencies for building the verilog files corresponding to the model
+=== Dependencies for building the model
 . Coq 8.9.0
-. GHC 8.6.5 or newer
+. GHC 8.6.5 or newer and Cabal
 
-=== Dependencies for running the model on riscv-tests
-. Clang 3.8.0 or newer
+=== Dependencies for compiling the tests
 . RISCV GCC 8.2.0-2019.02.0
+
+=== Dependencies for running the Kami-generated Verilog model on riscv-tests
+. Clang 3.8.0 or newer
 . Verilator master branch (4.015 devel rev UNKNOWN_REV)
 
 Note that the versions mentioned above are known to work. Try other versions at your own peril. In particular, I believe Coq 8.9.1 works; GHC 8.2.2 or newer works; Clang 10.0.0 or newer works *but Clang 8.0.0 does not work*; Verilator 4.013 devel rev UNKNOWN_REV or newer works.
@@ -34,7 +36,8 @@ Note that in the following set of instructions `sudo` permission is needed to in
 
 === One time installation
 
-==== Installing Coq
+==== Always necessary
+===== Installing Coq
 [source,shell]
 ----
 sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
@@ -43,25 +46,18 @@ sudo apt-get install coq-8.9.0 --yes
 coqc --version
 ----
 
-==== Installing GHC
-Note that this PPA installs `ghc` in a non-standard location (`/opt/ghc/bin`) so as to not clobber your existing `ghc` installation.
+===== Installing GHC and Cabal
+Note that this PPA installs `ghc` in a non-standard location (`$HOME/.ghcup/bin`) so as to not clobber your existing `ghc` installation.
 [source,shell]
 ----
-sudo add-apt-repository ppa:hvr/ghc --yes
-sudo apt-get update
-sudo apt-get install ghc-8.6.5 --yes
-export PATH=/opt/ghc/bin:$PATH
+export BOOTSTRAP_HASKELL_NONINTERACTIVE=1
+curl https://get-ghcup.haskell.org -sSf | sh
+source $HOME/.ghcup/env
 ghc --version
+cabal --version
 ----
 
-==== Installing Clang
-[source,shell]
-----
-sudo apt-get install clang --yes
-clang --version
-----
-
-==== Installing RISCV GCC
+===== Installing RISCV GCC
 These instructions install RISCV GCC on the current directory and adds that directory to the path for later commands to execute correctly.
 [source,shell]
 ----
@@ -71,22 +67,7 @@ export PATH=`pwd`/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/
 riscv64-unknown-elf-gcc --version
 ----
 
-==== Installing Verilator
-Verilator will be install inside the directory `verilator-binary`, which will be added to the path.
-[source,shell]
-----
-git clone http://git.veripool.org/git/verilator
-cd verilator
-autoconf
-./configure --prefix=`pwd`/../verilator-binary
-make -j 4 && make install
-export PATH=`pwd`/../verilator-binary/bin:$PATH
-verilator --version
-cd ..
-----
-
-
-==== Installing RISCV tests
+===== Installing RISCV tests
 Note that we change the linker script to start the addresses from `0x00000000` instead of `0x80000000`. `riscv-tests` will be installed in `riscv-tests-install`.
 [source,shell]
 ----
@@ -101,10 +82,41 @@ cd ..
 ----
 
 
+==== Necessary for generating the Verilog model generated from Kami
+===== Installing Clang
+[source,shell]
+----
+sudo apt-get install clang --yes
+clang --version
+----
 
-=== Installing the model.
+===== Installing Verilator
+Verilator will be install inside the directory `verilator-binary`, which will be added to the path.
+[source,shell]
+----
+git clone http://git.veripool.org/git/verilator
+cd verilator
+autoconf
+./configure --prefix=`pwd`/../verilator-binary
+make -j 4 && make install
+export PATH=`pwd`/../verilator-binary/bin:$PATH
+verilator --version
+cd ..
+----
 
-==== Cloning the model
+==== Necessary for generating the Haskell model generated from Kami
+===== Installing Cabal packages
+[source,shell]
+----
+cabal update
+cabal install hashmap
+cabal install bv
+----
+
+
+
+=== Cloning the model.
+
 [souce,shell]
 ----
 git clone https://github.com/sifive/RiscvSpecFormal.git
@@ -112,29 +124,29 @@ cd RiscvSpecFormal
 git submodule update --init
 ----
 
-==== Building the 32-bit model
-[source,shell]
-----
-./doGenerate.sh --xlen 32
-----
+=== Building and running the riscv-tests
+The following command builds the model and runs the riscv-tests. `runTests.sh` requires the path of the directory where `riscv-tests` are installed.
 
-==== Building the 64-bit model
-[souce,shell]
-----
-./doGenerate.sh --xlen 64
-----
-
-=== Running the riscv-tests on the model
-Note that the following `runTests.sh` command internally calls `doGenerate.sh`, though if the instructions are followed and the model is built, this command will finish fast. (The previous invocation of `doGenerate.sh` can be skipped if `runTests.sh` is invoked. `runTests.sh` requires the path of the directory where `riscv-tests` are installed.
-
-==== Running the 32-bit tests
+==== Running the 32-bit tests on the Verilog model generated from Kami
 [souce,shell]
 ----
 ./runTests.sh --path `pwd`/../riscv-tests/isa --xlen 32
 ----
 
-==== Running the 64-bit tests
+==== Running the 64-bit tests on the Verilog model generated from Kami
 [souce,shell]
 ----
 ./runTests.sh --path `pwd`/../riscv-tests/isa --xlen 64
+----
+
+==== Running the 32-bit tests on the Haskell model generated from Kami
+[souce,shell]
+----
+./runTests.sh --path `pwd`/../riscv-tests/isa --haskell --xlen 32
+----
+
+==== Running the 64-bit tests on the Haskell model generated from Kami
+[souce,shell]
+----
+./runTests.sh --path `pwd`/../riscv-tests/isa --haskell --xlen 64
 ----

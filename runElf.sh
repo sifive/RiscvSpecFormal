@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 # This script accepts one argument, a RISC-V binary program file
 # path, and runs the program within the RISC-V processor simulator.
 
