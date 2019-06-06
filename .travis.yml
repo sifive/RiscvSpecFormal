@@ -70,6 +70,7 @@ jobs:
     - cp $HOME/haskell-files/* ./Haskell
     - cat Haskell/Target.raw > Haskell/Target.hs
     - echo "rtlMod = model32" >> Haskell/Target.hs
+    - cat ./Haskell/HaskellTarget.raw > ./Haskell/HaskellTarget.hs
     - echo "kami_model = (kami_model32, 32)" >> Haskell/HaskellTarget.hs
     - ./Kami/fixHaskell.sh ./Kami
     - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
@@ -83,6 +84,7 @@ jobs:
     - cp $HOME/haskell-files/* ./Haskell
     - cat Haskell/Target.raw > Haskell/Target.hs
     - echo "rtlMod = model64" >> Haskell/Target.hs
+    - cat ./Haskell/HaskellTarget.raw > ./Haskell/HaskellTarget.hs
     - echo "kami_model = (kami_model64, 64)" >> Haskell/HaskellTarget.hs
     - ./Kami/fixHaskell.sh ./Kami
     - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
