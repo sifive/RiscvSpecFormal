@@ -111,6 +111,7 @@ cd ..
 cabal update
 cabal install hashmap
 cabal install bv
+cabal install random
 ----
 
 
