@@ -80,52 +80,7 @@ then
 fi
 execute "$cmd"
 
-unameOut="$(uname -s)"
-case "${unameOut}" in
-  Darwin*) SED=gsed;;
-  *)       SED=sed
-esac
-
-ghc -iKami Kami/FixLits.hs -o fixlits
-
-notice "Fixing Literals"
-for file in $(find . -maxdepth 1 -name "*.hs")
-do
-  ./fixlits $file
-  mv $file Haskell
-  echo "$file fixed."
-done
-
-notice "Adding missing imports"
-
-for file in $(grep -l "CustomExtract" Haskell/*.hs)
-do
-  grep -q "import qualified CustomExtract" $file
-  if [ $? -ne 0 ]
-  then
-    $SED -i -e '0,/^import/{s/^import/import qualified CustomExtract\nimport/}' $file
-  fi
-done
-
-for file in $(grep -l "Data\.Char" Haskell/*.hs)
-do
-  grep -q "import qualified Data\.Char" $file
-  if [ $? -ne 0 ]
-  then
-    $SED -i -e '0,/^import/{s/^import/import qualified Data.Char\nimport/}' $file
-  fi
-done
-
-for file in $(grep -l "Data\.Bits" Haskell/*.hs)
-do
-  grep -q "import qualified Data\.Bits" $file
-  if [ $? -ne 0 ]
-  then
-    $SED -i -e '0,/^import/{s/^import/import qualified Data.Bits\nimport/}' $file
-  fi
-done
-
-
+./Kami/fixHaskell.sh ./Kami
 
 if [[ $haskell == 0 ]]
 then
@@ -158,10 +113,11 @@ then
   echo "kami_model = (kami_model$xlen, $xlen)" >> Haskell/HaskellTarget.hs
   
   cp Main.raw Main.hs
-  
+
   notice "Compiling the Haskell generator."
   execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iHaskell -iKami Main.hs"
 #  execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O0 --make -iKami Main.hs"
+  rm Main.hs
 fi
 
 notice "Done."

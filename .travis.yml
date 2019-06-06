@@ -12,7 +12,7 @@ cache:
 
 env:
   global:
-  - PATH=/opt/ghc/bin:$HOME/verilator-binary/bin:$HOME/riscv64-gcc/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
+  - PATH=$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOM:$HOME/verilator-binary/bin:$HOME/riscv64-gcc/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
 
 jobs:
   include:
@@ -49,7 +49,7 @@ jobs:
     - sudo apt-get install coq-8.9.0 --yes
     - coqc --version
 
-    - make -j 4
+    - travis_wait 50 make -j 4
     - rm -rf $HOME/haskell-files/*
     - mkdir -p $HOME/haskell-files
     - cp *.hs $HOME/haskell-files/
@@ -57,7 +57,6 @@ jobs:
   - script:
     - export BOOTSTRAP_HASKELL_NONINTERACTIVE=1
     - curl https://get-ghcup.haskell.org -sSf | sh
-    - source $HOME/.ghcup/env
     - ghc --version
     - cabal --version
     - cabal update
@@ -67,35 +66,25 @@ jobs:
 
   - stage: generate_verilog_and_haskell-binary
     script:
-    - source $HOME/.ghcup/env
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
     - cat Haskell/Target.raw > Haskell/Target.hs
     - echo "rtlMod = model32" >> Haskell/Target.hs
-    - ghc -iKami Kami/FixLits.hs -o fixlits
-    - for file in Haskell/*.hs; do ./fixlits $file; echo "$file fixed"; done
-    - for file in $(grep -l "CustomExtract" Haskell/*.hs); do grep -q "import qualified CustomExtract" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified CustomExtract\nimport/}' $file; fi; done
-    - for file in $(grep -l "Data\.Char" Haskell/*.hs); do grep -q "import qualified Data\.Char" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Char\nimport/}' $file; fi; done
-    - for file in $(grep -l "Data\.Bits" Haskell/*.hs); do grep -q "import qualified Data\.Bits" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Bits\nimport/}' $file; fi; done
-    - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - echo "kami_model = (kami_model32, 32)" >> Haskell/HaskellTarget.hs
+    - ./Kami/fixHaskell.sh ./Kami
+    - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
     - mv Main $HOME/verilog-file/Main32
     - travis_wait 50 ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
 
   - script:
-    - source $HOME/.ghcup/env
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
     - cat Haskell/Target.raw > Haskell/Target.hs
     - echo "rtlMod = model64" >> Haskell/Target.hs
     - echo "kami_model = (kami_model64, 64)" >> Haskell/HaskellTarget.hs
-    - ghc -iKami Kami/FixLits.hs -o fixlits
-    - for file in Haskell/*.hs; do ./fixlits $file; echo "$file fixed"; done
-    - for file in $(grep -l "CustomExtract" Haskell/*.hs); do grep -q "import qualified CustomExtract" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified CustomExtract\nimport/}' $file; fi; done
-    - for file in $(grep -l "Data\.Char" Haskell/*.hs); do grep -q "import qualified Data\.Char" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Char\nimport/}' $file; fi; done
-    - for file in $(grep -l "Data\.Bits" Haskell/*.hs); do grep -q "import qualified Data\.Bits" $file; if [ $? -ne 0 ]; then sed -i -e '0,/^import/{s/^import/import qualified Data.Bits\nimport/}' $file; fi; done
+    - ./Kami/fixHaskell.sh ./Kami
     - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
@@ -104,6 +93,18 @@ jobs:
 
   - stage: generate_obj_dir_and_run_tests
     script:
+    - sudo apt-get install parallel --yes
+    - ls $HOME/verilog-file
+    - cp $HOME/verilog-file/Main32 ./Main
+    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
+
+  - script:
+    - sudo apt-get install parallel --yes
+    - ls $HOME/verilog-file
+    - cp $HOME/verilog-file/Main64 ./Main
+    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
+
+  - script:
     - sudo apt-get install clang parallel --yes
     - clang --version
 
@@ -122,16 +123,4 @@ jobs:
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
     - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
-
-  - script:
-    - sudo apt-get install parallel --yes
-    - ls $HOME/verilog-file
-    - cp $HOME/verilog-file/Main32 ./Main
-    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
-
-  - script:
-    - sudo apt-get install parallel --yes
-    - ls $HOME/verilog-file
-    - cp $HOME/verilog-file/Main64 ./Main
-    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
 
