@@ -82,7 +82,7 @@ jobs:
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
     - mv ./Main $HOME/verilog-file/Main32
-    - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - while sleep 599; do echo "=====[ $SECONDS seconds still running ]====="; done &
     - "./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv"
     - kill %1
 
@@ -106,7 +106,7 @@ jobs:
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
     - mv Main $HOME/verilog-file/Main64
-    - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - while sleep 599; do echo "=====[ $SECONDS seconds still running ]====="; done &
     - "./Kami/PrettyPrintVerilog > $HOME/verilog-file/System64.sv"
     - kill %1
 
