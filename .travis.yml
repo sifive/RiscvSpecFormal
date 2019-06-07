@@ -82,9 +82,9 @@ jobs:
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
     - mv ./Main $HOME/verilog-file/Main32
-    - travis_wait 50 "./Kami/PrettyPrintVerilog > ./System.sv"
-    - mkdir -p $HOME/verilog-file
-    - mv System.sv $HOME/verilog-file/System32.sv
+    - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - "./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv"
+    - kill %1
 
   - script:
     - ghc --version
@@ -106,9 +106,9 @@ jobs:
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
     - mv Main $HOME/verilog-file/Main64
-    - travis_wait 50 "./Kami/PrettyPrintVerilog > ./System.sv"
-    - mkdir -p $HOME/verilog-file
-    - mv System.sv $HOME/verilog-file/System64.sv
+    - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - "./Kami/PrettyPrintVerilog > $HOME/verilog-file/System64.sv"
+    - kill %1
 
   - stage: generate_obj_dir_and_run_tests
     script:
