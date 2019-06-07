@@ -62,11 +62,13 @@ jobs:
 
   - stage: generate_verilog_and_haskell-binary
     script:
+    - ghc --version
     - cabal update
     - cabal install hashmap
     - cabal install vector
     - cabal install bv
     - cabal install random
+    - cabal install split
     - ls -R $HOME/.cabal
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
@@ -82,11 +84,13 @@ jobs:
     - travis_wait 50 ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
 
   - script:
+    - ghc --version
     - cabal update
     - cabal install hashmap
     - cabal install vector
     - cabal install bv
     - cabal install random
+    - cabal install split
     - ls -R $HOME/.cabal
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
