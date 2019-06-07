@@ -9,6 +9,7 @@ cache:
   - $HOME/haskell-files
   - $HOME/.ghcup
   - $HOME/.cabal
+  - $HOME/verilog-file
 
 env:
   global:
@@ -80,7 +81,7 @@ jobs:
     - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
-    - mv Main $HOME/verilog-file/Main32
+    - mv ./Main $HOME/verilog-file/Main32
     - travis_wait 50 ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
 
   - script:
