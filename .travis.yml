@@ -64,6 +64,7 @@ jobs:
     script:
     - cabal update
     - cabal install hashmap
+    - cabal install vector
     - cabal install bv
     - cabal install random
     - ls -R $HOME/.cabal
@@ -83,6 +84,7 @@ jobs:
   - script:
     - cabal update
     - cabal install hashmap
+    - cabal install vector
     - cabal install bv
     - cabal install random
     - ls -R $HOME/.cabal
