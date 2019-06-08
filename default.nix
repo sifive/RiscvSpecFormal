@@ -10,7 +10,7 @@ pkgs.stdenv.mkDerivation {
     coq
   ];
 
-  src = null;
+  src = ./.;
 
   installFlags = "COQLIB=$(out)/lib/coq/${coq.coq-version}/";
 }

@@ -47,10 +47,7 @@ jobs:
     - cd ..
 
   - script:
-    - nix-build --arg doInstallCheck false
-    - export PATH=`pwd`:$PATH
-    - coqc --version
-    - travis_wait 50 make -j 4
+    - travis_wait 50 nix-build --arg doInstallCheck false
     - rm -rf $HOME/haskell-files/*
     - mkdir -p $HOME/haskell-files
     - cp *.hs $HOME/haskell-files/
