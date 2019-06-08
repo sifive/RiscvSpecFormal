@@ -64,6 +64,8 @@ jobs:
 
   - stage: generate_verilog_and_haskell-binary
     script:
+    - ls -R $HOME/.ghcup
+    - ls -R $HOME/.cabal
     - ghc --version
     - cabal update
     - cabal install hashmap
@@ -89,6 +91,8 @@ jobs:
     - kill %1
 
   - script:
+    - ls -R $HOME/.ghcup
+    - ls -R $HOME/.cabal
     - ghc --version
     - cabal update
     - cabal install hashmap
