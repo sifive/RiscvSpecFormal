@@ -8,8 +8,6 @@ pkgs.stdenv.mkDerivation {
 
   propagatedBuildInputs = [
     coq
-    # list other dependencies, for instance:
-    ssreflect
   ];
 
   src = if shell then null else ./.;

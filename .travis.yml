@@ -47,10 +47,8 @@ jobs:
     - cd ..
 
   - script:
-    - nix-build --argstr coq-version-or-url "$COQ"
-    - coqc --version
+    - travis_wait 50 nix-build --argstr coq-version-or-url "$COQ"
 
-    - travis_wait 50 make -j 4
     - rm -rf $HOME/haskell-files/*
     - mkdir -p $HOME/haskell-files
     - cp *.hs $HOME/haskell-files/
