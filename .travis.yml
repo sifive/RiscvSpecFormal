@@ -83,9 +83,9 @@ jobs:
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
     - mv ./Main $HOME/verilog-file/Main32
+    - rm $HOME/verilog-file/System32.sv
     - while sleep 560; do echo "=====[ $SECONDS seconds still running ]====="; done &
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
-    - head $HOME/verilog-file/System32.sv
     - kill %1
 
   - script:
@@ -108,9 +108,9 @@ jobs:
     - cp Main.raw Main.hs
     - ghc -O0 --make -iHaskell -iKami Main.hs
     - mv Main $HOME/verilog-file/Main64
+    - rm $HOME/verilog-file/System64.sv
     - while sleep 560; do echo "=====[ $SECONDS seconds still running ]====="; done &
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System64.sv
-    - head $HOME/verilog-file/System64.sv
     - kill %1
 
   - stage: generate_obj_dir_and_run_tests
@@ -132,6 +132,7 @@ jobs:
 
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/System32.sv ./System.sv
+    - head $HOME/verilog-file/System32.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
     - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
@@ -142,6 +143,7 @@ jobs:
 
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/System64.sv ./System.sv
+    - head $HOME/verilog-file/System64.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
     - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
