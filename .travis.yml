@@ -47,7 +47,7 @@ jobs:
     - cd ..
 
   - script:
-    - nix-build --argstr coq-version-or-url "$COQ" --arg doInstallCheck false
+    - nix-build --arg doInstallCheck false
     - export PATH=`pwd`:$PATH
     - coqc --version
     - travis_wait 50 make -j 4
