@@ -1,4 +1,4 @@
-language: generic
+language: nix
 sudo: true
 dist: xenial
 
@@ -15,6 +15,7 @@ cache:
 env:
   global:
   - PATH=$HOME/.cabal/bin:$HOME/.ghcup/bin:$HOM:$HOME/verilator-binary/bin:$HOME/riscv64-gcc/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin:$PATH
+  - COQ=8.9
 
 jobs:
   include:
@@ -46,9 +47,7 @@ jobs:
     - cd ..
 
   - script:
-    - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
-    - sudo apt-get update
-    - sudo apt-get install coq-8.9.0 --yes
+    - nix-build --argstr coq-version-or-url "$COQ"
     - coqc --version
 
     - travis_wait 50 make -j 4
@@ -64,8 +63,6 @@ jobs:
 
   - stage: generate_verilog_and_haskell-binary
     script:
-    - ls -R $HOME/.ghcup
-    - ls -R $HOME/.cabal
     - ghc --version
     - cabal update
     - cabal install hashmap
@@ -73,7 +70,6 @@ jobs:
     - cabal install bv
     - cabal install random
     - cabal install split
-    - ls -R $HOME/.cabal
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
     - cat Haskell/Target.raw > Haskell/Target.hs
@@ -91,8 +87,6 @@ jobs:
     - kill %1
 
   - script:
-    - ls -R $HOME/.ghcup
-    - ls -R $HOME/.cabal
     - ghc --version
     - cabal update
     - cabal install hashmap
@@ -100,7 +94,6 @@ jobs:
     - cabal install bv
     - cabal install random
     - cabal install split
-    - ls -R $HOME/.cabal
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
     - cat Haskell/Target.raw > Haskell/Target.hs
@@ -136,7 +129,6 @@ jobs:
 
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/System32.sv ./System.sv
-    - head $HOME/verilog-file/System32.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
     - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
@@ -147,7 +139,6 @@ jobs:
 
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/System64.sv ./System.sv
-    - head $HOME/verilog-file/System64.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
     - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
