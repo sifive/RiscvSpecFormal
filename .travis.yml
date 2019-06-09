@@ -47,7 +47,11 @@ jobs:
     - cd ..
 
   - script:
-    - travis_wait 50 nix-build --arg doInstallCheck false
+    - sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
+    - sudo apt-get update
+    - sudo apt-get install coq-8.9.0 --yes
+    - coqc --version
+    - travis_wait 50 make -j 4
     - rm -rf $HOME/haskell-files/*
     - mkdir -p $HOME/haskell-files
     - cp *.hs $HOME/haskell-files/
