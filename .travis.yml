@@ -65,12 +65,12 @@ jobs:
   - stage: generate_verilog_and_haskell-binary
     script:
     - ghc --version
-    - cabal new-update
-    - cabal new-install hashmap
-    - cabal new-install vector
-    - cabal new-install bv
-    - cabal new-install random
-    - cabal new-install split
+    - cabal update
+    - cabal install hashmap
+    - cabal install vector
+    - cabal install bv
+    - cabal install random
+    - cabal install split
     - ls $HOME/haskell-files
     - cp $HOME/haskell-files/* ./Haskell
     - ./Kami/fixHaskell.sh ./Kami
