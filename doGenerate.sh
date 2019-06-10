@@ -115,8 +115,8 @@ then
   cp Main.raw Main.hs
 
   notice "Compiling the Haskell generator."
-  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iHaskell -iKami Main.hs"
-#  execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O0 --make -iKami Main.hs"
+  execute "time ghc -j +RTS -s -RTS -O1 --make -iHaskell -iKami Main.hs"
+#  execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O1 --make -iKami Main.hs"
   rm Main.hs
 fi
 

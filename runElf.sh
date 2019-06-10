@@ -65,12 +65,18 @@ else
 fi
 
 mkdir -p $dump
+mkdir -p $dump
 
+binfile=$dump/$base.bin
 hexfile=$dump/$base.hex
 
-execute "riscv64-unknown-elf-objcopy -O verilog '$path' $hexfile"
+execute "riscv64-unknown-elf-objcopy -O binary $path $binfile"
+execute "hexdump -v $binfile | cut -c 9- > $hexfile"
 
-tohost_address=$(riscv64-unknown-elf-readelf -a $path | grep '[^\.]\<tohost\>' | awk '{print $2}')
+tohost_addr=$(riscv64-unknown-elf-readelf -a $path | grep '[^\.]\<tohost\>' | awk '{print $2}')
+
+tohost_address=$((0x$tohost_addr - 0x80000000))
+tohost_address=$(printf "%x" $tohost_address)
 
 notice "Running $base"
 
