@@ -68,8 +68,6 @@ riscv64-unknown-elf-gcc --version
 ----
 
 ===== Installing RISCV tests
-//Note that we change the linker script to start the addresses from `0x00000000` instead of `0x80000000`.
-//#sed -i -e "s/0x80000000/00000000/g" ./env/p/link.ld
 `riscv-tests` will be installed in `riscv-tests-install`.
 [source,shell]
 ----
