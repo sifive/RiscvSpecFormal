@@ -88,7 +88,7 @@ then
   echo "rtlMod = model$xlen" >> Haskell/Target.hs
 
   notice "Compiling the Verilog generator."
-  execute "time ghc -j +RTS -A128m -n4m -s -RTS -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs"
+  execute "time ghc -j +RTS -s -RTS -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs"
   #execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O0 --make Kami/PrettyPrintVerilog.hs"
 
   notice "Generating the Verilog model."

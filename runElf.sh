@@ -71,7 +71,7 @@ binfile=$dump/$base.bin
 hexfile=$dump/$base.hex
 
 execute "riscv64-unknown-elf-objcopy -O binary $path $binfile"
-execute "hexdump -v $binfile | cut -c 9- > $hexfile"
+execute "hexdump -v -e '16/1 \"%02x \" \"\n\"' $binfile > $hexfile"
 
 tohost_addr=$(riscv64-unknown-elf-readelf -a $path | grep '[^\.]\<tohost\>' | awk '{print $2}')
 
