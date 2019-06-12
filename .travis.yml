@@ -101,7 +101,7 @@ jobs:
     - sudo apt-get install parallel --yes
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/Main32 ./Main
-    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
+    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
 
   - script:
     - sudo apt-get install parallel --yes
