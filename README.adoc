@@ -108,7 +108,7 @@ such as whether it has a source 1 integer register, source 2 integer
 register, destination integer register, source 1 floating point
 register, source 2 floating point register, source 3 floating point
 register, destination floating point register, whether it is a branch,
-a jump to a register, a jump to immediate value, a system call, a
+a jump to a register, a jump to an immediate value, a system call, a
 CSR-related instruction, a store or AMO instruction, etc.
 
 One reason for such an organization, where each functional unit
@@ -132,9 +132,10 @@ unit, the generic functionality of the functional unit and a
 transformation of the output of the functional unit to an
 *UpdateContextPkt* does not overly impose any burden on the
 readability or the understandability of the RISC-V ISA specification,
-but eases the formal verification cost significantly.
+but eases the formal verification cost of implementations significantly.
 
 === Top-level directory and files.
 These files take the tables present in the FuncUnits directory representing
 
+[[generator]]
 ProcessorCore
