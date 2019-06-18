@@ -8,11 +8,11 @@ This project gives the formal specification of RISC-V ISA in Kami
 semantics for RV32GC and RV64GC ISAs with User-mode, Supervisor-mode and
 Machine-mode instructions and the Zam extension (unaligned atomics).
 
-Installation instructions are available in <<INSTALL.adoc>>.
+Installation instructions are available in link:INSTALL.adoc.
 
 == Organization
-The semantics are organized into two parts, the <<ProcKami/FuncUnits>> directory,
-and the top-level <<ProcKami>>  directory.
+The semantics are organized into two parts, the link:ProcKami/FuncUnits directory,
+and the top-level link:ProcKami directory.
 
 === FuncUnits directory
 This is a directory that contains a list of instructions that defines
@@ -26,7 +26,7 @@ a set of instructions, each, of the RISC-V ISA. Related functional units
 are grouped together into directories (e.g., the different functional units
 comprising the ALU functional units, such as the adder, the logical
 operations unit, the branch unit, etc. are grouped into the
-<<ProcKami/FuncUnits/Alu>> directory).
+link:ProcKami/FuncUnits/Alu directory).
 
 Each functional unit is is represented by a record which contains the
 following fields:
