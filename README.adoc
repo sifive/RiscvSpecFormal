@@ -3,6 +3,9 @@
 
 = Formal Specification of RISC-V ISA in Kami
 
+image:https://travis-ci.org/sifive/RiscvSpecFormal.svg?branch=master["Build Status", link="https://travis-ci.org/sifive/RiscvSpecFormal"]
+
+
 This project gives the formal specification of RISC-V ISA in
 https://github.com/sifive/Kami[Kami]. In particular, it gives the
 semantics for RV32GC and RV64GC ISAs with User-mode, Supervisor-mode and
@@ -23,12 +26,24 @@ written as Kami expressions, that define how the instruction reads and
 updates the state of a processor such as the register files, the
 floating point register files, the PC, etc.
 
+The reason for such an organization, where each functional unit handles
+a set of instructions is for both clarity, and for common-subexpression
+elimination. We intend these tables to be used in generating implementations
+with complex micro-architectures, such as the out-of-order processor, etc. Even
+though the microarchitectures are different, the <<generators>>
+
+
 The directory is organized as the different functional units that execute
 a set of instructions, each, of the RISC-V ISA. Related functional units
 are grouped together into directories (e.g., the different functional units
-comprising the ALU functional units, such as the adder, the logical
-operations unit, the branch unit, etc. are grouped into the
-https://github.com/sifive/ProcKami/tree/master/FuncUnits/Alu[ProcKami/FuncUnits/Alu] directory).
+comprising the ALU functional units, such as the
+https://github.com/sifive/ProcKami/tree/master/FuncUnits/Alu/Add.v[Add],
+https://github.com/sifive/ProcKami/tree/master/FuncUnits/Alu/Add.v[Logical],
+https://github.com/sifive/ProcKami/tree/master/FuncUnits/Alu/Add.v[Branch],
+https://github.com/sifive/ProcKami/tree/master/FuncUnits/Alu/Add.v[DivRem],
+etc. are grouped into the
+https://github.com/sifive/ProcKami/tree/master/FuncUnits/Alu[ProcKami/FuncUnits/Alu]
+directory).
 
 Each functional unit is is represented by a record which contains the
 following fields:
@@ -97,18 +112,13 @@ memMisalignedException?:: Specifies whether the instruction should
     throw an exception when performing a load, store, AMO or LR/SC on
     an unaligned address
 accessException?:: Specifies whether the instruction should throw
-    an access fault instead of misaligned fault (misaligned faults are
-    handled by the trap handler usually to split the access into
-    multiple aligned accesses; access faults result in system error)
+    an access fault instead of misaligned fault (memory accesses
+    resulting in misaligned faults are usually still completed by the
+    trap handler by splitting the access into multiple aligned
+    accesses; access faults result in system error)
 outputXform::
 optMemXform::
 instHints::
-
-The reason for such an organization, where each functional unit handles
-a set of instructions is for both clarity, and for common-subexpression
-elimination. We intend these tables to be used in generating implementations
-with complex micro-architectures, such as the out-of-order processor, etc. Even
-though the microarchitectures are different, the <<generators>>
 
 === Top-level directory and files.
 These files take the tables present in the FuncUnits directory representing
