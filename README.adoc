@@ -1,0 +1,103 @@
+:sectnums:
+:toc:
+
+= Formal Specification of RISC-V ISA in Kami
+
+This project gives the formal specification of RISC-V ISA in Kami
+(https://github.com/sifive/Kami). In particular, it gives the
+semantics for RV32GC and RV64GC ISAs with User-mode, Supervisor-mode and
+Machine-mode instructions and the Zam extension (unaligned atomics).
+
+Installation instructions are available in <<INSTALL.adoc>>.
+
+== Organization
+The semantics are organized into two parts, the <<ProcKami/FuncUnits>> directory,
+and the top-level <<ProcKami>>  directory.
+
+=== FuncUnits directory
+This is a directory that contains a list of instructions that defines
+the RISC-V ISA, along with the semantics of these instructions,
+written as Kami expressions, that define how the instruction reads and
+updates the state of a processor such as the register files, the
+floating point register files, the PC, etc.
+
+The directory is organized as the different functional units that execute
+a set of instructions, each, of the RISC-V ISA. Related functional units
+are grouped together into directories (e.g., the different functional units
+comprising the ALU functional units, such as the adder, the logical
+operations unit, the branch unit, etc. are grouped into the
+<<ProcKami/FuncUnits/Alu>> directory).
+
+Each functional unit is is represented by a record which contains the
+following fields:
+* fuName: The name of the functional unit (for documentation purposes only)
+* fuFunc: The function represented by the functional unit as a Kami
+  expression (which takes some inputs, in the form of a Kami struct
+  and produces some outputs, again in the form of a Kami struct)`
+* fuInsts: The list of instructions that are supported by this functional unit
+
+The fuInsts itself is a list of records where each record contains the
+following fields:
+* instName: The name of the instruction (for documentation purposes only)
+* extensions: The list of extensions that the instruction is necessary to be included in
+* uniqId: The unique identification information for the instruction as
+  defined by the RISC-V ISA. It contains a list of ranges (between 0
+  and 31) and the bit patterns in those ranges
+* inputXform: The transformation of the generic _ExecContextPkt_ and _ContextCfgPkt_
+into the inputs for the functional unit that executes this instruction.
+** ExecContextPkt represents the register state which the current
+   instruction that is being executed requires to execute. It contains
+   the following fields:
+*** pc: The PC of the instruction packet
+*** reg1: The value in the register file for the first register
+    referenced by the instruction packet, in either the integer
+    register file or the floating point register file, depending on
+    the instruction
+*** reg2: The value in the register file for the second register
+    referenced by the instruction packet, again, in either the integer
+    register file or the floating point register file, depening on the
+    instruction
+*** reg3: The value in the register file for the third register
+    referenced by the instruction packet. This is needed only for the
+    FMADD instruction and its variants, and therefore necessarily from
+    the floating point register file
+*** fflags: The current status of the floating point flags, in order to set the new flags
+*** frm: The floating point rounding mode
+*** inst: The uncompressed 32-bit instruction represented by the current packet
+*** compressed?: Whether the instruction represented by the current
+    packet was compressed or not
+** ContextCfgPkt represents more of the register state which the
+   current instruction requires to execute. The difference from the
+   ExecContextPkt is that this represents the state which changes less
+   frequently as opposed to the state represented by the
+   ExecContextPkt, which changes more or less after exery
+   instruction. It contains the following fields:
+*** xlen: Specifies whether we are running the 32-bit ISA or the 64-bit ISA
+*** mode: Specifies whether we are in user mode, supervisor mode,
+    hypervisor mode or machine mode
+*** extensions: Specifies the extensions that the machine should be
+    supporting when executing the current instruction
+*** instMisalignedException?: Specifies whether the instruction should
+    throw an exception when fetching an instruction not aligned to
+    32-bit boundaries
+*** memMisalignedException?: Specifies whether the instruction should
+    throw an exception when performing a load, store, AMO or LR/SC on
+    an unaligned address
+*** accessException?: Specifies whether the instruction should throw
+    an access fault instead of misaligned fault (misaligned faults are
+    handled by the trap handler usually to split the access into
+    multiple aligned accesses; access faults result in system error)
+* outputXform:
+* optMemXform:
+* instHints:
+
+The reason for such an organization, where each functional unit handles
+a set of instructions is for both clarity, and for common-subexpression
+elimination. We intend these tables to be used in generating implementations
+with complex micro-architectures, such as the out-of-order processor, etc. Even
+though the microarchitectures are different, the <<generators>>
+
+=== Top-level directory and files.
+These files take the tables present in the FuncUnits directory representing
+
+ProcessorCore
