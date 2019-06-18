@@ -113,27 +113,26 @@ CSR-related instruction, a store or AMO instruction, etc.
 
 One reason for such an organization, where each functional unit
 handles a set of instructions is for clarity. The other, more
-important reason is as follows: We want to be able to automatically
+important reason is as follows. We want to be able to automatically
 analyze these functional units and generate decoders, executors,
 memory units, etc (see <<generators>>). These generated functions will
 be used not only in the specification in
 https://github.com/sifive/ProcKami[ProcKami], but also to generate
 complex microarchitecture implementations (such as the
 https://en.wikipedia.org/wiki/Out-of-order_execution[out-of-order
-processor]. This makes formal verification of these complex
+processor]). This makes formal verification of these complex
 microarchitectures easier, as they share the same generated functions
-(such as decode, execute, etc) with the specification they must be
-proven against. For such a microarchitecture, it is important that
-each functional unit handles several instructions, where the inputs
-for the functional units are multiplexed from different sources and
-transformed based on the instruction. This was the main reason for
-such an organization. This organization of separating the semantics of
-an instruction into a *ExecContextPkt* transformer to feed a
-functional unit, the generic functionality of the functional unit and
-a transformation of the output of the functional unit to an
+(such as decoder, executor, etc) with the specification they must be
+proven against. For actual implementations, it is important that each
+functional unit handles several instructions, where the inputs and
+outputs for the functional units are transformed based on the
+instruction. This organization of separating the semantics of an
+instruction into a *ExecContextPkt* transformer to feed a functional
+unit, the generic functionality of the functional unit and a
+transformation of the output of the functional unit to an
 *UpdateContextPkt* does not overly impose any burden on the
-readability or the understandability of the RISC-V ISA specification, but
-eases the formal verification cost significantly.
+readability or the understandability of the RISC-V ISA specification,
+but eases the formal verification cost significantly.
 
 === Top-level directory and files.
 These files take the tables present in the FuncUnits directory representing
