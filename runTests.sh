@@ -205,7 +205,7 @@ do
   done
   if [[ $insert == 1 ]]
   then
-    files="$files $file"
+    files=$(printf "$files\n$file")
   fi
 done
 
