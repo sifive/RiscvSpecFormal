@@ -19,7 +19,6 @@ https://github.com/sifive/ProcKami/tree/master/FuncUnits[ProcKami/FuncUnits]
 directory, and the top-level
 https://github.com/sifive/ProcKami[ProcKami] directory.
 
-[[generator]]
 === FuncUnits directory
 This is a directory that contains a list of instructions that defines
 the RISC-V ISA, along with the semantics of these instructions,
@@ -138,4 +137,5 @@ but eases the formal verification cost of implementations significantly.
 === Top-level directory and files.
 These files take the tables present in the FuncUnits directory representing
 
+[[generator]]
 ProcessorCore
