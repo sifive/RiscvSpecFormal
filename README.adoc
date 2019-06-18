@@ -61,7 +61,7 @@ into the inputs for the functional unit that executes this instruction.
    the following fields:
 pc:::: The PC of the instruction packet
 reg1:::: The value in the register file for the first register
-    referenced by the instruction packet, in either the integer
+    referenced by the instruction [[generator]] packet, in either the integer
     register file or the floating point register file, depending on
     the instruction
 reg2:::: The value in the register file for the second register
@@ -137,5 +137,4 @@ but eases the formal verification cost of implementations significantly.
 === Top-level directory and files.
 These files take the tables present in the FuncUnits directory representing
 
-[[generator]]
 ProcessorCore
