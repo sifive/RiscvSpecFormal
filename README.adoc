@@ -116,7 +116,7 @@ One reason for such an organization, where each functional unit
 handles a set of instructions is for clarity. The other, more
 important reason is as follows. We want to be able to automatically
 analyze these functional units and generate decoders, executors,
-memory units, etc (see <<generators>>). These generated functions will
+memory units, etc (see <<generator>>). These generated functions will
 be used not only in the specification in
 https://github.com/sifive/ProcKami[ProcKami], but also to generate
 complex microarchitecture implementations (such as the
