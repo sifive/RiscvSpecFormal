@@ -1,9 +1,9 @@
+image:https://travis-ci.org/sifive/RiscvSpecFormal.svg?branch=master["Build Status", link="https://travis-ci.org/sifive/RiscvSpecFormal"]
+
 :sectnums:
 :toc:
 
 = Formal Specification of RISC-V ISA in Kami
-
-image:https://travis-ci.org/sifive/RiscvSpecFormal.svg?branch=master["Build Status", link="https://travis-ci.org/sifive/RiscvSpecFormal"]
 
 
 This project gives the formal specification of RISC-V ISA in
