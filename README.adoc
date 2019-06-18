@@ -61,7 +61,7 @@ into the inputs for the functional unit that executes this instruction.
    the following fields:
 pc:::: The PC of the instruction packet
 reg1:::: The value in the register file for the first register
-    referenced by the instruction [[generator]] packet, in either the integer
+    referenced by the instruction packet, in either the integer
     register file or the floating point register file, depending on
     the instruction
 reg2:::: The value in the register file for the second register
@@ -115,7 +115,7 @@ One reason for such an organization, where each functional unit
 handles a set of instructions is for clarity. The other, more
 important reason is as follows. We want to be able to automatically
 analyze these functional units and generate decoders, executors,
-memory units, etc (see <<generator>>). These generated functions will
+memory units, etc (see <<generators>>). These generated functions will
 be used not only in the specification in
 https://github.com/sifive/ProcKami[ProcKami], but also to generate
 complex microarchitecture implementations (such as the
@@ -134,7 +134,13 @@ transformation of the output of the functional unit to an
 readability or the understandability of the RISC-V ISA specification,
 but eases the formal verification cost of implementations significantly.
 
-=== Top-level directory and files.
-These files take the tables present in the FuncUnits directory representing
-
-ProcessorCore
+=== Top-level directory and files [[generators]].
+These files take the tables in the
+ https://github.com/sifive/ProcKami/tree/master/FuncUnits[ProcKami/FuncUnits]
+ directory and produce several useful functions like the
+ https://github.com/sifive/ProcKami/blob/master/Decoder.v[decoder],
+ https://github.com/sifive/ProcKami/blob/master/RegReader.v[reg-reader],
+ https://github.com/sifive/ProcKami/blob/master/Executer.v[executor], etc. These
+ functions are all assembled in
+ https://github.com/sifive/ProcKami/tree/master/ProcessorCore.v[ProcessorCore.v]
+ to create a formal specification of the processor.
