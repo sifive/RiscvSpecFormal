@@ -209,8 +209,6 @@ do
   fi
 done
 
-echo $files
-
 if [[ $parallel == 0 ]]
 then
   for file in $files
