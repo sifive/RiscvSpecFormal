@@ -209,7 +209,7 @@ transformation of the output of the functional unit to an
 readability or the understandability of the RISC-V ISA specification,
 but eases the formal verification cost of implementations significantly.
 
-=== Top-level directory and files [[generators]].
+=== Top-level directory and files [[generators]]
 These files take the tables in the
  https://github.com/sifive/ProcKami/tree/master/FuncUnits[ProcKami/FuncUnits]
  directory and produce several useful functions like the
