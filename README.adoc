@@ -138,45 +138,45 @@ of the register file and what comes out of the memory and transforms
 it into a *_MemoryOutput_* packet that specifies what goes into the
 register file and what goes into the memory.
 
-*_MemoryInput_* contains the following fields.
+*_MemoryInput_*::::
 
-aq:::: In case of AMO or LR/SC operation, tells whether it has the
+aq::::: In case of AMO or LR/SC operation, tells whether it has the
 https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
 
-rl:::: In case of AMO or LR/SC operation, tells whether it has the
+rl::::: In case of AMO or LR/SC operation, tells whether it has the
 https://en.wikipedia.org/wiki/Release_consistency[release] semantics
 
-reservation:::: In case of LR/SC, specifies whether the reservation bit is
+reservation::::: In case of LR/SC, specifies whether the reservation bit is
 set for each byte corresponding to the memory operation
 
-mem:::: The value written into the memory in case of a store, AMO or SC
+mem::::: The value written into the memory in case of a store, AMO or SC
 
-reg_data:::: The value written into the register file in case of a load, AMO or LR
+reg_data::::: The value written into the register file in case of a load, AMO or LR
 
-*_MemoryOutput_* contains the following fields.
+*_MemoryOutput_*::::
 
-aq:::: In case of AMO or LR/SC operation, tells whether it has the
+aq::::: In case of AMO or LR/SC operation, tells whether it has the
 https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
 
-rl:::: In case of AMO or LR/SC operation, tells whether it has the
+rl::::: In case of AMO or LR/SC operation, tells whether it has the
 https://en.wikipedia.org/wiki/Release_consistency[release] semantics
 
-isWr:::: Tells whether the memory operation involves writing the memory (i.e. Store,
+isWr::::: Tells whether the memory operation involves writing the memory (i.e. Store,
 AMO or SC)
 
-mask:::: Tells which bytes  will be written in case of Store, AMO or SC
+mask::::: Tells which bytes  will be written in case of Store, AMO or SC
 
-data:::: Tells the written value in case of Store, AMO or SC
+data::::: Tells the written value in case of Store, AMO or SC
 
-isLrSc:::: Tells whether the operation is LR or SC
+isLrSc::::: Tells whether the operation is LR or SC
 
-reservation:::: Tells which bytes will be reserved in case of LR and which bytes' reservations
+reservation::::: Tells which bytes will be reserved in case of LR and which bytes' reservations
 have to be checked in case of SC
 
-tag:::: Tells whether the value from a load is written into the integer register file or floating
+tag::::: Tells whether the value from a load is written into the integer register file or floating
 point register file
 
-reg_data:::: Tells the value read in case of Load, AMO or LR
+reg_data::::: Tells the value read in case of Load, AMO or LR
 
 instHints::: Specifies various information about the instruction,
 such as whether it has a source 1 integer register, source 2 integer
