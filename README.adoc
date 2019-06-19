@@ -101,9 +101,83 @@ accessException?:::: Specifies whether the instruction should throw
     resulting in misaligned faults are usually still completed by the
     trap handler by splitting the access into multiple aligned
     accesses; access faults result in system error)
-outputXform::::
-optMemXform::::
-instHints:::: Specifies various information about the instruction,
+    
+outputXform::: Specifies how to transform the output of a functional unit
+into a processor-state update packet *ExecUpdPkt*, which contains the
+following fields:
+
+val1:::: The value for the first destination register, along with
+whether it is an updated value of an integer register or a floating
+point register, the PC, the floating point flags register, a memory
+address, a memory data (for stores and AMOs) or a CSR register.
+
+val2:::: Same as _*val1*_. This is needed when we update multiple
+locations, for instance the PC and an integer register in case of the
+JALR instruction.
+
+memBitMask:::: The memory mask for Store, AMO and SC operations
+
+mem:::: The value written to memory for Store, AMO and SC operations
+
+taken?:::: In case of a branch or jump instruction, tells whether the
+branch or jump is taken or not
+
+aq:::: In case of AMO or LR/SC operation, tells whether it has the
+https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
+
+rl:::: In case of AMO or LR/SC operation, tells whether it has the
+https://en.wikipedia.org/wiki/Release_consistency[release] semantics
+
+https://github.com/sifive/ProcKami/blob/master/RegReader.v
+optMemXform::: In case of memory-related instructions, specifies
+how the data from the memory is transformed before storing into
+the register file (for instance, in the case of a load byte, load
+half word, etc), and how the register value gets transformed before storing
+into the memory (in the case of a store byte, store half word, etc). This
+function takes a *_MemoryInput_* packet that specifies what comes out
+of the register file and what comes out of the memory and transforms
+it into a *_MemoryOutput_* packet that specifies what goes into the
+register file and what goes into the memory.
+
+*_MemoryInput_* contains the following fields:
+aq:::: In case of AMO or LR/SC operation, tells whether it has the
+https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
+
+rl:::: In case of AMO or LR/SC operation, tells whether it has the
+https://en.wikipedia.org/wiki/Release_consistency[release] semantics
+
+reservation:::: In case of LR/SC, specifies whether the reservation bit is
+set for each byte corresponding to the memory operation
+
+mem:::: The value written into the memory in case of a store, AMO or SC
+
+reg_data:::: The value written into the register file in case of a load, AMO or LR
+
+*_MemoryOutput_* contains the following fields:
+aq:::: In case of AMO or LR/SC operation, tells whether it has the
+https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
+
+rl:::: In case of AMO or LR/SC operation, tells whether it has the
+https://en.wikipedia.org/wiki/Release_consistency[release] semantics
+
+isWr:::: Tells whether the memory operation involves writing the memory (i.e. Store,
+AMO or SC)
+
+mask:::: Tells which bytes  will be written in case of Store, AMO or SC
+
+data:::: Tells the written value in case of Store, AMO or SC
+
+isLrSc:::: Tells whether the operation is LR or SC
+
+reservation:::: Tells which bytes will be reserved in case of LR and which bytes' reservations
+have to be checked in case of SC
+
+tag:::: Tells whether the value from a load is written into the integer register file or floating
+point register file
+
+reg_data:::: Tells the value read in case of Load, AMO or LR
+
+instHints::: Specifies various information about the instruction,
 such as whether it has a source 1 integer register, source 2 integer
 register, destination integer register, source 1 floating point
 register, source 2 floating point register, source 3 floating point
