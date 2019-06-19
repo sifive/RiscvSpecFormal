@@ -128,7 +128,6 @@ https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
 rl:::: In case of AMO or LR/SC operation, tells whether it has the
 https://en.wikipedia.org/wiki/Release_consistency[release] semantics
 
-https://github.com/sifive/ProcKami/blob/master/RegReader.v
 optMemXform::: In case of memory-related instructions, specifies
 how the data from the memory is transformed before storing into
 the register file (for instance, in the case of a load byte, load
