@@ -128,18 +128,19 @@ https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
 rl:::: In case of AMO or LR/SC operation, tells whether it has the
 https://en.wikipedia.org/wiki/Release_consistency[release] semantics
 
-#how the data from the memory is transformed before storing into
-#the register file (for instance, in the case of a load byte, load
-#half word, etc), and how the register value gets transformed before storing
-#into the memory (in the case of a store byte, store half word, etc). This
-#function takes a *_MemoryInput_* packet that specifies what comes out
-#of the register file and what comes out of the memory and transforms
-#it into a *_MemoryOutput_* packet that specifies what goes into the
-#register file and what goes into the memory.
+optMemXform::: In case of memory-related instructions, specifies
+how the data from the memory is transformed before storing into
+the register file (for instance, in the case of a load byte, load
+half word, etc), and how the register value gets transformed before storing
+into the memory (in the case of a store byte, store half word, etc). This
+function takes a *_MemoryInput_* packet that specifies what comes out
+of the register file and what comes out of the memory and transforms
+it into a *_MemoryOutput_* packet that specifies what goes into the
+register file and what goes into the memory.
 
-//*_MemoryInput_* contains the following fields:
+*_MemoryInput_* contains the following fields:
 
-aq:::: In case of AMO or LR/SC operation, tells whether it has the
+aq:: In case of AMO or LR/SC operation, tells whether it has the
 https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
 
 rl:::: In case of AMO or LR/SC operation, tells whether it has the
@@ -152,7 +153,7 @@ mem:::: The value written into the memory in case of a store, AMO or SC
 
 reg_data:::: The value written into the register file in case of a load, AMO or LR
 
-//*_MemoryOutput_* contains the following fields:
+*_MemoryOutput_* contains the following fields:
 
 aq:::: In case of AMO or LR/SC operation, tells whether it has the
 https://en.wikipedia.org/wiki/Release_consistency[acquire] semantics
