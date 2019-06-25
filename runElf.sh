@@ -87,7 +87,7 @@ else
     cmd="./Main testfile=$hexfile tohost_address:$tohost_address > $dump/$base.out"
 fi
 
-execute "$cmd"
+execute "time $cmd"
 
 result=$?
 
