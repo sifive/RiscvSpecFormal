@@ -79,9 +79,9 @@ jobs:
     - echo "rtlMod = model32" >> Haskell/Target.hs
     - cat ./Haskell/HaskellTarget.raw > ./Haskell/HaskellTarget.hs
     - echo "kami_model = (kami_model32, 32)" >> Haskell/HaskellTarget.hs
-    - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
+    - ghc -O1 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - cp Main.raw Main.hs
-    - ghc -O0 --make -iHaskell -iKami Main.hs
+    - ghc -O1 --make -iHaskell -iKami Main.hs
     - mv ./Main $HOME/verilog-file/Main32
     - while sleep 560; do echo "=====[ $SECONDS seconds still running ]====="; done &
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System32.sv
@@ -90,9 +90,9 @@ jobs:
     - echo "rtlMod = model64" >> Haskell/Target.hs
     - cat ./Haskell/HaskellTarget.raw > ./Haskell/HaskellTarget.hs
     - echo "kami_model = (kami_model64, 64)" >> Haskell/HaskellTarget.hs
-    - ghc -O0 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
+    - ghc -O1 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs
     - cp Main.raw Main.hs
-    - ghc -O0 --make -iHaskell -iKami Main.hs
+    - ghc -O1 --make -iHaskell -iKami Main.hs
     - mv ./Main $HOME/verilog-file/Main64
     - while sleep 560; do echo "=====[ $SECONDS seconds still running ]====="; done &
     - ./Kami/PrettyPrintVerilog > $HOME/verilog-file/System64.sv
@@ -119,7 +119,9 @@ jobs:
     - cp $HOME/verilog-file/System32.sv ./System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
-    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
+    - while sleep 560; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - ./fileList.sh $HOME/riscv/share/riscv-tests/isa 32 | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
+    - kill %1
 
   - script:
     - sudo apt-get install clang parallel --yes
@@ -129,5 +131,7 @@ jobs:
     - cp $HOME/verilog-file/System64.sv ./System.sv
     - verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp
     - make -j -C obj_dir -f Vsystem.mk Vsystem CXX=clang LINK=clang
-    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
+    - while sleep 560; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - ./fileList.sh $HOME/riscv/share/riscv-tests/isa 64 | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --path {})) || (file {} | grep -viq elf)"
+    - kill %1
 

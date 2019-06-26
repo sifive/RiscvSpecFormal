@@ -74,33 +74,8 @@ notice "Generating model".
 execute "./doGenerate.sh $verboseflag $haskell --xlen $xlen"
 
 notice "Running tests in $path."
-allfiles=$(find "$path" -maxdepth 1 -regex ".*/rv$xlen[um].-[vp][^\.]*")
-for file in $allfiles
-do
-  for badfile in \
-    rv32mi-p-csr \
-    rv32mi-p-illegal \
-    rv32mi-p-sbreak \
-    rv32mi-p-shamt \
-    rv32uc-v-rvc \
-    rv64mi-p-access \
-    rv64mi-p-csr \
-    rv64mi-p-illegal \
-    rv64mi-p-sbreak \
-    rv64uc-v-rvc
-  do
-    insert=1
-    if [[ $file == "$path/$badfile" ]]
-    then
-      insert=0
-      break
-    fi
-  done
-  if [[ $insert == 1 ]]
-  then
-    files=$(printf "$files\n$file")
-  fi
-done
+
+files=$(./fileList.sh $path $xlen)
 
 if [[ $parallel == 0 ]]
 then
