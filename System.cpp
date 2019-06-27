@@ -21,7 +21,7 @@ int main(int argc, char ** argv, char **env) {
   vluint64_t main_time = 0;
 
   int result = 0;
-  uint32_t timeout = 60000;
+  uint32_t timeout = 110000;
 
   uint32_t tohost_address, tohost_val;
   uint32_t  sign_size;
