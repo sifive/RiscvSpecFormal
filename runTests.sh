@@ -10,7 +10,7 @@ parallel=0
 
 xlen=32
 
-options=$(getopt --options="hvcsx:p:" --longoptions="help,verbose,parallel,haskell,xlen:,path:" -- "$@")
+options=$(getopt --options="hvcsx:p:" --longoptions="help,verbose,parallel,haskell,debug,xlen:,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -36,6 +36,8 @@ Options:
   Displays this message.
   -v|--verbose
   Enables verbose output.
+  --debug
+  Uses default values in place of random values (useful for when debugging against verilog)
 Example
 ./runTests.sh --verbose riscv-tests/build/isa/rv32ui-p-simple
 Generates the RISC-V processor simulator.
@@ -60,6 +62,9 @@ EOF
     -p|--path)
       path=$2
       shift 2;;
+      --debug)
+      debug="--debug"
+      shift;;
     --)
       shift
       break;;
@@ -85,7 +90,7 @@ then
     result=$(( $? | $result ));
   done
 else
-  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh $verboseflag $haskell --path {})) || (file {} | grep -viq elf)"
+  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
   result=$?
 fi
 

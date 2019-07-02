@@ -5,6 +5,7 @@
 source common.sh
 
 haskell=0
+debug=0
 
 options=$(getopt --options="hvsp:" --longoptions="help,verbose,haskell,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
@@ -27,6 +28,8 @@ Options:
   Path to the directory where the test is located.
   -s|--haskell
   Runs the haskell simulator
+  --debug
+  Uses default values in place of random values (useful for when debugging against verilog)
 Example
 ./runElf.sh -v rv32ui-p-and
 Simulates the rv32ui-p-and test suite program in the RISC-V
@@ -45,6 +48,9 @@ EOF
       shift 2;;
     -s|--haskell)
       haskell=1
+      shift;;
+      --debug)
+      debug=1
       shift;;
     --)
       shift
@@ -84,7 +90,12 @@ if [[ $haskell == 0 ]]
 then
     cmd="./obj_dir/Vsystem +sign_size=8192 +signature=$dump/$base.signature +testfile=$hexfile +tohost_address=$tohost_address > $dump/$base.out"
 else
+  if [[ $debug == 0 ]]
+  then
     cmd="./Main testfile=$hexfile tohost_address:$tohost_address > $dump/$base.out"
+  else
+    cmd="./Main --debug testfile=$hexfile tohost_address:$tohost_address > $dump/$base.out"
+  fi
 fi
 
 execute "time $cmd"
