@@ -103,13 +103,17 @@ jobs:
     - sudo apt-get install parallel --yes
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/Main32 ./Main
-    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv32u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
+    - while sleep 560; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - ./fileList.sh $HOME/riscv/share/riscv-tests/isa 32 | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
+    - kill %1
 
   - script:
     - sudo apt-get install parallel --yes
     - ls $HOME/verilog-file
     - cp $HOME/verilog-file/Main64 ./Main
-    - travis_wait 50 ls $HOME/riscv/share/riscv-tests/isa/rv64u?-p-* | parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
+    - while sleep 560; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - ./fileList.sh $HOME/riscv/share/riscv-tests/isa 64| parallel -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --haskell --path {})) || (file {} | grep -viq elf)"
+    - kill %1
 
   - script:
     - sudo apt-get install clang parallel --yes
