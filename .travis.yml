@@ -34,6 +34,10 @@ jobs:
     - make -j
     - make install
     - cd ..
+    - echo "32 bit tests"
+    - ./fileList.sh $HOME/riscv/share/riscv-tests/isa 32
+    - echo "64 bit tests"
+    - ./fileList.sh $HOME/riscv/share/riscv-tests/isa 64
 
   - script:
     - git clone http://git.veripool.org/git/verilator

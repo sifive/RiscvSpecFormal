@@ -3,7 +3,10 @@
 dir=$1
 xlen=$2
 
-allfiles=$(find "$dir" -maxdepth 1 -regex ".*/rv$xlen[um].-[vp][^\.]*")
+allfilesp=$(find "$dir" -maxdepth 1 -regex ".*/rv$xlen[um].-p[^\.]*")
+allfilesv=$(find "$dir" -maxdepth 1 -regex ".*/rv$xlen[um].-v[^\.]*")
+
+allfiles="$allfilesp $allfilesv"
 
 for file in $allfiles
 do
