@@ -5,7 +5,7 @@ dist: xenial
 cache:
   directories:
   - $HOME/riscv64-gcc
-  - $HOME/riscv
+  - $HOME/riscv/share/riscv-tests/isa
   - $HOME/haskell-files
   - $HOME/verilator-binary
   - $HOME/.ghcup
