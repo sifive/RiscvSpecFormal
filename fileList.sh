@@ -14,12 +14,14 @@ do
     rv32mi-p-csr \
     rv32mi-p-illegal \
     rv32mi-p-sbreak \
+    rv32mi-p-breakpoint \
     rv32mi-p-shamt \
     rv32uc-v-rvc \
     rv64mi-p-access \
     rv64mi-p-csr \
     rv64mi-p-illegal \
     rv64mi-p-sbreak \
+    rv64mi-p-breakpoint \
     rv64uc-v-rvc
   do
     insert=1
