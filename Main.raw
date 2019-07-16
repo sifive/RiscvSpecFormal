@@ -8,10 +8,12 @@ import qualified Data.HashMap as M
 import qualified Data.Vector as V
 import qualified Data.BitVector as BV
 
+import Data.String
 import Control.Monad
 import Data.IORef
 import System.Exit
 import System.IO
+import Text.Read
 
 handle :: Handle
 handle = stdout
@@ -28,14 +30,24 @@ regfiles = fst $ fst T.kami_model
 basemod :: T.BaseModule
 basemod = snd $ fst T.kami_model
 
-file :: String
-file = "proc_core_mem_reg_file"
+mem_file :: String
+mem_file = "proc_core_mem_reg_file"
 
-meths :: IORef Int -> [(String, Val -> FileState -> M.Map String Val -> IO Val)]
-meths counter = [("proc_core_pc", proc_core_meth counter)]
+float_file :: String
+float_file = "proc_core_float_reg_file"
 
-proc_core_meth :: IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
-proc_core_meth counter v filestate regstate = do
+int_file :: String
+int_file = "proc_core_int_data_reg"
+
+-- 0x80000000
+offset :: Int
+offset = 2147483648
+
+meths :: IORef Int -> IORef Int -> [(String, Val -> FileState -> M.Map String Val -> IO Val)]
+meths steps counter = [("proc_core_pc", proc_core_meth steps counter)]
+
+proc_core_meth :: IORef Int -> IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
+proc_core_meth steps counter v filestate regstate = do
     tohost_addr <- getArgVal "tohost_address" isa_size
     n <- readIORef counter
     when (n > timeout) $ do
@@ -43,8 +55,10 @@ proc_core_meth counter v filestate regstate = do
         hPutStrLn stderr "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
         exitFailure
     writeIORef counter (n+1)
-    case M.lookup file (arrs filestate) of
-        Nothing -> error $ "File " ++ file ++ " not found."
+    currSteps <- readIORef steps
+    when (currSteps > 0) (writeIORef steps (currSteps-1))
+    case M.lookup mem_file (arrs filestate) of
+        Nothing -> error $ "File " ++ mem_file ++ " not found."
         Just v -> let val = v V.! (fromIntegral $ BV.nat $ bvCoerce tohost_addr) in 
             if bvCoerce val == 1 then do
                 hPutStrLn handle "Passed"
@@ -55,10 +69,51 @@ proc_core_meth counter v filestate regstate = do
                     hPutStrLn handle "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
                     hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
                     exitFailure
-            else return tt
+            else do
+                io_stuff
+                return tt
+
+    where 
+
+    io_stuff = do
+        currSteps <- readIORef steps
+        interactive <- interactive_mode
+        when (interactive && currSteps == 0) $ do
+        putStr "% "
+        hFlush stdout
+        input <- getLine
+        case words input of
+            ["Step",num] -> case readMaybe num of
+                Nothing -> do
+                    putStrLn "Formatting error."
+                    io_stuff
+                Just n -> writeIORef steps n
+            [reg] -> do 
+                print_reg regstate $ "proc_core_" ++ reg
+                io_stuff
+            ["Float",addr] -> do
+                case hex_to_maybe_integer_str addr of
+                    Just n -> print_file_reg filestate float_file $ fromInteger n
+                    Nothing -> putStrLn "Formatting error."
+                io_stuff
+            ["Int",addr] -> do
+                case hex_to_maybe_integer_str addr of
+                    Just n -> print_file_reg filestate int_file $ fromInteger n
+                    Nothing -> putStrLn "Formatting error."
+                io_stuff
+            ["Mem",addr] -> do
+                case hex_to_maybe_integer_str addr of
+                    Just n -> print_file_reg filestate mem_file $ fromInteger n
+                    Nothing -> putStrLn "Formatting error."
+                io_stuff
+            [] -> io_stuff
+            _ -> do
+                putStrLn "Formatting error."
+                io_stuff
 
 main :: IO()
 main = do
     counter <- newIORef 0
-    simulate_module 0 round_robin_rules (map fst $ T.getRules basemod) (meths counter) regfiles basemod
+    steps <- newIORef 0
+    simulate_module 0 round_robin_rules (map fst $ T.getRules basemod) (meths steps counter) regfiles basemod
     return ()

@@ -5,9 +5,9 @@
 source common.sh
 
 haskell=0
-debug=0
+interactive=0
 
-options=$(getopt --options="hvsp:" --longoptions="help,verbose,haskell,path:" -- "$@")
+options=$(getopt --options="hvsp:" --longoptions="help,verbose,interactive,haskell,path:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -46,11 +46,14 @@ EOF
     -p|--path)
       path=$2
       shift 2;;
+      --interactive)
+      interactive=1
+      shift;;
     -s|--haskell)
       haskell=1
       shift;;
       --debug)
-      debug=1
+      debug="--debug"
       shift;;
     --)
       shift
@@ -90,12 +93,12 @@ if [[ $haskell == 0 ]]
 then
     cmd="./obj_dir/Vsystem +sign_size=8192 +signature=$dump/$base.signature +testfile=$hexfile +tohost_address=$tohost_address > $dump/$base.out"
 else
-  if [[ $debug == 0 ]]
+  if [[ $interactive == 0 ]]
   then
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address > $dump/$base.out"
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $debug > $dump/$base.out"
   else
-    cmd="./Main --debug testfile=$hexfile tohost_address:$tohost_address > $dump/$base.out"
-  fi
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address --interactive $debug"
+  fi  
 fi
 
 execute "time $cmd"
