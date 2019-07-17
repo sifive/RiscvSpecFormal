@@ -98,7 +98,11 @@ proc_core_meth steps counter v filestate regstate = do
                 io_stuff
             ["Int",addr] -> do
                 case hex_to_maybe_integer_str addr of
-                    Just n -> print_file_reg filestate int_file $ fromInteger n
+                    Just n -> case n == 0 of
+                        True -> case M.lookup int_file (files filestate) of
+                            Nothing -> putStrLn $ "File " ++ int_file ++ " not found."
+                            Just r -> let k = kind r in putStrLn $ ppr_hex $ defVal k
+                        False -> print_file_reg filestate int_file $ fromInteger n
                     Nothing -> putStrLn "Formatting error."
                 io_stuff
             ["Mem",addr] -> do
