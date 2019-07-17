@@ -107,7 +107,7 @@ proc_core_meth steps counter v filestate regstate = do
                 io_stuff
             ["Mem",addr] -> do
                 case hex_to_maybe_integer_str addr of
-                    Just n -> print_file_reg filestate mem_file $ fromInteger n
+                    Just n -> print_file_reg filestate mem_file $ fromInteger n - offset
                     Nothing -> putStrLn "Formatting error."
                 io_stuff
             [] -> io_stuff

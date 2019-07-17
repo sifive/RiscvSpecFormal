@@ -7,7 +7,7 @@ source common.sh
 haskell=0
 interactive=0
 
-options=$(getopt --options="hvsp:" --longoptions="help,verbose,interactive,haskell,path:" -- "$@")
+options=$(getopt --options="hvsp:" --longoptions="help,verbose,interactive,haskell,path:,debug" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
