@@ -6,8 +6,9 @@ source common.sh
 
 haskell=0
 interactive=0
+interrupts=''
 
-options=$(getopt --options="hvsp:" --longoptions="help,verbose,interactive,haskell,path:,debug" -- "$@")
+options=$(getopt --options="hvsp:" --longoptions="help,verbose,interactive,haskell,path:,debug,enable-ext-interrupts" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -30,6 +31,8 @@ Options:
   Runs the haskell simulator
   --debug
   Uses default values in place of random values (useful for when debugging against verilog)
+  --enable-ext-interrupts
+  Send random external interrupts to the processor model
 Example
 ./runElf.sh -v rv32ui-p-and
 Simulates the rv32ui-p-and test suite program in the RISC-V
@@ -52,8 +55,11 @@ EOF
     -s|--haskell)
       haskell=1
       shift;;
-      --debug)
+    --debug)
       debug="--debug"
+      shift;;
+    --enable-ext-interrupts)
+      interrupts="--enable-ext-interrupts"
       shift;;
     --)
       shift
@@ -95,9 +101,9 @@ then
 else
   if [[ $interactive == 0 ]]
   then
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $debug > $dump/$base.out"
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $debug $interrupts > $dump/$base.out"
   else
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address --interactive $debug"
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address --interactive $debug $interrupts"
   fi  
 fi
 

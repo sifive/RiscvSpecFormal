@@ -9,10 +9,14 @@ import qualified Data.Vector as V
 import qualified Data.BitVector as BV
 
 import Data.String
+import Data.List (find)
+import Data.Maybe (isJust)
 import Control.Monad
 import Data.IORef
 import System.Exit
 import System.IO
+import System.Random (randomIO)
+import System.Environment (getArgs)
 import Text.Read
 
 handle :: Handle
@@ -44,7 +48,19 @@ offset :: Int
 offset = 2147483648
 
 meths :: IORef Int -> IORef Int -> [(String, Val -> FileState -> M.Map String Val -> IO Val)]
-meths steps counter = [("proc_core_pc", proc_core_meth steps counter)]
+meths steps counter =
+  [("proc_core_pc", proc_core_meth steps counter),
+   ("proc_core_ext_interrupt_pending", io_meth steps counter)]
+
+io_meth :: IORef Int -> IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
+io_meth steps counter v filestate regstate = do
+   args <- getArgs
+   if isJust $ find (\arg -> arg == "--enable-ext-interrupts") args then do
+     putStrLn "external interrupts enabled"
+     result <- randomIO
+     if result then do putStrLn "signalling an external interrupt"; return tt else return tt
+     return $ BoolVal result
+   else return $ BoolVal False
 
 proc_core_meth :: IORef Int -> IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
 proc_core_meth steps counter v filestate regstate = do
