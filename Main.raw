@@ -62,6 +62,11 @@ io_meth steps counter v filestate regstate = do
      return $ BoolVal result
    else return $ BoolVal False
 
+signature_file :: IO [(String, String)]
+signature_file = do
+    args <- getArgs
+    return $ (catMaybes . map (binary_split '=')) args
+
 proc_core_meth :: IORef Int -> IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
 proc_core_meth steps counter v filestate regstate = do
     tohost_addr <- getArgVal "tohost_address" isa_size
