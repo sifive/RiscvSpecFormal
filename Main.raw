@@ -10,7 +10,7 @@ import qualified Data.BitVector as BV
 
 import Data.String
 import Data.List (find)
-import Data.Maybe (isJust)
+import Data.Maybe (isJust, catMaybes)
 import Control.Monad
 import Data.IORef
 import System.Exit
@@ -47,6 +47,12 @@ int_file = "proc_core_int_data_reg"
 offset :: Int
 offset = 2147483648
 
+intersperse_at :: Int -> a -> [a] -> [a]
+intersperse_at n x xs = let (ys,zs) = splitAt n xs in
+    case zs of
+    [] -> ys
+    _ -> ys ++ (x:intersperse_at n x zs)
+
 meths :: IORef Int -> IORef Int -> [(String, Val -> FileState -> M.Map String Val -> IO Val)]
 meths steps counter =
   [("proc_core_pc", proc_core_meth steps counter),
@@ -77,6 +83,20 @@ proc_core_meth steps counter v filestate regstate = do
         Nothing -> error $ "File " ++ mem_file ++ " not found."
         Just v -> let val = v V.! (fromIntegral $ BV.nat $ bvCoerce tohost_addr) in 
             if bvCoerce val == 1 then do
+                args <- getArgs
+                let ps = catMaybes $ map (binary_split '@') args
+                case lookup "signature" ps of
+                    Nothing -> return ()
+                    Just filename -> case lookup "sign_size" ps of
+                        Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
+                        Just x -> let sign_size = read x in
+                            case M.lookup mem_file (arrs filestate) of
+                                Nothing -> putStrLn $ "File " ++ mem_file ++ " not found."
+                                Just v -> do
+                                    let sz = V.length v
+                                    let indices = [(sz-sign_size)..(sz-1)]
+                                    let vals = concat $ map (\i -> ppr_hex (v V.! i)) indices
+                                    writeFile filename $ intersperse_at 8 '\n' vals
                 hPutStrLn handle "Passed"
                 hPutStrLn stderr "Passed"
                 exitSuccess
