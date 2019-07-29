@@ -47,11 +47,11 @@ int_file = "proc_core_int_data_reg"
 offset :: Int
 offset = 2147483648
 
-intersperse_at :: Int -> a -> [a] -> [a]
-intersperse_at n x xs = let (ys,zs) = splitAt n xs in
-    case zs of
-    [] -> ys
-    _ -> ys ++ (x:intersperse_at n x zs)
+-- intersperse_at :: Int -> a -> [a] -> [a]
+-- intersperse_at n x xs = let (ys,zs) = splitAt n xs in
+--     case zs of
+--     [] -> ys
+--     _ -> ys ++ (x:intersperse_at n x zs)
 
 meths :: IORef Int -> IORef Int -> [(String, Val -> FileState -> M.Map String Val -> IO Val)]
 meths steps counter =
@@ -72,6 +72,12 @@ signature_file :: IO [(String, String)]
 signature_file = do
     args <- getArgs
     return $ (catMaybes . map (binary_split '=')) args
+
+chunksOf :: Int -> [a] -> [[a]]
+chunksOf n [] = []
+chunksOf n ys =
+  let (val, rest) = splitAt n ys in
+  (val : chunksOf n rest)
 
 proc_core_meth :: IORef Int -> IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
 proc_core_meth steps counter v filestate regstate = do
@@ -99,9 +105,12 @@ proc_core_meth steps counter v filestate regstate = do
                                 Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
                                 Just v -> do
                                     let sz = V.length v
-                                    let indices = [(sz-sign_size)..(sz-1)]
-                                    let vals = concat $ map (\i -> ppr_hex (v V.! i)) indices
-                                    writeFile filename $ intersperse_at 8 '\n' vals
+                                    let indices = reverse [(sz-sign_size)..(sz-1)]
+                                    let vals = map (\i -> ppr_hex (v V.! i)) indices
+                                    let spliced = (chunksOf 4 vals) :: [[String]]
+                                    let newlined = (map (\t -> concat (t ++ [['\n']])) spliced) :: [String]
+                                    let reversed = (reverse newlined) :: [String]
+                                    writeFile filename $ concat reversed
                 hPutStrLn handle "Passed"
                 hPutStrLn stderr "Passed"
                 exitSuccess

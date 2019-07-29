@@ -29,6 +29,10 @@ Options:
   Enables verbose output.
   --path location
   Path to the directory where the test is located.
+  --signature filename
+  The name of the file to dump the memory
+  --sign_size size
+  Size of the memory to dump
   -s|--haskell
   Runs the haskell simulator
   --debug
