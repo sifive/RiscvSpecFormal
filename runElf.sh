@@ -6,9 +6,9 @@ source common.sh
 
 haskell=0
 interactive=0
-interrupts=''
-signature=''
-sign_size=''
+interrupts=""
+signature=""
+sign_size=""
 
 options=$(getopt --options="hvsp:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,path:,debug,enable-ext-interrupts" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
@@ -64,10 +64,10 @@ EOF
       interrupts="--enable-ext-interrupts"
       shift;;
     --signature)
-      signature=$2
+      signature=signature@$2
       shift 2;;
     --sign_size)
-      sign_size=$2
+      sign_size=sign_size@$2
       shift 2;;
     --)
       shift
@@ -109,9 +109,9 @@ then
 else
   if [[ $interactive == 0 ]]
   then
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address signature@$signature sign_size@$sign_size $debug $interrupts > $dump/$base.out"
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $signature $sign_size $debug $interrupts > $dump/$base.out"
   else
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address signature@$signature sign_size@$sign_size --interactive $debug $interrupts"
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $signature $sign_size --interactive $debug $interrupts"
   fi  
 fi
 

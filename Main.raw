@@ -96,7 +96,7 @@ proc_core_meth steps counter v filestate regstate = do
                         Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
                         Just x -> let sign_size = read x in
                             case M.lookup mem_file (arrs filestate) of
-                                Nothing -> putStrLn $ "File " ++ mem_file ++ " not found."
+                                Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
                                 Just v -> do
                                     let sz = V.length v
                                     let indices = [(sz-sign_size)..(sz-1)]
