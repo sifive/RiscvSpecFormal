@@ -9,8 +9,9 @@ interactive=0
 interrupts=""
 signature=""
 sign_size=""
+xlen=32
 
-options=$(getopt --options="hvsp:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,path:,debug,enable-ext-interrupts" -- "$@")
+options=$(getopt --options="hvsp:x:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,path:,debug,enable-ext-interrupts,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -39,6 +40,9 @@ Options:
   Uses default values in place of random values (useful for when debugging against verilog)
   --enable-ext-interrupts
   Send random external interrupts to the processor model
+  --xlen 32|64
+  Specifies whether or not the generator should produce a 32 or 64
+  bit RISC-V processor model. Default is 32.
 Example
 ./runElf.sh -v rv32ui-p-and
 Simulates the rv32ui-p-and test suite program in the RISC-V
@@ -72,6 +76,9 @@ EOF
       shift 2;;
     --sign_size)
       sign_size=sign_size@$2
+      shift 2;;
+    -x|--xlen)
+      xlen=$2
       shift 2;;
     --)
       shift
@@ -113,9 +120,9 @@ then
 else
   if [[ $interactive == 0 ]]
   then
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $signature $sign_size $debug $interrupts > $dump/$base.out"
+    cmd="./Main --xlen=$xlen testfile=$hexfile tohost_address:$tohost_address $signature $sign_size $debug $interrupts > $dump/$base.out"
   else
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $signature $sign_size --interactive $debug $interrupts"
+    cmd="./Main --xlen=$xlen testfile=$hexfile tohost_address:$tohost_address $signature $sign_size --interactive $debug $interrupts"
   fi  
 fi
 
