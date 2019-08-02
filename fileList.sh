@@ -11,10 +11,7 @@ allfiles="$allfilesp $allfilesv"
 for file in $allfiles
 do
   for badfile in \
-    rv32mi-p-sbreak \
     rv32mi-p-breakpoint \
-    rv64mi-p-access \
-    rv64mi-p-sbreak \
     rv64mi-p-breakpoint
   do
     insert=1
