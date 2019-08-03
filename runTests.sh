@@ -7,10 +7,11 @@ source common.sh
 
 result=0
 parallel=0
+skip=0
 
 xlen=32
 
-options=$(getopt --options="hvcsx:p:" --longoptions="help,verbose,parallel,haskell,debug,xlen:,path:" -- "$@")
+options=$(getopt --options="hvcfdx:p:s" --longoptions="help,verbose,parallel,haskell,debug,xlen:,path:,skip" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -53,7 +54,7 @@ EOF
     -c|--parallel)
       parallel=1
       shift;;
-    -s|--haskell)
+    -f|--haskell)
       haskell="--haskell"
       shift;;
     -x|--xlen)
@@ -62,8 +63,11 @@ EOF
     -p|--path)
       path=$2
       shift 2;;
-      --debug)
+    -d|--debug)
       debug="--debug"
+      shift;;
+    -s|--skip)
+      skip=1
       shift;;
     --)
       shift
@@ -75,8 +79,11 @@ shift $((OPTIND - 1))
 
 [[ -z "$path" ]] && error "Invalid command line. The PATH argument is missing."
 
-notice "Generating model".
-execute "./doGenerate.sh $verboseflag $haskell --xlen $xlen"
+if [[ $skip == 0 ]]
+then
+  notice "Generating model".
+  execute "./doGenerate.sh $verboseflag $haskell --xlen $xlen"
+fi
 
 notice "Running tests in $path."
 
