@@ -93,11 +93,11 @@ if [[ $parallel == 0 ]]
 then
   for file in $files
   do
-    ((file $file | (grep -iq elf && ./runElf.sh --xlen=$xlen $verboseflag $haskell --path $file)) || (file $file | grep -viq elf));
+    ((file $file | (grep -iq elf && ./runElf.sh --xlen $xlen $verboseflag $haskell --path $file)) || (file $file | grep -viq elf));
     result=$(( $? | $result ));
   done
 else
-  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --xlen=$xlen $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
+  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --xlen $xlen $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
   result=$?
 fi
 

@@ -120,9 +120,9 @@ then
 else
   if [[ $interactive == 0 ]]
   then
-    cmd="./Main$xlen --xlen=$xlen testfile=$hexfile tohost_address:$tohost_address $signature $sign_size $debug $interrupts > $dump/$base.out"
+    cmd="./Main$xlen testfile=$hexfile tohost_address:$tohost_address $signature $sign_size $debug $interrupts > $dump/$base.out"
   else
-    cmd="./Main$xlen --xlen=$xlen testfile=$hexfile tohost_address:$tohost_address $signature $sign_size --interactive $debug $interrupts"
+    cmd="./Main$xlen testfile=$hexfile tohost_address:$tohost_address $signature $sign_size --interactive $debug $interrupts"
   fi  
 fi
 
