@@ -120,9 +120,9 @@ then
 else
   if [[ $interactive == 0 ]]
   then
-    cmd="./Haskell/Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size $debug $interrupts > $dump/$base.out"
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size $debug $interrupts > $dump/$base.out"
   else
-    cmd="./Haskell/Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size --interactive $debug $interrupts"
+    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size --interactive $debug $interrupts"
   fi  
 fi
 
