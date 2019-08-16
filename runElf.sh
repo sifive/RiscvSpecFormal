@@ -78,7 +78,7 @@ EOF
       sign_size=sign_size@$2
       shift 2;;
     -x|--xlen)
-      xlen=$2
+      xlenval=xlen@$2
       shift 2;;
     --)
       shift
@@ -120,9 +120,9 @@ then
 else
   if [[ $interactive == 0 ]]
   then
-    cmd="./Main$xlen testfile=$hexfile tohost_address:$tohost_address $signature $sign_size $debug $interrupts > $dump/$base.out"
+    cmd="./Haskell/Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size $debug $interrupts > $dump/$base.out"
   else
-    cmd="./Main$xlen testfile=$hexfile tohost_address:$tohost_address $signature $sign_size --interactive $debug $interrupts"
+    cmd="./Haskell/Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size --interactive $debug $interrupts"
   fi  
 fi
 

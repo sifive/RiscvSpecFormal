@@ -112,14 +112,10 @@ then
   cat Haskell/HaskellTarget.raw > Haskell/HaskellTarget.hs
   echo "kami_model = (kami_model$xlen, $xlen)" >> Haskell/HaskellTarget.hs
   
-  cp Main.raw Main.hs
-
   notice "Compiling the Haskell generator."
-  execute "time ghc -j -O1 --make -iHaskell -iKami Main.hs"
-#  execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O1 --make -iKami Main.hs"
-  rm Main.hs
-  mv Main Main$xlen
-  notice "Done: Generated Main$xlen."
+  execute "time ghc -j -O1 --make -iHaskell -iKami ./Haskell/Main.hs"
+#  execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O1 --make -iKami ./Haskell/Main.hs"
+  notice "Done: Generated Main."
 fi
 
 notice "Done."

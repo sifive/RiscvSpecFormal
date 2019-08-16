@@ -19,20 +19,36 @@ import System.Random (randomIO)
 import System.Environment (getArgs)
 import Text.Read
 
+import EclecticLib hiding (__)
+import PeanoNat
+import Fin
+import Instance
+import Syntax hiding (unsafeCoerce, __)
+import Word
+
 handle :: Handle
 handle = stdout
 
 timeout :: Int
 timeout = 50000
 
-isa_size :: Int
-isa_size = snd T.kami_model
+isa_size :: IO Int
+isa_size = do
+  args <- getArgs
+  let ps = catMaybes $ map (binary_split '@') args
+  case lookup "xlen" ps of
+    Just n -> return (read n :: Int)
+    Nothing -> return 32
 
-regfiles :: [T.RegFileBase]
-regfiles = fst $ fst T.kami_model
+kami_model :: Int -> ([Syntax.RegFileBase] , Syntax.BaseModule)
+kami_model 32 = kami_model32
+kami_model 64 = kami_model64
 
-basemod :: T.BaseModule
-basemod = snd $ fst T.kami_model
+regfiles :: Int -> [T.RegFileBase]
+regfiles n = fst $ kami_model n
+
+basemod :: Int -> T.BaseModule
+basemod n = snd $ kami_model n
 
 mem_file :: String
 mem_file = "proc_core_mem_reg_file"
@@ -67,11 +83,6 @@ io_meth steps counter v filestate regstate = do
      if result then do putStrLn "signalling an external interrupt"; return tt else return tt
      return $ BoolVal result
    else return $ BoolVal False
-
-signature_file :: IO [(String, String)]
-signature_file = do
-    args <- getArgs
-    return $ (catMaybes . map (binary_split '=')) args
 
 chunksOf :: Int -> [a] -> [[a]]
 chunksOf n [] = []
@@ -169,5 +180,6 @@ main :: IO()
 main = do
     counter <- newIORef 0
     steps <- newIORef 0
-    simulate_module 0 round_robin_rules (map fst $ T.getRules basemod) (meths steps counter) regfiles basemod
+    n <- isa_size
+    simulate_module 0 round_robin_rules (map fst $ T.getRules (basemod n)) (meths steps counter) (regfiles n) (basemod n)
     return ()
