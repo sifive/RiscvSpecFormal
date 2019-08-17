@@ -80,7 +80,7 @@ then
 fi
 execute "$cmd"
 
-cd Kami && ./fixHaskell.sh .. Main.hs && cd ..
+cd Kami && ./fixHaskell.sh .. Main.hs HaskellTarget.hs && cd ..
 
 if [[ $haskell == 0 ]]
 then
