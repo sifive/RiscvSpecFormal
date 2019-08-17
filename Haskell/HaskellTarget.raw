@@ -1,9 +1,0 @@
-module HaskellTarget (module Syntax, module Word, module Fin, module EclecticLib, module PeanoNat, kami_model) where
-import EclecticLib hiding (__)
-import PeanoNat
-import Fin
-import Instance
-import Syntax hiding (unsafeCoerce, __)
-import Word
-
-kami_model :: (([Syntax.RegFileBase] , Syntax.BaseModule) , Int)
