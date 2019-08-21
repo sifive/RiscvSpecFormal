@@ -1,0 +1,48 @@
+image: nixos/unstable
+packages:
+- nixpkgs.gnumake
+- nixpkgs.ghc
+- nixpkgs.haskellPackages.bv
+- nixpkgs.haskellPackages.hashmap
+- nixpkgs.haskellPackages.random
+- nixpkgs.haskellPackages.split
+- nixpkgs.haskellPackages.vector
+repositories:
+  nixpkgs: https://nixos.org/channels/nixpkgs-unstable
+sources:
+- https://github.com/sifive/RiscvSpecFormal
+tasks:
+- submodules: |
+    cd RiscvSpecFormal
+    git submodule foreach --quiet pwd \
+      | while IFS= read -r mod ; do
+        [ ! -d "$HOME/$(basename "$mod")" ] && continue
+        cd "$mod"
+        git fetch "$HOME/$(basename "$mod")"
+        git checkout FETCH_HEAD
+      done
+- coq: |
+    path=$(nix-prefetch-url --unpack 'https://github.com/coq/coq-on-cachix/tarball/master' --name source 2>&1 | tee /dev/stderr | grep -m1 '^path is' | cut -d\' -f2)
+    nix-env -if "$path" --extra-substituters "https://coq.cachix.org" --trusted-public-keys "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= coq.cachix.org-1:5QW/wwEnD+l2jvN6QRbRRsa4hBHG3QiQQ26cxu1F5tI="
+- riscvspecformal_coq: |
+    time make -C RiscvSpecFormal
+- kami_hs: |
+    cd RiscvSpecFormal/Kami
+    ghc -O1 --make ./FixLits.hs
+    time ./fixHaskell.sh .. Main.hs HaskellTarget.hs
+- riscvspecformal_hs: |
+    cd ~/RiscvSpecFormal
+    time ghc -O1 --make -iHaskell -iKami ./Main.hs
+- riscv_toolchain: |
+    curl -s https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz | tar -xzf -
+- riscv_tests: |
+    cd riscv-tests
+    export PATH="$PATH:$HOME/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin"
+    autoconf
+    ./configure --prefix=$HOME/riscv
+    time make install
+- haskell_test: |
+    cd ~/RiscvSpecFormal
+    export PATH="$PATH:$HOME/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin"
+    ./runElf.sh --haskell --path /home/build/riscv/share/riscv-tests/isa/rv32ui-p-simple
+    ./runElf.sh --haskell --path /home/build/riscv/share/riscv-tests/isa/rv32ui-v-simple
