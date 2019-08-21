@@ -1,0 +1,53 @@
+triggers: # NOTE: put your spam inbox here :)
+- to: Submitter Email <yourstruly+kami.builds.sr.ht@example.com>
+  action: email
+  condition: failure
+# NOTE: you can ssh into a failed build within 10 minutes:
+#     ssh -t builds@azusa.runners.sr.ht connect BUILDNUMBER
+sources: # NOTE: override submodule revisions by appending "#BRANCHNAME"
+- https://github.com/sifive/RiscvSpecFormal
+# - https://github.com/sifive/Kami#master
+# - https://github.com/sifive/ProcKami
+# - https://github.com/sifive/FpuKami
+# - https://github.com/mit-plv/bbv
+# - https://github.com/tchajed/coq-record-update
+# - https://github.com/sifive/StdLibKami.git
+# - https://github.com/riscv/riscv-tests
+image: archlinux
+packages: [coq, ghc, cabal-install, haskell-random, haskell-split, haskell-vector]
+tasks:
+- submodules: |
+    cd RiscvSpecFormal
+    git submodule foreach --quiet pwd \
+      | while IFS= read -r mod ; do
+        [ ! -d "$HOME/$(basename "$mod")" ] && continue
+        cd "$mod"
+        git fetch "$HOME/$(basename "$mod")"
+        git checkout FETCH_HEAD
+      done
+- riscvspecformal_coq: |
+    time make -C RiscvSpecFormal
+- haskell_dependencies: |
+    time cabal v1-update
+    printf "\nlibrary-vanilla: False\nshared: True\nexecutable-dynamic: True\nghc-options:\n  -dynamic\n" >> ~/.cabal/config
+    cabal v1-install hashmap bv
+- kami_hs: |
+    cd RiscvSpecFormal/Kami
+    ghc -dynamic -O1 --make ./FixLits.hs
+    time ./fixHaskell.sh .. Main.hs HaskellTarget.hs
+- riscvspecformal_hs: |
+    cd ~/RiscvSpecFormal
+    time ghc -dynamic -O1 --make -iHaskell -iKami ./Main.hs
+- riscv_toolchain: |
+    curl -s https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz | tar -xzf -
+- riscv_tests: |
+    cd riscv-tests
+    export PATH="$PATH:$HOME/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin"
+    autoconf
+    ./configure --prefix=$HOME/riscv
+    time make install
+- haskell_test: |
+    cd ~/RiscvSpecFormal
+    export PATH="$PATH:$HOME/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin"
+    ./runElf.sh --haskell --path /home/build/riscv/share/riscv-tests/isa/rv32ui-p-simple
+    ./runElf.sh --haskell --path /home/build/riscv/share/riscv-tests/isa/rv32ui-v-simple
