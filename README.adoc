@@ -66,7 +66,7 @@ reg1:::: The value in the register file for the first register
     the instruction
 reg2:::: The value in the register file for the second register
     referenced by the instruction packet, again, in either the integer
-    register file or the floating point register file, depening on the
+    register file or the floating point register file, depending on the
     instruction
 reg3:::: The value in the register file for the third register
     referenced by the instruction packet. This is needed only for the
