@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # This script accepts a path to the rv32ui test directory included
 # in the RISC-V Test Suite and runs a subset of the tests contained
 # therein.
