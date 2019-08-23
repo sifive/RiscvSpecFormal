@@ -82,7 +82,7 @@ shift $((OPTIND - 1))
 if [[ $skip == 0 ]]
 then
   notice "Generating model".
-  execute "./doGenerate.sh $verboseflag $haskell --xlen $xlen"
+  execute "./doGenerate.sh --parallel $verboseflag $haskell --xlen $xlen"
 fi
 
 notice "Running tests in $path."

@@ -12,7 +12,9 @@ xlen=32
 
 haskell=0
 
-options=$(getopt --options="hrvsx:" --longoptions="help,rebuild,verbose,haskell,xlen:" -- "$@")
+parallel=""
+
+options=$(getopt --options="hrvsx:p" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -42,6 +44,8 @@ Options:
   Generates the haskell simulator.
   -r|--rebuild
   Recompiles source files that Make believes have not changed.
+  -p|--parallel
+  Parallel build
   -v|--verbose
   Enables verbose output.
 Example
@@ -61,6 +65,9 @@ EOF
       shift;;
     -s|--haskell)
       haskell=1
+      shift;;
+    -p|--parallel)
+      parallel="-j"
       shift;;
     -x|--xlen)
       xlen=$2
@@ -88,8 +95,8 @@ then
   echo "rtlMod = model$xlen" >> Haskell/Target.hs
 
   notice "Compiling the Verilog generator."
-  execute "time ghc -j -O1 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs"
-  #execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O1 --make Kami/PrettyPrintVerilog.hs"
+  execute "time ghc $parallel -O1 --make -iHaskell -iKami Kami/PrettyPrintVerilog.hs"
+  #execute "time ghc -prof -fprof-auto $parallel +RTS -A128m -n4m -s -RTS -O1 --make Kami/PrettyPrintVerilog.hs"
 
   notice "Generating the Verilog model."
   execute "time Kami/PrettyPrintVerilog > System.sv"
@@ -104,14 +111,14 @@ then
   fi
 
   notice "Compiling the simulation program."
-  execute "time make -j -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+  execute "time make $parallel -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
 fi    
 
 if [[ $haskell == 1 ]]
 then 
   notice "Compiling the Haskell generator."
-  execute "time ghc -j -O1 --make -iHaskell -iKami ./Main.hs"
-#  execute "time ghc -prof -fprof-auto -j +RTS -A128m -n4m -s -RTS -O1 --make -iKami ./Main.hs"
+  execute "time ghc $parallel -O1 --make -iHaskell -iKami ./Main.hs"
+#  execute "time ghc -prof -fprof-auto $parallel +RTS -A128m -n4m -s -RTS -O1 --make -iKami ./Main.hs"
   notice "Done: Generated Main."
 fi
 
