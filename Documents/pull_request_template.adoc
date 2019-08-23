@@ -1,3 +1,0 @@
-Thank you for your contribution.
-
-If this change affects executable code in this repository, please https://builds.sr.ht/submit[start a build] using link:.builds/archlinux.yml[this template] filled with the git source url of your branch and any submodules that need to be updated atomically with this change.
