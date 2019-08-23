@@ -31,7 +31,7 @@ tasks:
     cabal v1-install hashmap bv
 - generate_hs: |
     cd RiscvSpecFormal
-    ./doGenerate.sh --haskell
+    env GHCFLAGS=--dynamic ./doGenerate.sh --haskell
 - riscv_toolchain: |
     curl -s https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz | tar -xzf -
 - riscv_tests: |

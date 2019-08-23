@@ -32,8 +32,8 @@ tasks:
     path=$(nix-prefetch-url --unpack 'https://github.com/coq/coq-on-cachix/tarball/master' --name source 2>&1 | tee /dev/stderr | grep -m1 '^path is' | cut -d\' -f2)
     nix-env -if "$path" --extra-substituters "https://coq.cachix.org" --trusted-public-keys "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= coq.cachix.org-1:5QW/wwEnD+l2jvN6QRbRRsa4hBHG3QiQQ26cxu1F5tI="
 - generate_hs: |
-    cd RiscSpecFormal
-    ./doGenerate.sh --haskell
+    cd RiscvSpecFormal
+    GHCFLAGS=--dynamic ./doGenerate.sh --haskell
 - riscv_toolchain: |
     curl -s https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14.tar.gz | tar -xzf -
 - riscv_tests: |
