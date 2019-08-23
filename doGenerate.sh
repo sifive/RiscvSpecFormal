@@ -80,7 +80,7 @@ done
 shift $((OPTIND - 1))
 
 notice "Compiling the Gallina (COQ) source code."
-cmd="time make -j"
+cmd="time make $parallel"
 if [[ $rebuild == 1 ]]
 then
   cmd="$cmd -B"
