@@ -18,6 +18,7 @@ import System.IO
 import System.Random (randomIO)
 import System.Environment (getArgs)
 import Text.Read
+import ConsoleDevice (mkConsoleDevice)
 
 import HaskellTarget as T
 
