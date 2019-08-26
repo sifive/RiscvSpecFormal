@@ -64,13 +64,31 @@ offset = 2147483648
 --     [] -> ys
 --     _ -> ys ++ (x:intersperse_at n x zs)
 
-meths :: IORef Int -> IORef Int -> [(String, Val -> FileState -> M.Map String Val -> IO Val)]
-meths steps counter =
-  [("proc_core_pc", proc_core_meth steps counter),
-   ("proc_core_ext_interrupt_pending", io_meth steps counter)]
+proc_core_readUART :: IORef Int -> IORef Int -> [Device] -> Val -> FileState -> M.Map String Val -> IO Val
+proc_core_readUART steps counter devices v filestate regstate = do
+    putStrLn "[proc_core_readUART]"
+    case find ((==) "console" . device_name) devices of
+      Nothing -> error "Error: attempted to read from the terminal when the terminal device is not available."
+      Just console -> device_read console v
 
-io_meth :: IORef Int -> IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
-io_meth steps counter v filestate regstate = do
+proc_core_writeUART :: IORef Int -> IORef Int -> [Device] -> Val -> FileState -> M.Map String Val -> IO Val
+proc_core_writeUART steps counter devices v filestate regstate = do
+    putStrLn "[proc_core_writeUART]"
+    case find ((==) "console" . device_name) devices of
+      Nothing -> error "Error: attempted to write to the terminal when the terminal device is not available."
+      Just console -> device_write console v
+
+meths :: IORef Int -> IORef Int -> [Device] -> [(String, Val -> FileState -> M.Map String Val -> IO Val)]
+meths steps counter devices =
+  [("proc_core_pc", proc_core_meth steps counter devices),
+   ("proc_core_ext_interrupt_pending", io_meth steps counter devices),
+   ("proc_core_readUART", proc_core_readUART steps counter devices),
+   ("proc_core_writeUART", proc_core_writeUART steps counter devices)]
+
+io_meth :: IORef Int -> IORef Int -> [Device] -> Val -> FileState -> M.Map String Val -> IO Val
+io_meth steps counter devices v filestate regstate = do
+  foldM (\acc device -> device_has_interrupt device >>= return . (acc ||)) False devices >>= return . BoolVal
+{-
    args <- getArgs
    if isJust $ find (\arg -> arg == "--enable-ext-interrupts") args then do
      putStrLn "external interrupts enabled"
@@ -78,6 +96,7 @@ io_meth steps counter v filestate regstate = do
      if result then do putStrLn "signalling an external interrupt"; return tt else return tt
      return $ BoolVal result
    else return $ BoolVal False
+-}
 
 chunksOf :: Int -> [a] -> [[a]]
 chunksOf n [] = []
@@ -85,8 +104,8 @@ chunksOf n ys =
   let (val, rest) = splitAt n ys in
   (val : chunksOf n rest)
 
-proc_core_meth :: IORef Int -> IORef Int -> Val -> FileState -> M.Map String Val -> IO Val
-proc_core_meth steps counter v filestate regstate = do
+proc_core_meth :: IORef Int -> IORef Int -> [Device] -> Val -> FileState -> M.Map String Val -> IO Val
+proc_core_meth steps counter devices v filestate regstate = do
     isaSize <- isa_size
     tohost_addr <- getArgVal "tohost_address" isaSize
     n <- readIORef counter
@@ -174,8 +193,10 @@ proc_core_meth steps counter v filestate regstate = do
 
 main :: IO()
 main = do
-    counter <- newIORef 0
-    steps <- newIORef 0
-    n <- isa_size
-    simulate_module 0 round_robin_rules (map fst $ getRules (basemod n)) (meths steps counter) (regfiles n) (basemod n)
-    return ()
+    console <- mkConsoleDevice
+    let devices = [Device console] in do
+      counter <- newIORef 0
+      steps <- newIORef 0
+      n <- isa_size
+      simulate_module 0 round_robin_rules devices (map fst $ getRules (basemod n)) (meths steps counter devices) (regfiles n) (basemod n)
+      return ()
