@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # This script accepts one argument, a RISC-V binary program file
 # path, and runs the program within the RISC-V processor simulator.
 
@@ -120,9 +120,9 @@ then
 else
   if [[ $interactive == 0 ]]
   then
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size $debug $interrupts > $dump/$base.out"
+    cmd="./Main boot_rom=boot_ROM_RV64.hex32 testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size $debug $interrupts > $dump/$base.out"
   else
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size --interactive $debug $interrupts"
+    cmd="./Main boot_rom=boot_ROM_RV64.hex32 testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size --interactive $debug $interrupts"
   fi  
 fi
 
