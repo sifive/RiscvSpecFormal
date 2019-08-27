@@ -46,7 +46,7 @@ tasks:
 - haskell_test: |
     cd ~/RiscvSpecFormal
     export PATH="$PATH:$HOME/riscv64-unknown-elf-gcc-8.2.0-2019.02.0-x86_64-linux-ubuntu14/bin"
-    #./runTests.sh --haskell --path /home/build/riscv/share/riscv-tests/isa --parallel --xlen 32
-    #./runTests.sh --haskell --path /home/build/riscv/share/riscv-tests/isa --parallel --xlen 64
+    #env GHCFLAGS=-dynamic ./runTests.sh --haskell --path /home/build/riscv/share/riscv-tests/isa --parallel --xlen 32
+    #env GHCFLAGS=-dynamic ./runTests.sh --haskell --path /home/build/riscv/share/riscv-tests/isa --parallel --xlen 64
     ./runElf.sh --xlen 32 --haskell --path /home/build/riscv/share/riscv-tests/isa/rv32ui-p-simple
     ./runElf.sh --xlen 32 --haskell --path /home/build/riscv/share/riscv-tests/isa/rv32ui-v-simple
