@@ -86,7 +86,8 @@ console_read = do
                 return ""
 
 instance AbstractEnvironment Environment where
-  envStep env filestate regstate = do
+  envPost env filestate regstate ruleName = return env
+  envPre env filestate regstate ruleName = do
     -- I. update console state
     console_input <- console_read
     uart_state_init <- readIORef $ consoleUART env
@@ -97,51 +98,55 @@ instance AbstractEnvironment Environment where
         else return ()
       writeIORef (consoleUART env) uart_state_final
     -- II. update simulation state
-    let currCounter = counter env
-        currSteps = steps env in do
-      isaSize <- isa_size
-      tohost_addr <- getArgVal "tohost_address" isaSize
-      when (currCounter > timeout) $ do
-          hPutStrLn stdout "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
-          hPutStrLn stderr "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
-          exitFailure
-      case M.lookup mem_file (arrs filestate) of
-          Nothing -> error $ "File " ++ mem_file ++ " not found."
-          Just v -> let val = v V.! (fromIntegral $ BV.nat $ bvCoerce tohost_addr) in 
-              if bvCoerce val == 1 then do
-                  args <- getArgs
-                  let ps = catMaybes $ map (binary_split '@') args
-                  case lookup "signature" ps of
-                      Nothing -> return ()
-                      Just filename -> case lookup "sign_size" ps of
-                          Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
-                          Just x -> let sign_size = read x in
-                              case M.lookup mem_file (arrs filestate) of
-                                  Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
-                                  Just v -> do
-                                      let sz = V.length v
-                                      let indices = reverse [(sz-sign_size)..(sz-1)]
-                                      let vals = map (\i -> ppr_hex (v V.! i)) indices
-                                      let spliced = (chunksOf 4 vals) :: [[String]]
-                                      let newlined = (map (\t -> concat (t ++ [['\n']])) spliced) :: [String]
-                                      let reversed = (reverse newlined) :: [String]
-                                      writeFile filename $ concat reversed
-                  hPutStrLn stdout "Passed"
-                  hPutStrLn stderr "Passed"
-                  exitSuccess
-              else if bvCoerce val > 1 then do
-                      hPutStrLn stdout "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
-                      hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
-                      exitFailure
-              else do
-                nextEnv <- io_stuff filestate regstate
-                             env {
-                               counter = (currCounter + 1),
-                               steps = if currSteps > 0
-                                         then currSteps - 1
-                                         else currSteps
-                             }
-                return env
+    putStrLn $ "[main] rule name: " ++ ruleName
+    if ruleName /= "proc_core_pipeline"
+      then return env
+      else
+        let currCounter = counter env
+            currSteps = steps env in do
+          isaSize <- isa_size
+          tohost_addr <- getArgVal "tohost_address" isaSize
+          when (currCounter > timeout) $ do
+              hPutStrLn stdout "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
+              hPutStrLn stderr "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
+              exitFailure
+          case M.lookup mem_file (arrs filestate) of
+              Nothing -> error $ "File " ++ mem_file ++ " not found."
+              Just v -> let val = v V.! (fromIntegral $ BV.nat $ bvCoerce tohost_addr) in 
+                  if bvCoerce val == 1 then do
+                      args <- getArgs
+                      let ps = catMaybes $ map (binary_split '@') args
+                      case lookup "signature" ps of
+                          Nothing -> return ()
+                          Just filename -> case lookup "sign_size" ps of
+                              Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
+                              Just x -> let sign_size = read x in
+                                  case M.lookup mem_file (arrs filestate) of
+                                      Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
+                                      Just v -> do
+                                          let sz = V.length v
+                                          let indices = reverse [(sz-sign_size)..(sz-1)]
+                                          let vals = map (\i -> ppr_hex (v V.! i)) indices
+                                          let spliced = (chunksOf 4 vals) :: [[String]]
+                                          let newlined = (map (\t -> concat (t ++ [['\n']])) spliced) :: [String]
+                                          let reversed = (reverse newlined) :: [String]
+                                          writeFile filename $ concat reversed
+                      hPutStrLn stdout "Passed"
+                      hPutStrLn stderr "Passed"
+                      exitSuccess
+                  else if bvCoerce val > 1 then do
+                          hPutStrLn stdout "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+                          hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+                          exitFailure
+                  else do
+                    nextEnv <- io_stuff filestate regstate
+                                 env {
+                                   counter = (currCounter + 1),
+                                   steps = if currSteps > 0
+                                             then currSteps - 1
+                                             else currSteps
+                                 }
+                    return env
 
 io_stuff :: FileState -> M.Map String Val -> Environment -> IO Environment
 io_stuff filestate regstate env =
