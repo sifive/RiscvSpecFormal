@@ -70,12 +70,27 @@ mkEnv = do
 
 console_read :: IO String
 console_read = do
+  -- putStrLn "[console_read]"
+  console_has_input <- try (hReady stdin) :: IO (Either IOError Bool)
+  case console_has_input of
+    Left isEOFError -> return ""
+    Right has_input
+      -> if has_input
+              then do
+                -- putStrLn "[console_read] read input."
+                b <- getChar
+                bs <- console_read
+                return (b : bs)
+              else do
+                -- putStrLn "[console_read] did not read any input."
+                return ""
+{-
   input <- try (getLine) :: IO (Either IOError String)
   return $
     case input of
       Left isEOFError -> ""
       Right content -> content
-
+-}
 instance AbstractEnvironment Environment where
   envPost env filestate regstate ruleName = return env
   envPre env filestate regstate ruleName = do
@@ -96,6 +111,7 @@ instance AbstractEnvironment Environment where
         let currCounter = counter env
             currSteps = steps env in do
           isaSize <- isa_size
+{-
           tohost_addr <- getArgVal "tohost_address" isaSize
           when (currCounter > timeout) $ do
               hPutStrLn stdout "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
@@ -130,14 +146,15 @@ instance AbstractEnvironment Environment where
                           hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
                           exitFailure
                   else do
-                    nextEnv <- io_stuff filestate regstate
-                                 env {
-                                   counter = (currCounter + 1),
-                                   steps = if currSteps > 0
-                                             then currSteps - 1
-                                             else currSteps
-                                 }
-                    return env
+-}
+          nextEnv <- io_stuff filestate regstate
+                       env {
+                         counter = (currCounter + 1),
+                         steps = if currSteps > 0
+                                   then currSteps - 1
+                                   else currSteps
+                       }
+          return env
 
 io_stuff :: FileState -> M.Map String Val -> Environment -> IO Environment
 io_stuff filestate regstate env =
@@ -224,8 +241,10 @@ proc_core_meth env _ _ _  = return (env, tt)
 
 main :: IO()
 main = do
+  hSetBuffering stdout NoBuffering
   env <- mkEnv
   envRef <- newIORef env
   n <- isa_size
+  putStrLn "[main] starting the simulation"
   simulate_module 0 round_robin_rules envRef (map fst $ getRules (basemod n)) meths (regfiles n) (basemod n)
   return ()
