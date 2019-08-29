@@ -152,7 +152,7 @@ instance AbstractEnvironment Environment where
                                              then currSteps - 1
                                              else currSteps
                                  }
-                    return env
+                    return nextEnv
 
 io_stuff :: FileState -> M.Map String Val -> Environment -> IO Environment
 io_stuff filestate regstate env =
