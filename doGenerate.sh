@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script generates the RISC-V processor simulator from the
 # Gallina and Verilog source files.
