@@ -68,6 +68,7 @@ EOF
       shift;;
     --noprint)
       noprint="--noprint"
+      shift;;
     -s|--skip)
       skip=1
       shift;;
