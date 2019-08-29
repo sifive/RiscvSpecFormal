@@ -70,12 +70,27 @@ mkEnv = do
 
 console_read :: IO String
 console_read = do
+  -- putStrLn "[console_read]"
+  console_has_input <- try (hReady stdin) :: IO (Either IOError Bool)
+  case console_has_input of
+    Left isEOFError -> return ""
+    Right has_input
+      -> if has_input
+              then do
+                -- putStrLn "[console_read] read input."
+                b <- getChar
+                bs <- console_read
+                return (b : bs)
+              else do
+                -- putStrLn "[console_read] did not read any input."
+                return ""
+{-
   input <- try (getLine) :: IO (Either IOError String)
   return $
     case input of
       Left isEOFError -> ""
       Right content -> content
-
+-}
 instance AbstractEnvironment Environment where
   envPost env filestate regstate ruleName = return env
   envPre env filestate regstate ruleName = do
