@@ -5,13 +5,14 @@
 source common.sh
 
 haskell=0
-interactive=0
+interactive=""
 interrupts=""
 signature=""
 sign_size=""
+noprint=""
 xlen=32
 
-options=$(getopt --options="hvsp:x:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,path:,debug,enable-ext-interrupts,xlen:" -- "$@")
+options=$(getopt --options="hvsp:x:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,noprint,path:,debug,enable-ext-interrupts,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -59,14 +60,17 @@ EOF
     -p|--path)
       path=$2
       shift 2;;
-      --interactive)
-      interactive=1
+    --interactive)
+      interactive="--interactive"
       shift;;
     -s|--haskell)
       haskell=1
       shift;;
     --debug)
       debug="--debug"
+      shift;;
+    --noprint)
+      noprint="--noprint"
       shift;;
     --enable-ext-interrupts)
       interrupts="--enable-ext-interrupts"
@@ -118,12 +122,7 @@ if [[ $haskell == 0 ]]
 then
     cmd="./obj_dir/Vsystem +sign_size=8192 +signature=$dump/$base.signature +testfile=$hexfile +tohost_address=$tohost_address > $dump/$base.out"
 else
-  if [[ $interactive == 0 ]]
-  then
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size $debug $interrupts > $dump/$base.out"
-  else
-    cmd="./Main testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size --interactive $debug $interrupts"
-  fi  
+    cmd="./Main $interactive $noprint testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size $debug $interrupts > $dump/$base.out"
 fi
 
 execute "time $cmd"

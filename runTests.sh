@@ -11,7 +11,7 @@ skip=0
 
 xlen=32
 
-options=$(getopt --options="hvcfdx:p:s" --longoptions="help,verbose,parallel,haskell,debug,xlen:,path:,skip" -- "$@")
+options=$(getopt --options="hvcfdx:p:s" --longoptions="help,noprint,verbose,parallel,haskell,debug,xlen:,path:,skip" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -66,6 +66,8 @@ EOF
     -d|--debug)
       debug="--debug"
       shift;;
+    --noprint)
+      noprint="--noprint"
     -s|--skip)
       skip=1
       shift;;
@@ -93,11 +95,11 @@ if [[ $parallel == 0 ]]
 then
   for file in $files
   do
-    ((file $file | (grep -iq elf && ./runElf.sh --xlen $xlen $verboseflag $haskell --path $file)) || (file $file | grep -viq elf));
+    ((file $file | (grep -iq elf && ./runElf.sh --xlen $xlen $noprint $verboseflag $haskell --path $file)) || (file $file | grep -viq elf));
     result=$(( $? | $result ));
   done
 else
-  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --xlen $xlen $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
+  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --xlen $xlen $noprint $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
   result=$?
 fi
 
