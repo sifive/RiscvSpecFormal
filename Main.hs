@@ -20,6 +20,7 @@ import System.Environment (getArgs)
 import Text.Read
 import Control.Exception
 import UART
+import Data.BitVector as BV
 
 import HaskellTarget as T
 
@@ -199,23 +200,32 @@ io_stuff filestate regstate env =
                 io_stuff filestate regstate env
       else return env
 
-
 proc_core_readUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 proc_core_readUART env v filestate regstate = do
     putStrLn "[proc_core_readUART]"
-    uart_state_init <- readIORef $ consoleUART env
-    (result, uart_state_final) <- return $ uart_read uart_state_init $ BV.nat $ bvCoerce v
-    writeIORef (consoleUART env) uart_state_final
-    return (env, BVVal $ BV.bitVec 8 result)
+    result <- foldM
+                (\acc offset -> do
+                  uart_state_init <- readIORef $ consoleUART env
+                  (result, uart_state_final) <-
+                    return $ uart_read uart_state_init
+                      (offset + (BV.nat $ bvCoerce $ struct_field_access "addr" v))
+                  writeIORef (consoleUART env) uart_state_final
+                  return $ (acc <<. (bitVec 4 8)) .|. (bitVec 64 result))
+                (bitVec 64 0)
+                [0 .. (2 ^ (BV.nat $ bvCoerce $ struct_field_access "size" v) - 1)]
+    return (env, BVVal result)
 
 proc_core_writeUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 proc_core_writeUART env v filestate regstate = do
     putStrLn "[proc_core_writeUART]"
-    uart_state_init <- readIORef $ consoleUART env
-    writeIORef (consoleUART env) $
-      uart_write uart_state_init
-        (fromIntegral $ BV.nat $ bvCoerce $ struct_field_access "addr" v)
-        (fromIntegral $ BV.nat $ bvCoerce $ struct_field_access "data" v)
+    mapM_
+      (\offset -> do
+          uart_state_init <- readIORef $ consoleUART env
+          writeIORef (consoleUART env) $
+            uart_write uart_state_init
+              (offset + (fromIntegral $ BV.nat $ bvCoerce $ struct_field_access "addr" v))
+              (fromIntegral $ BV.nat $ bvCoerce $ struct_field_access "data" v))
+      [0 .. (2 ^ (BV.nat $ bvCoerce $ struct_field_access "size" v) - 1)]
     return (env, BVVal BV.nil)
 
 io_meth :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
