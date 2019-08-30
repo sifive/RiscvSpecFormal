@@ -101,7 +101,11 @@ instance AbstractEnvironment Environment where
     let (console_output, uart_state_final) =
           uart_deq_output $ uart_enq_input uart_state_init console_input in do
       if console_output /= ""
-        then putStrLn $ "[console out] > " ++ console_output
+        then do
+          result <- try (putStrLn $ "[console out] > " ++ console_output) :: IO (Either IOError ())
+          case result of
+            Left _  -> putStrLn "[console out] Error: an IO error occured while trying to print out a console character."
+            Right _ -> return ()
         else return ()
       writeIORef (consoleUART env) uart_state_final
     -- II. update simulation state
