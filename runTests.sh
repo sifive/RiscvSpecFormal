@@ -90,7 +90,7 @@ fi
 
 notice "Running tests in $path."
 
-files=$(./fileList.sh $path $xlen)
+files=$(./blackList.sh $path $xlen)
 
 if [[ $parallel == 0 ]]
 then
