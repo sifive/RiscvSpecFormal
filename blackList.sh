@@ -12,7 +12,11 @@ for file in $allfiles
 do
   for badfile in \
     rv32mi-p-breakpoint \
-    rv64mi-p-breakpoint
+    rv64mi-p-breakpoint \
+    rv32mi-p-csr \
+    rv64mi-p-csr \
+    rv32mi-p-ma_fetch \
+    rv64mi-p-ma_fetch
   do
     insert=1
     if [[ $file == "$dir/$badfile" ]]
