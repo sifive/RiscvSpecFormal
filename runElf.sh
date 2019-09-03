@@ -82,7 +82,7 @@ EOF
       sign_size=sign_size@$2
       shift 2;;
     -x|--xlen)
-      xlenval=xlen@$2
+      xlen=$2
       shift 2;;
     --)
       shift
@@ -122,7 +122,7 @@ if [[ $haskell == 0 ]]
 then
     cmd="./obj_dir/Vsystem +sign_size=8192 +signature=$dump/$base.signature +testfile=$hexfile +tohost_address=$tohost_address > $dump/$base.out"
 else
-    cmd="./Main boot_rom=boot_ROM_RV64.hex32 $interactive $noprint testfile=$hexfile tohost_address:$tohost_address $xlenval $signature $sign_size $debug $interrupts > $dump/$base.out"
+    cmd="./Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts > $dump/$base.out"
 fi
 
 execute "time $cmd"
