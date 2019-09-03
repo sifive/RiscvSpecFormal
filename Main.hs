@@ -9,7 +9,7 @@ import qualified Data.Vector as V
 import qualified Data.BitVector as BV
 
 import Data.String
-import Data.List (find)
+import Data.List
 import Data.Maybe (isJust, catMaybes)
 import Control.Monad
 import Data.IORef
@@ -20,6 +20,7 @@ import System.Environment (getArgs)
 import Text.Read
 import Control.Exception
 import UART
+import Data.BitVector as BV
 
 import HaskellTarget as T
 
@@ -84,13 +85,10 @@ console_read = do
               else do
                 -- putStrLn "[console_read] did not read any input."
                 return ""
-{-
-  input <- try (getLine) :: IO (Either IOError String)
-  return $
-    case input of
-      Left isEOFError -> ""
-      Right content -> content
--}
+
+hasArg :: String -> IO Bool
+hasArg name = getArgs >>= (.) return (maybe False (const True) . find (\arg -> (isPrefixOf name arg)))
+
 instance AbstractEnvironment Environment where
   envPost env filestate regstate ruleName = return env
   envPre env filestate regstate ruleName = do
@@ -100,7 +98,11 @@ instance AbstractEnvironment Environment where
     let (console_output, uart_state_final) =
           uart_deq_output $ uart_enq_input uart_state_init console_input in do
       if console_output /= ""
-        then putStrLn $ "[console out] > " ++ console_output
+        then do
+          result <- try (putStrLn $ "[console out] > " ++ console_output) :: IO (Either IOError ())
+          case result of
+            Left msg -> putStrLn $ "[console out] Error: an IO error occured while trying to print out a console character." ++ show msg
+            Right _ -> return ()
         else return ()
       writeIORef (consoleUART env) uart_state_final
     -- II. update simulation state
@@ -111,48 +113,53 @@ instance AbstractEnvironment Environment where
         let currCounter = counter env
             currSteps = steps env in do
           isaSize <- isa_size
-          tohost_addr <- getArgVal "tohost_address" isaSize
+          -- handle timeouts
           when (currCounter > timeout) $ do
               hPutStrLn stdout "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
               hPutStrLn stderr "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
               exitFailure
-          case M.lookup mem_file (arrs filestate) of
-              Nothing -> error $ "File " ++ mem_file ++ " not found."
-              Just v -> let val = v V.! (fromIntegral $ BV.nat $ bvCoerce tohost_addr) in 
-                  if bvCoerce val == 1 then do
-                      args <- getArgs
-                      let ps = catMaybes $ map (binary_split '@') args
-                      case lookup "signature" ps of
-                          Nothing -> return ()
-                          Just filename -> case lookup "sign_size" ps of
-                              Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
-                              Just x -> let sign_size = read x in
-                                  case M.lookup mem_file (arrs filestate) of
-                                      Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
-                                      Just v -> do
-                                          let sz = V.length v
-                                          let indices = reverse [(sz-sign_size)..(sz-1)]
-                                          let vals = map (\i -> ppr_hex (v V.! i)) indices
-                                          let spliced = (chunksOf 4 vals) :: [[String]]
-                                          let newlined = (map (\t -> concat (t ++ [['\n']])) spliced) :: [String]
-                                          let reversed = (reverse newlined) :: [String]
-                                          writeFile filename $ concat reversed
-                      hPutStrLn stdout "Passed"
-                      hPutStrLn stderr "Passed"
-                      exitSuccess
-                  else if bvCoerce val > 1 then do
-                          hPutStrLn stdout "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
-                          hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
-                          exitFailure
-                  else do
-                    nextEnv <- io_stuff filestate regstate
-                                 env {
-                                   counter = (currCounter + 1),
-                                   steps = if currSteps > 0
-                                             then currSteps - 1
-                                             else currSteps
-                                 }
-                    return nextEnv
+          has_tohost <- hasArg "tohost_address"
+          if Prelude.not has_tohost
+            then return ()
+            else do
+              tohost_addr <- getArgVal "tohost_address" isaSize
+              case M.lookup mem_file (arrs filestate) of
+                  Nothing -> error $ "File " ++ mem_file ++ " not found."
+                  Just v -> let val = v V.! (fromIntegral $ BV.nat $ bvCoerce tohost_addr) in 
+                      if bvCoerce val == 1 then do
+                          args <- getArgs
+                          let ps = catMaybes $ map (binary_split '@') args
+                          case lookup "signature" ps of
+                              Nothing -> return ()
+                              Just filename -> case lookup "sign_size" ps of
+                                  Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
+                                  Just x -> let sign_size = read x in
+                                      case M.lookup mem_file (arrs filestate) of
+                                          Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
+                                          Just v -> do
+                                              let sz = V.length v
+                                              let indices = Data.List.reverse [(sz-sign_size)..(sz-1)]
+                                              let vals = map (\i -> ppr_hex (v V.! i)) indices
+                                              let spliced = (chunksOf 4 vals) :: [[String]]
+                                              let newlined = (map (\t -> Data.List.concat (t ++ [['\n']])) spliced) :: [String]
+                                              let reversed = (Data.List.reverse newlined) :: [String]
+                                              writeFile filename $ Data.List.concat reversed
+                          hPutStrLn stdout "Passed"
+                          hPutStrLn stderr "Passed"
+                          exitSuccess
+                      else if bvCoerce val > 1 then do
+                              hPutStrLn stdout "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+                              hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+                              exitFailure
+                      else return ()
+          nextEnv <- io_stuff filestate regstate
+                       env {
+                         counter = (currCounter + 1),
+                         steps = if currSteps > 0
+                                   then currSteps - 1
+                                   else currSteps
+                       }
+          return nextEnv
 
 io_stuff :: FileState -> M.Map String Val -> Environment -> IO Environment
 io_stuff filestate regstate env =
@@ -197,23 +204,32 @@ io_stuff filestate regstate env =
                 io_stuff filestate regstate env
       else return env
 
-
 proc_core_readUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 proc_core_readUART env v filestate regstate = do
     putStrLn "[proc_core_readUART]"
-    uart_state_init <- readIORef $ consoleUART env
-    (result, uart_state_final) <- return $ uart_read uart_state_init $ BV.nat $ bvCoerce v
-    writeIORef (consoleUART env) uart_state_final
-    return (env, BVVal $ BV.bitVec 8 result)
+    result <- foldM
+                (\acc offset -> do
+                  uart_state_init <- readIORef $ consoleUART env
+                  (result, uart_state_final) <-
+                    return $ uart_read uart_state_init
+                      (offset + (BV.nat $ bvCoerce $ struct_field_access "addr" v))
+                  writeIORef (consoleUART env) uart_state_final
+                  return $ (acc <<. (bitVec 4 8)) .|. (bitVec 64 result))
+                (bitVec 64 0)
+                (Data.List.reverse [0 .. (2 ^ (BV.nat $ bvCoerce $ struct_field_access "size" v) - 1)])
+    return (env, BVVal result)
 
 proc_core_writeUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 proc_core_writeUART env v filestate regstate = do
     putStrLn "[proc_core_writeUART]"
-    uart_state_init <- readIORef $ consoleUART env
-    writeIORef (consoleUART env) $
-      uart_write uart_state_init
-        (fromIntegral $ BV.nat $ bvCoerce $ struct_field_access "addr" v)
-        (fromIntegral $ BV.nat $ bvCoerce $ struct_field_access "data" v)
+    mapM_
+      (\offset -> do
+          uart_state_init <- readIORef $ consoleUART env
+          writeIORef (consoleUART env) $
+            uart_write uart_state_init
+              (offset + (fromIntegral $ BV.nat $ bvCoerce $ struct_field_access "addr" v))
+              (fromIntegral $ BV.nat ((bvCoerce $ struct_field_access "data" v) >>. (bitVec 7 (offset * 8)))))
+      [0 .. (2 ^ (BV.nat $ bvCoerce $ struct_field_access "size" v) - 1)]
     return (env, BVVal BV.nil)
 
 io_meth :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
@@ -233,14 +249,12 @@ chunksOf n ys =
   let (val, rest) = splitAt n ys in
   (val : chunksOf n rest)
 
--- TODO: merge this into envStep
-proc_core_meth :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
-proc_core_meth env _ _ _  = return (env, tt)
-
 main :: IO()
 main = do
+  hSetBuffering stdout NoBuffering
   env <- mkEnv
   envRef <- newIORef env
   n <- isa_size
+  putStrLn "[main] starting the simulation"
   simulate_module 0 round_robin_rules envRef (map fst $ getRules (basemod n)) meths (regfiles n) (basemod n)
   return ()
