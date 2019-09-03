@@ -228,7 +228,7 @@ proc_core_writeUART env v filestate regstate = do
           writeIORef (consoleUART env) $
             uart_write uart_state_init
               (offset + (fromIntegral $ BV.nat $ bvCoerce $ struct_field_access "addr" v))
-              (fromIntegral $ BV.nat ((bvCoerce $ struct_field_access "data" v) >>. (bitVec 7 (offset * 8)))))
+              (fromIntegral $ BV.nat $ BV.least 8 ((bvCoerce $ struct_field_access "data" v) >>. (bitVec 7 (offset * 8)))))
       [0 .. (2 ^ (BV.nat $ bvCoerce $ struct_field_access "size" v) - 1)]
     return (env, BVVal BV.nil)
 
