@@ -164,7 +164,8 @@ instance AbstractEnvironment Environment where
 io_stuff :: FileState -> M.Map String Val -> Environment -> IO Environment
 io_stuff filestate regstate env =
   let currSteps = steps env :: Int in do
-    interactive <- interactive_mode
+    modes <- get_modes
+    let interactive = interactive_mode modes
     if interactive && currSteps == 0
       then do 
         putStr "% "
