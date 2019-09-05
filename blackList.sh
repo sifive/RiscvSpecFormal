@@ -11,6 +11,8 @@ allfiles="$allfilesp $allfilesv"
 for file in $allfiles
 do
   for badfile in \
+    rv32mi-p-ma_fetch \
+    rv32mi-p-ma_fetch \
     rv32mi-p-breakpoint \
     rv64mi-p-breakpoint
   do
