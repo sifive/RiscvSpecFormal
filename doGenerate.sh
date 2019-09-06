@@ -118,7 +118,7 @@ if [[ $haskell == 1 ]]
 then 
   notice "Compiling the Haskell generator."
   execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskell -iKami ./Main.hs"
-#  execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iKami ./Main.hs"
+#  execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskell -iKami ./Main.hs"
   notice "Done: Generated Main."
 fi
 
