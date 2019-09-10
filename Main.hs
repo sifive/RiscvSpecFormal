@@ -69,6 +69,7 @@ mkEnv = do
   uartRef <- newIORef mkUART
   return $ Environment 0 0 uartRef
 
+{-
 console_read :: IO String
 console_read = do
   -- putStrLn "[console_read]"
@@ -85,6 +86,15 @@ console_read = do
               else do
                 -- putStrLn "[console_read] did not read any input."
                 return ""
+-}
+
+console_read :: IO String
+console_read = do
+  console_has_input <- try (hReady stdin) :: IO (Either IOError Bool)
+  case console_has_input of
+    Left _ -> return ""
+    Right has_input -> if has_input then getLine else return ""
+
 
 hasArg :: String -> IO Bool
 hasArg name = getArgs >>= (.) return (maybe False (const True) . find (\arg -> (isPrefixOf name arg)))
