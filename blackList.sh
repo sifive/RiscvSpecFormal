@@ -3,16 +3,14 @@
 dir=$1
 xlen=$2
 
-allfilesp=$(find "$dir" -maxdepth 1 -regex ".*/rv$xlen[um].-p[^\.]*")
-allfilesv=$(find "$dir" -maxdepth 1 -regex ".*/rv$xlen[um].-v[^\.]*")
+allfilesp=$(find "$dir" -maxdepth 1 -regex ".*/rv$xlen[.].-p[^\.]*")
+allfilesv=$(find "$dir" -maxdepth 1 -regex ".*/rv$xlen[.].-v[^\.]*")
 
 allfiles="$allfilesp $allfilesv"
 
 for file in $allfiles
 do
   for badfile in \
-    rv32mi-p-ma_fetch \
-    rv32mi-p-ma_fetch \
     rv32mi-p-breakpoint \
     rv64mi-p-breakpoint
   do
