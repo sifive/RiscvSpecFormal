@@ -100,7 +100,7 @@ then
     result=$(( $? | $result ));
   done
 else
-  printf "$files" | parallel --bar -P 0 -j0 "(file {} | (grep -iq elf && ./runElf.sh --xlen $xlen $noprint $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
+  printf "$files" | parallel --bar -P 0 -j32 "(file {} | (grep -iq elf && ./runElf.sh --xlen $xlen $noprint $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
   result=$?
 fi
 
