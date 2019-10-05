@@ -34,13 +34,6 @@ int main(int argc, char ** argv, char **env) {
 
   VL_VALUEPLUSARGS_INN(-1, "signature=%s", signature);
 
-  FILE* signature_fd = fopen(signature.c_str(), "w");
-
-  if(signature_fd == NULL) {
-    fprintf(stderr, "Can't open signature file %s\n", signature.c_str());
-    exit(-1);
-  }
-  
   VL_VALUEPLUSARGS_INI(32, "sign_size=%d", sign_size);
   
   VL_VALUEPLUSARGS_INI(32, "tohost_address=%h", tohost_address);
@@ -84,11 +77,16 @@ int main(int argc, char ** argv, char **env) {
   }
 
   
-  for(int i = numBlockBytes-sign_size+1; i < numBlockBytes; i+=4) {
-    for(int j = 3; j >= 0; j--) {
-      fprintf(signature_fd, "%02x", system->system->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[i+j]);
+  if(signature.c_str() != 0) {
+    FILE* signature_fd = fopen(signature.c_str(), "w");
+    if(signature_fd != NULL) {
+      for(int i = numBlockBytes-sign_size+1; i < numBlockBytes; i+=4) {
+        for(int j = 3; j >= 0; j--) {
+          fprintf(signature_fd, "%02x", system->system->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[i+j]);
+        }
+        fprintf(signature_fd, "\n");
+      }
     }
-    fprintf(signature_fd, "\n");
   }
   
   system->final();
