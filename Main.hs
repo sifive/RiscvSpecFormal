@@ -116,7 +116,7 @@ instance AbstractEnvironment Environment where
         else return ()
       writeIORef (consoleUART env) uart_state_final
     -- II. update simulation state
-    putStrLn $ "[main] rule name: " ++ ruleName
+    --putStrLn $ "[main] rule name: " ++ ruleName
     if ruleName /= "proc_core_pipeline"
       then return env
       else
@@ -217,7 +217,7 @@ io_stuff filestate regstate env =
 
 proc_core_readUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 proc_core_readUART env v filestate regstate = do
-    putStrLn "[proc_core_readUART]"
+    --putStrLn "[proc_core_readUART]"
     result <- foldM
                 (\acc offset -> do
                   uart_state_init <- readIORef $ consoleUART env
@@ -232,7 +232,7 @@ proc_core_readUART env v filestate regstate = do
 
 proc_core_writeUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 proc_core_writeUART env v filestate regstate = do
-    putStrLn "[proc_core_writeUART]"
+    --putStrLn "[proc_core_writeUART]"
     mapM_
       (\offset -> do
           uart_state_init <- readIORef $ consoleUART env
@@ -266,6 +266,6 @@ main = do
   env <- mkEnv
   envRef <- newIORef env
   n <- isa_size
-  putStrLn "[main] starting the simulation"
+  --putStrLn "[main] starting the simulation"
   simulate_module 0 round_robin_rules envRef (map fst $ getRules (basemod n)) meths (regfiles n) (basemod n)
   return ()

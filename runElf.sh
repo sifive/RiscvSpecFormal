@@ -76,10 +76,12 @@ EOF
       interrupts="--enable-ext-interrupts"
       shift;;
     --signature)
-      signature=$2
+      signaturev=$2
+      signature=signature@$2
       shift 2;;
     --sign_size)
-      sign_size=$2
+      sign_sizev=$2
+      sign_size=sign_size@$2
       shift 2;;
     -x|--xlen)
       xlen=$2
@@ -120,10 +122,10 @@ notice "Running $base"
 
 if [[ $haskell == 0 ]]
 then
-    cmd="./obj_dir/Vsystem +sign_size=$sign_size +signature=$signature +testfile=$hexfile +boot_rom=boot_ROM_RV${xlen}.hex +tohost_address=$tohost_address > $dump/$base.out"
+    cmd="./obj_dir/Vsystem +sign_size=$sign_sizev +signature=$signaturev +testfile=$hexfile +boot_rom=boot_ROM_RV${xlen}.hex +tohost_address=$tohost_address > $dump/$base.out"
 else
-    cmd="./Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} signature@$signature sign_size@$sign_size $debug $interrupts > $dump/$base.out"
-#    cmd="./Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} signature@$signature sign_size@$sign_size $debug $interrupts +RTS -p > $dump/$base.out"
+    cmd="./Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts > $dump/$base.out"
+#    cmd="./Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts +RTS -p > $dump/$base.out"
 fi
 
 execute "time $cmd"
