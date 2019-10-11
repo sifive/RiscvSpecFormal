@@ -1,4 +1,6 @@
-module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, rtlMod) where
+module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CompileVerifiable, module CVSimple, rtlMod) where
+import CompileVerifiable hiding (unsafeCoerce, __)
+import CVSimple hiding (unsafeCoerce, __)
 import EclecticLib hiding (__)
 import PeanoNat
 import Fin
