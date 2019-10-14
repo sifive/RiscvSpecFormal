@@ -1,5 +1,4 @@
-module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CompileVerifiable, module CVSimple, rtlMod) where
-import CompileVerifiable hiding (unsafeCoerce, __)
+module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CVSimple, module Extraction, rtlMod) where
 import CVSimple hiding (unsafeCoerce, __)
 import EclecticLib hiding (__)
 import PeanoNat
@@ -7,5 +6,6 @@ import Fin
 import Instance
 import Rtl
 import Syntax hiding (unsafeCoerce, __)
+import Extraction hiding (unsafeCoerce, Any)
 import Word
 rtlMod :: RtlModule
