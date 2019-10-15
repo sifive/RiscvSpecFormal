@@ -1,4 +1,4 @@
-VS:=$(shell find . -type f -name '*.v')
+VS:=$(shell find . -type f -name '*.v' -not -name 'FpuProperties.v')
 
 .PHONY: coq clean force
 
