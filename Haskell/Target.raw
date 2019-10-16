@@ -1,5 +1,5 @@
-module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CVSimple, module Extraction, rtlMod) where
-import CVSimple hiding (unsafeCoerce, __)
+module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CompilerSimple, module Extraction, rtlMod) where
+import CompilerSimple hiding (unsafeCoerce, __)
 import EclecticLib hiding (__)
 import PeanoNat
 import Fin
