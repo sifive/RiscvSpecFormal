@@ -36,8 +36,8 @@ isa_size = do
     Nothing -> return 32
 
 kami_model :: Int -> ([RegFileBase] , BaseModule)
-kami_model 32 = T.kami_model32
-kami_model 64 = T.kami_model64
+kami_model 32 = snd T.kami_model32
+kami_model 64 = snd T.kami_model64
 
 regfiles :: Int -> [RegFileBase]
 regfiles n = fst $ kami_model n

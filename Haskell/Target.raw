@@ -9,4 +9,5 @@ import Syntax hiding (unsafeCoerce, __)
 import Extraction hiding (unsafeCoerce, Any)
 import Word
 import LibStruct hiding (unsafeCoerce, __)
-rtlMod :: RtlModule
+
+rtlMod :: ([String], ([RegFileBase], BaseModule))
