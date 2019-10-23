@@ -1,9 +1,9 @@
-module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CompilerSimple, module Extraction, module LibStruct, rtlMod) where
+module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CompilerSimple, module Extraction, module LibStruct, module Instance, rtlMod) where
 import CompilerSimple hiding (unsafeCoerce, __)
 import EclecticLib hiding (__)
 import PeanoNat
 import Fin
-import Instance
+import Instance hiding (unsafeCoerce, __)
 import Rtl
 import Syntax hiding (unsafeCoerce, __)
 import Extraction hiding (unsafeCoerce, Any)
