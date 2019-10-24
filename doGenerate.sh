@@ -92,14 +92,14 @@ cd Kami && ./fixHaskell.sh .. Main.hs HaskellTarget.hs && cd ..
 if [[ $haskell == 0 ]]
 then
   cat Haskell/Target.raw > Haskell/Target.hs
-  echo "rtlMod = model$xlen" >> Haskell/Target.hs
+  echo "rtlMod = kami_model$xlen" >> Haskell/Target.hs
 
   notice "Compiling the Verilog generator."
-  execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskell -iKami Kami/Compiler/PrettyPrintVerilog.hs"
-  #execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make Kami/PrettyPrintVerilog.hs"
+  execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskell -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
+  #execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskell -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
 
   notice "Generating the Verilog model."
-  execute "time Kami/Compiler/PrettyPrintVerilog > System.sv"
+  execute "time Kami/Compiler/CompAction > System.sv"
     
   notice "Generating the simulator source code (i.e. C files)."
   execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
