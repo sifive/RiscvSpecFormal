@@ -11,7 +11,6 @@ Makefile.coq.all: force
 force:
 
 clean:: Makefile.coq.all
-	$(MAKE) -f Makefile.coq.all clean
 	find . -type f -name '*.v.d' -exec rm {} \;
 	find . -type f -name '*.glob' -exec rm {} \;
 	find . -type f -name '*.vo' -exec rm {} \;
