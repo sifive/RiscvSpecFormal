@@ -5,7 +5,7 @@
 
 == Dependencies
 === Dependencies for building the model
-. Coq 8.9.0
+. Coq 8.10.0
 . GHC 8.6.5 or newer and Cabal
 
 === Dependencies for compiling the tests
@@ -15,7 +15,7 @@
 . Clang 3.8.0 or newer
 . Verilator master branch (4.015 devel rev UNKNOWN_REV)
 
-Note that the versions mentioned above are known to work. Try other versions at your own peril. In particular, I believe Coq 8.9.1 works; GHC 8.2.2 or newer works; Clang 10.0.0 or newer works *but Clang 8.0.0 does not work*; Verilator 4.013 devel rev UNKNOWN_REV or newer works.
+Note that the versions mentioned above are known to work. Try other versions at your own peril. In particular, GHC 8.2.2 or newer works; Clang 10.0.0 or newer works *but Clang 8.0.0 does not work*; Verilator 4.013 devel rev UNKNOWN_REV or newer works.
 
 
 == Repositories needed to build the model
@@ -42,7 +42,7 @@ Note that in the following set of instructions `sudo` permission is needed to in
 ----
 sudo add-apt-repository ppa:jgross-h/many-coq-versions --yes
 sudo apt-get update
-sudo apt-get install coq-8.9.0 --yes
+sudo apt-get install coq-8.10.0 --yes
 coqc --version
 ----
 
