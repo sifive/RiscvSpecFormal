@@ -1,4 +1,4 @@
-module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CompilerSimple, module Extraction, module LibStruct, module Instance, module Compile, rtlMod) where
+module Target (module Syntax, module Rtl, module Word, module Fin, module EclecticLib, module PeanoNat, module CompilerSimple, module Extraction, module LibStruct, module Instance, module Compile, module Test, rtlMod) where
 import CompilerSimple hiding (unsafeCoerce, __)
 import Compile hiding (unsafeCoerce, __) -- TODO must remove
 import EclecticLib hiding (__)
@@ -10,5 +10,6 @@ import Syntax hiding (unsafeCoerce, __)
 import Extraction hiding (unsafeCoerce, Any)
 import Word
 import LibStruct hiding (unsafeCoerce, __)
+import Test
 
 rtlMod :: ([String], ([RegFileBase], BaseModule))
