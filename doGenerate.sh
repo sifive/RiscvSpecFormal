@@ -14,7 +14,7 @@ haskell=0
 
 parallel=""
 
-options=$(getopt --options="hrvsx:p" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel" -- "$@")
+options=$(getopt --options="hrvsx:pt" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel,test" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -69,6 +69,9 @@ EOF
     -p|--parallel)
       parallel="-j"
       shift;;
+    -t|--test)
+      test=1
+      shift;;
     -x|--xlen)
       xlen=$2
       shift 2;;
@@ -89,10 +92,17 @@ execute "$cmd"
 
 cd Kami && ./fixHaskell.sh .. Main.hs HaskellTarget.hs && cd ..
 
+if [[ $test == 1 ]]
+then
+  model=testMod
+else
+  model=model$xlen
+fi
+
 if [[ $haskell == 0 ]]
 then
   cat Haskell/Target.raw > Haskell/Target.hs
-  echo "rtlMod = separateModRemove model$xlen" >> Haskell/Target.hs
+  echo "rtlMod = separateModRemove $model" >> Haskell/Target.hs
 
   notice "Compiling the Verilog generator."
   execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskell -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
