@@ -92,7 +92,7 @@ cd Kami && ./fixHaskell.sh .. Main.hs HaskellTarget.hs && cd ..
 if [[ $haskell == 0 ]]
 then
   cat Haskell/Target.raw > Haskell/Target.hs
-  echo "rtlMod = kami_model$xlen" >> Haskell/Target.hs
+  echo "rtlMod = separateModRemove model$xlen" >> Haskell/Target.hs
 
   notice "Compiling the Verilog generator."
   execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskell -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
