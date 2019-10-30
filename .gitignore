@@ -9,7 +9,6 @@ Makefile.coq.all.conf
 *.hi
 *.ho
 *.o
-*.hs
 .lia.cache
 *.vcd
 *.hex
@@ -23,3 +22,5 @@ Main
 fixlits
 Main32
 Main64
+Haskell
+HaskellGen/*

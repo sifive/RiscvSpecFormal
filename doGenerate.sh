@@ -101,8 +101,8 @@ fi
 
 if [[ $haskell == 0 ]]
 then
-  cat Haskell/Target.raw > Haskell/Target.hs
-  echo "rtlMod = separateModRemove $model" >> Haskell/Target.hs
+  cat Haskell/Target.raw > HaskellGen/Target.hs
+  echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
 
   notice "Compiling the Verilog generator."
   execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskell -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
