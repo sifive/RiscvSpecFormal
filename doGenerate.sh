@@ -90,7 +90,7 @@ then
 fi
 execute "$cmd"
 
-cd Kami && ./fixHaskell.sh .. Main.hs HaskellTarget.hs && cd ..
+cd Kami && ./fixHaskell.sh ../HaskellGen && cd ..
 
 if [[ $test == 1 ]]
 then
