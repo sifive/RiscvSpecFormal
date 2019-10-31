@@ -99,7 +99,7 @@ else
   model=model$xlen
 fi
 
-cp UART.hs HaskellGen
+cp Haskell/UART.hs HaskellGen
 
 if [[ $haskell == 0 ]]
 then
@@ -129,8 +129,8 @@ fi
 if [[ $haskell == 1 ]]
 then 
   notice "Compiling the Haskell generator."
-  cp HaskellTarget.hs HaskellGen
-  cp Main.hs HaskellGen
+  cp Haskell/HaskellTarget.hs HaskellGen
+  cp Haskell/Main.hs HaskellGen
   execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
 #  execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
   notice "Done: Generated Main."
