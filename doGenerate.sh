@@ -99,14 +99,16 @@ else
   model=model$xlen
 fi
 
+cp UART.hs HaskellGen
+
 if [[ $haskell == 0 ]]
 then
   cat Haskell/Target.raw > HaskellGen/Target.hs
   echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
 
   notice "Compiling the Verilog generator."
-  execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskell -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
-  #execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskell -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
+  execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
+  #execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
 
   notice "Generating the Verilog model."
   execute "time Kami/Compiler/CompAction > System.sv"
@@ -127,8 +129,10 @@ fi
 if [[ $haskell == 1 ]]
 then 
   notice "Compiling the Haskell generator."
-  execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskell -iHaskellGen -iKami ./Haskell/Main.hs"
-#  execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskell -iHaskellGen -iKami ./Haskell/Main.hs"
+  cp HaskellTarget.hs HaskellGen
+  cp Main.hs HaskellGen
+  execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
+#  execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
   notice "Done: Generated Main."
 fi
 
