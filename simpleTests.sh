@@ -6,9 +6,9 @@
 		./runElf.sh --xlen 64 --haskell --path $1/rv64ui-p-add & \
 		./runElf.sh --xlen 64 --haskell --path $1/rv64ui-v-add & \
 		./runElf.sh --xlen 32 --haskell --path $1/rv32ui-p-add & \
-		./runElf.sh --xlen 32 --haskell --path $1/rv32ui-v-add
+		./runElf.sh --xlen 32 --haskell --path $1/rv32ui-v-add & \
 	) \
-) & \
+) && \
 ( \
 	( \
 		./doGenerate.sh --xlen 64 --parallel && \
