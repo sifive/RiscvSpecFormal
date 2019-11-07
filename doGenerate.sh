@@ -111,10 +111,10 @@ then
   #execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
 
   notice "Generating the Verilog model."
-  execute "time Kami/Compiler/CompAction > System.sv"
+  execute "mkdir -p $model; time Kami/Compiler/CompAction > $model/System.sv"
     
   notice "Generating the simulator source code (i.e. C files)."
-  execute "time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp"
+  execute "cd $model; time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp; cd .."
     
   if [ -x "$(command -v clang)" ]; then
     compiler=clang
@@ -123,7 +123,7 @@ then
   fi
 
   notice "Compiling the simulation program."
-  execute "time make $parallel -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler"
+  execute "cd $model; time make $parallel -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler; cd .."
 fi    
 
 if [[ $haskell == 1 ]]
