@@ -26,7 +26,6 @@ int main(int argc, char ** argv, char **env) {
 
     system->CLK = 1;
     system->RESET = main_time < 10;
-    printf("Hello\n");
     system->eval();
 
     tfp->dump(main_time++);
