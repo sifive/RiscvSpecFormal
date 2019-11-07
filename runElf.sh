@@ -5,6 +5,7 @@
 source common.sh
 
 haskell=0
+heap=""
 interactive=""
 interrupts=""
 signature=""
@@ -12,7 +13,7 @@ sign_size=""
 noprint=""
 xlen=32
 
-options=$(getopt --options="hvsp:x:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,noprint,path:,debug,enable-ext-interrupts,xlen:" -- "$@")
+options=$(getopt --options="hvsp:x:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,noprint,path:,debug,heap,enable-ext-interrupts,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -39,6 +40,8 @@ Options:
   Runs the haskell simulator
   --debug
   Uses default values in place of random values (useful for when debugging against verilog)
+  --heap
+  Generate a heap file named Main.prof that displays the heap usage of Main when run in haskell mode.
   --enable-ext-interrupts
   Send random external interrupts to the processor model
   --xlen 32|64
@@ -68,6 +71,9 @@ EOF
       shift;;
     --debug)
       debug="--debug"
+      shift;;
+    --heap)
+      heap="+RTS -p -h -RTS"
       shift;;
     --noprint)
       noprint="--noprint"
@@ -124,7 +130,7 @@ if [[ $haskell == 0 ]]
 then
     cmd="./model$xlen/obj_dir/Vsystem +sign_size=$sign_sizev +signature=$signaturev +testfile=$hexfile +boot_rom=boot_ROM_RV${xlen}.hex +tohost_address=$tohost_address > $dump/$base.out"
 else
-    cmd="./Haskell/Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts > $dump/$base.out"
+    cmd="./Haskell/Main $heap boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts > $dump/$base.out"
 #    cmd="./Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts +RTS -p > $dump/$base.out"
 fi
 
