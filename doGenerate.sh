@@ -14,7 +14,9 @@ haskell=0
 
 parallel=""
 
-options=$(getopt --options="hrvsx:pt" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel,test" -- "$@")
+testcase=""
+
+options=$(getopt --options="hrvsx:pt:" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel,test:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -67,14 +69,14 @@ EOF
       haskell=1
       shift;;
     -p|--parallel)
-      parallel="-j"
-      shift;;
-    -t|--test)
-      test=1
-      shift;;
+	parallel="-j"
+	shift;;
     -x|--xlen)
       xlen=$2
       shift 2;;
+    -t|--test)
+	testcase=$2
+	shift 2;;
     --)
       shift
       break;;
@@ -92,11 +94,11 @@ execute "$cmd"
 
 cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
 
-if [[ $test == 1 ]]
+if [[ $testcase == "" ]]
 then
-  model=testMod
-else
   model=model$xlen
+else
+  model=test$testcase
 fi
 
 cp Haskell/UART.hs HaskellGen
