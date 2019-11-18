@@ -25,7 +25,7 @@ import Data.BitVector as BV
 import HaskellTarget as T
 
 timeout :: Int
-timeout = 50000
+timeout = 200000
 
 isa_size :: IO Int
 isa_size = do
