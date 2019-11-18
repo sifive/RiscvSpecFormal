@@ -10,7 +10,7 @@ interrupts=""
 signature=""
 sign_size=""
 noprint=""
-xlen=32
+xlen=64
 
 options=$(getopt --options="hvsp:x:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,noprint,path:,debug,enable-ext-interrupts,xlen:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
@@ -43,7 +43,7 @@ Options:
   Send random external interrupts to the processor model
   --xlen 32|64
   Specifies whether or not the generator should produce a 32 or 64
-  bit RISC-V processor model. Default is 32.
+  bit RISC-V processor model. Default is 64.
 Example
 ./runElf.sh -v rv32ui-p-and
 Simulates the rv32ui-p-and test suite program in the RISC-V

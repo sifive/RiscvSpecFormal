@@ -9,7 +9,7 @@ result=0
 parallel=0
 skip=0
 
-xlen=32
+xlen=64
 
 options=$(getopt --options="hvcfdx:p:s" --longoptions="help,noprint,verbose,parallel,haskell,debug,xlen:,path:,skip" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
@@ -31,7 +31,7 @@ Arguments:
   Path to the directory where all the tests are located.
   --xlen 32|64
   Specifies whether we are running 32-bit or 64-bit tests.
-  Default 32.
+  Default 64.
 Options:
   -h|--help
   Displays this message.

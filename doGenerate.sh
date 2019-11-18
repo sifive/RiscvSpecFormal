@@ -8,7 +8,7 @@ source common.sh
 verbose=0
 rebuild=0 # indicates whether or not to recompile source files that Make thinks have not changed.
 
-xlen=32
+xlen=64
 
 haskell=0
 
@@ -38,7 +38,7 @@ that can be viewed using programs such as GTKWave.
 Arguments:
   --xlen 32|64
   Specifies whether or not the generator should produce a 32 or 64
-  bit RISC-V processor model. Default is 32.
+  bit RISC-V processor model. Default is 64.
 Options:
   -h|--help
   Displays this message.
@@ -113,10 +113,10 @@ then
   #execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
 
   notice "Generating the Verilog model."
-  execute "mkdir -p $model; time Kami/Compiler/CompAction > $model/System.sv"
+  execute "mkdir -p models/$model; time Kami/Compiler/CompAction > models/$model/System.sv"
     
   notice "Generating the simulator source code (i.e. C files)."
-  execute "cd $model; time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp; cd .."
+  execute "cd models/$model; time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp; cd ../.."
     
   if [ -x "$(command -v clang)" ]; then
     compiler=clang
@@ -125,7 +125,7 @@ then
   fi
 
   notice "Compiling the simulation program."
-  execute "cd $model; time make $parallel -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler; cd .."
+  execute "cd models/$model; time make $parallel -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler; cd ../.."
 fi    
 
 if [[ $haskell == 1 ]]
