@@ -21,8 +21,15 @@ import Text.Read
 import Control.Exception
 import UART
 import Data.BitVector as BV
+import Data.Array.MArray as MA
 
 import HaskellTarget as T
+
+chunksOf :: Int -> [a] -> [[a]]
+chunksOf n [] = []
+chunksOf n ys =
+  let (val, rest) = splitAt n ys in
+  (val : chunksOf n rest)
 
 timeout :: Int
 timeout = 200000
@@ -99,6 +106,54 @@ console_read = do
 hasArg :: String -> IO Bool
 hasArg name = getArgs >>= (.) return (maybe False (const True) . find (\arg -> (isPrefixOf name arg)))
 
+io_stuff :: FileState -> M.Map String Val -> Environment -> IO Environment
+io_stuff filestate regstate env =
+  let currSteps = steps env :: Int in do
+    modes <- get_modes
+    let interactive = interactive_mode modes
+    if interactive && currSteps == 0
+      then do 
+        putStr "% "
+        hFlush stdout
+        input <- getLine
+        case words input of
+            ["Step",num] -> case readMaybe num of
+                Nothing -> do
+                    putStrLn "Formatting error."
+                    io_stuff filestate regstate env
+                Just n -> return $ env {steps = n}
+            [reg] -> do 
+                print_reg regstate $ "proc_core_" ++ reg
+                io_stuff filestate regstate env
+            ["Float",addr] -> do
+                case hex_to_maybe_integer_str addr of
+                    Just n -> print_file_reg filestate float_file $ fromInteger n
+                    Nothing -> putStrLn "Formatting error."
+                io_stuff filestate regstate env
+            ["Int",addr] -> do
+                case hex_to_maybe_integer_str addr of
+                    Just n -> case n == 0 of
+                        True -> case M.lookup int_file (files filestate) of
+                            Nothing -> putStrLn $ "File " ++ int_file ++ " not found."
+                            Just r -> do
+                              let k = kind r
+                              v <- defVal k
+                              pval <- ppr_hex v
+                              putStrLn pval
+                        False -> print_file_reg filestate int_file $ fromInteger n
+                    Nothing -> putStrLn "Formatting error."
+                io_stuff filestate regstate env
+            ["Mem",addr] -> do
+                case hex_to_maybe_integer_str addr of
+                    Just n -> print_file_reg filestate mem_file $ fromInteger n - offset
+                    Nothing -> putStrLn "Formatting error."
+                io_stuff filestate regstate env
+            [] -> io_stuff filestate regstate env
+            _ -> do
+                putStrLn "Formatting error."
+                io_stuff filestate regstate env
+      else return env
+
 instance AbstractEnvironment Environment where
   envPost env filestate regstate ruleName = return env
   envPre env filestate regstate ruleName = do
@@ -135,33 +190,34 @@ instance AbstractEnvironment Environment where
               tohost_addr <- getArgVal "tohost_address" isaSize
               case M.lookup mem_file (arrs filestate) of
                   Nothing -> error $ "File " ++ mem_file ++ " not found."
-                  Just v -> let val = v V.! (fromIntegral $ BV.nat $ bvCoerce tohost_addr) in 
-                      if bvCoerce val == 1 then do
-                          args <- getArgs
-                          let ps = catMaybes $ map (binary_split '@') args
-                          case lookup "signature" ps of
-                              Nothing -> return ()
-                              Just filename -> case lookup "sign_size" ps of
-                                  Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
-                                  Just x -> let sign_size = read x in
-                                      case M.lookup mem_file (arrs filestate) of
-                                          Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
-                                          Just v -> do
-                                              let sz = V.length v
-                                              let indices = Data.List.reverse [(sz-sign_size)..(sz-1)]
-                                              let vals = map (\i -> ppr_hex (v V.! i)) indices
-                                              let spliced = (chunksOf 4 vals) :: [[String]]
-                                              let newlined = (map (\t -> Data.List.concat (t ++ [['\n']])) spliced) :: [String]
-                                              let reversed = (Data.List.reverse newlined) :: [String]
-                                              writeFile filename $ Data.List.concat reversed
-                          hPutStrLn stdout "Passed"
-                          hPutStrLn stderr "Passed"
-                          exitSuccess
-                      else if bvCoerce val > 1 then do
-                              hPutStrLn stdout "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
-                              hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
-                              exitFailure
-                      else return ()
+                  Just v -> do
+                    val <- MA.readArray v (fromIntegral $ BV.nat $ bvCoerce tohost_addr) 
+                    if bvCoerce val == 1 then do
+                        args <- getArgs
+                        let ps = catMaybes $ map (binary_split '@') args
+                        case lookup "signature" ps of
+                            Nothing -> return ()
+                            Just filename -> case lookup "sign_size" ps of
+                                Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
+                                Just x -> let sign_size = read x in
+                                    case M.lookup mem_file (arrs filestate) of
+                                        Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
+                                        Just v -> do
+                                            sz <- arr_length v
+                                            let indices = Data.List.reverse [(sz-sign_size)..(sz-1)]
+                                            vals <- sequence $ map (\i -> Control.Monad.join $ liftM ppr_hex (MA.readArray v i)) indices
+                                            let spliced = (chunksOf 4 vals) :: [[String]]
+                                            let newlined = (map (\t -> Data.List.concat (t ++ [['\n']])) spliced) :: [String]
+                                            let reversed = (Data.List.reverse newlined) :: [String]
+                                            writeFile filename $ Data.List.concat reversed
+                        hPutStrLn stdout "Passed"
+                        hPutStrLn stderr "Passed"
+                        exitSuccess
+                    else if bvCoerce val > 1 then do
+                            hPutStrLn stdout "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+                            hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+                            exitFailure
+                    else return ()
           nextEnv <- io_stuff filestate regstate
                        env {
                          counter = (currCounter + 1),
@@ -170,50 +226,6 @@ instance AbstractEnvironment Environment where
                                    else currSteps
                        }
           return nextEnv
-
-io_stuff :: FileState -> M.Map String Val -> Environment -> IO Environment
-io_stuff filestate regstate env =
-  let currSteps = steps env :: Int in do
-    modes <- get_modes
-    let interactive = interactive_mode modes
-    if interactive && currSteps == 0
-      then do 
-        putStr "% "
-        hFlush stdout
-        input <- getLine
-        case words input of
-            ["Step",num] -> case readMaybe num of
-                Nothing -> do
-                    putStrLn "Formatting error."
-                    io_stuff filestate regstate env
-                Just n -> return $ env {steps = n}
-            [reg] -> do 
-                print_reg regstate $ "proc_core_" ++ reg
-                io_stuff filestate regstate env
-            ["Float",addr] -> do
-                case hex_to_maybe_integer_str addr of
-                    Just n -> print_file_reg filestate float_file $ fromInteger n
-                    Nothing -> putStrLn "Formatting error."
-                io_stuff filestate regstate env
-            ["Int",addr] -> do
-                case hex_to_maybe_integer_str addr of
-                    Just n -> case n == 0 of
-                        True -> case M.lookup int_file (files filestate) of
-                            Nothing -> putStrLn $ "File " ++ int_file ++ " not found."
-                            Just r -> let k = kind r in putStrLn $ ppr_hex $ defVal k
-                        False -> print_file_reg filestate int_file $ fromInteger n
-                    Nothing -> putStrLn "Formatting error."
-                io_stuff filestate regstate env
-            ["Mem",addr] -> do
-                case hex_to_maybe_integer_str addr of
-                    Just n -> print_file_reg filestate mem_file $ fromInteger n - offset
-                    Nothing -> putStrLn "Formatting error."
-                io_stuff filestate regstate env
-            [] -> io_stuff filestate regstate env
-            _ -> do
-                putStrLn "Formatting error."
-                io_stuff filestate regstate env
-      else return env
 
 proc_core_readUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 proc_core_readUART env v filestate regstate = do
@@ -254,18 +266,12 @@ meths =
    ("proc_core_readUART", proc_core_readUART),
    ("proc_core_writeUART", proc_core_writeUART)]
 
-chunksOf :: Int -> [a] -> [[a]]
-chunksOf n [] = []
-chunksOf n ys =
-  let (val, rest) = splitAt n ys in
-  (val : chunksOf n rest)
-
 main :: IO()
 main = do
   hSetBuffering stdout NoBuffering
   env <- mkEnv
   envRef <- newIORef env
   n <- isa_size
-  --putStrLn "[main] starting the simulation"
+  hPutStrLn stderr "simulator with ioarrays"
   simulate_module 0 round_robin_rules envRef (map fst $ getRules (basemod n)) meths (regfiles n) (basemod n)
   return ()
