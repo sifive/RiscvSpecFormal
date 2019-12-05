@@ -43,8 +43,12 @@ isa_size = do
     Nothing -> return 32
 
 kami_model :: Int -> ([RegFileBase] , BaseModule)
-kami_model 32 = snd (T.separateModRemove T.model32)
-kami_model 64 = snd (T.separateModRemove T.model64)
+kami_model 32 = snd (T.separateModHidesNoInline T.model32)
+kami_model 64 = snd (T.separateModHidesNoInline T.model64)
+
+kami_hides :: Int -> [String]
+kami_hides 32 = fst (T.separateModHidesNoInline T.model32)
+kami_hides 64 = fst (T.separateModHidesNoInline T.model64)
 
 regfiles :: Int -> [RegFileBase]
 regfiles n = fst $ kami_model n
@@ -273,5 +277,5 @@ main = do
   envRef <- newIORef env
   n <- isa_size
   hPutStrLn stderr "simulator with ioarrays"
-  simulate_module 0 round_robin_rules envRef (map fst $ getRules (basemod n)) meths (regfiles n) (basemod n)
+  simulate_module 0 round_robin_rules envRef (map fst $ getRules (basemod n)) meths (regfiles n) (kami_hides n) (basemod n)
   return ()

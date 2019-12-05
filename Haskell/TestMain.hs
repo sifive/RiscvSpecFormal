@@ -30,5 +30,5 @@ main = do
     (b,mod) <- getMod
     let rules = if b then user_rules else round_robin_rules
     let (rfs,basemod) = snd $ T.separateModRemove mod
-    simulate_module 0 rules e (map fst $ T.getRules basemod) [] rfs basemod
+    simulate_module 0 rules e (map fst $ T.getRules basemod) [] rfs [] basemod
     return ()
