@@ -16,7 +16,7 @@ parallel=""
 
 testcase=""
 
-options=$(getopt --options="hrvsx:pt:" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel,test:" -- "$@")
+options=$(getopt --options="hrvsx:pft:" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel,prof,test:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -46,6 +46,8 @@ Options:
   Generates the haskell simulator.
   -r|--rebuild
   Recompiles source files that Make believes have not changed.
+  -f|--prof
+  Profiling on
   -p|--parallel
   Parallel build
   -v|--verbose
@@ -68,9 +70,12 @@ EOF
     -s|--haskell)
       haskell=1
       shift;;
+    -f|--prof)
+      prof="-prof -fprof-auto"
+      shift;;
     -p|--parallel)
-	parallel="-j"
-	shift;;
+      parallel="-j"
+      shift;;
     -x|--xlen)
       xlen=$2
       shift 2;;
@@ -109,7 +114,7 @@ then
   echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
 
   notice "Compiling the Verilog generator."
-  execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
+  execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
   #execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
 
   notice "Generating the Verilog model."
@@ -135,13 +140,13 @@ then
     notice "Compiling the Haskell generator."
     cp Haskell/HaskellTarget.hs HaskellGen
     cp Haskell/Main.hs HaskellGen
-    execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
+    execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
   #  execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
     notice "Done: Generated Main."
   else
     notice "Compiling Simulation Test."
     cp Haskell/HaskellTarget.hs HaskellGen
-    execute "time ghc $GHCFLAGS $parallel -O1 --make -iHaskellGen -iKami ./Haskell/TestMain.hs -o TestMain"
+    execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami ./Haskell/TestMain.hs -o TestMain"
     notice "Done: Generated TestMain."
   fi
 fi

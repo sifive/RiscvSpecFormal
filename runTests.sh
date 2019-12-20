@@ -11,7 +11,7 @@ skip=0
 
 xlen=64
 
-options=$(getopt --options="hvcfdx:p:s" --longoptions="help,noprint,verbose,parallel,haskell,debug,xlen:,path:,skip" -- "$@")
+options=$(getopt --options="hvcfdx:p:so" --longoptions="help,noprint,verbose,parallel,haskell,debug,xlen:,path:,skip,prof" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -39,6 +39,8 @@ Options:
   Enables verbose output.
   --debug
   Uses default values in place of random values (useful for when debugging against verilog)
+  -f|--prof
+  Profiling
 Example
 ./runTests.sh --verbose riscv-tests/build/isa/rv32ui-p-simple
 Generates the RISC-V processor simulator.
@@ -53,6 +55,10 @@ EOF
       shift;;
     -c|--parallel)
       parallel=1
+      parallel_word="--parallel"
+      shift;;
+    -o|--prof)
+      prof="--prof"
       shift;;
     -f|--haskell)
       haskell="--haskell"
@@ -85,7 +91,7 @@ shift $((OPTIND - 1))
 if [[ $skip == 0 ]]
 then
   notice "Generating model".
-  execute "./doGenerate.sh --parallel $verboseflag $haskell --xlen $xlen"
+  execute "./doGenerate.sh $parallel_word $prof $verboseflag $haskell --xlen $xlen"
 fi
 
 notice "Running tests in $path."
@@ -96,11 +102,11 @@ if [[ $parallel == 0 ]]
 then
   for file in $files
   do
-    ((file $file | (grep -iq elf && ./runElf.sh --xlen $xlen $noprint $verboseflag $haskell --path $file)) || (file $file | grep -viq elf));
+    ((file $file | (grep -iq elf && ./runElf.sh --xlen $xlen $prof $noprint $verboseflag $haskell --path $file)) || (file $file | grep -viq elf));
     result=$(( $? | $result ));
   done
 else
-  printf "$files" | parallel --bar -P 32 -j32 "(file {} | (grep -iq elf && ./runElf.sh --xlen $xlen $noprint $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
+  printf "$files" | parallel --bar -P 32 -j32 "(file {} | (grep -iq elf && ./runElf.sh --xlen $xlen $prof $noprint $verboseflag $haskell $debug --path {})) || (file {} | grep -viq elf)"
   result=$?
 fi
 

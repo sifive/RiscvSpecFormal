@@ -25,3 +25,11 @@ Main64
 Haskell
 HaskellGen/*
 screenlog.0
+Main.prof
+.*.swk
+.*.swl
+.*.swm
+.*.swn
+.*.swo
+.*.swp
+
