@@ -7,16 +7,14 @@ source common.sh
 
 verbose=0
 rebuild=0 # indicates whether or not to recompile source files that Make thinks have not changed.
-
 xlen=64
-
 haskell=0
-
 parallel=""
-
 testcase=""
+profile=""
+heapdump=""
 
-options=$(getopt --options="hrvsx:pft:" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel,prof,test:" -- "$@")
+options=$(getopt --options="hrvsx:pt:" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel,profile,heapdump,test:" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -46,8 +44,14 @@ Options:
   Generates the haskell simulator.
   -r|--rebuild
   Recompiles source files that Make believes have not changed.
-  -f|--prof
-  Profiling on
+  --profile
+  Compile the Haskell simulator to support heap tracings
+  (i.e. Profiling)
+  --heapdump
+  Compile the Haskell simulator so that if called with the
+  +RTS -xc -RTS option it will dump its heap state if it
+  encounters an exception while executing.
+  (Requires the --profile)
   -p|--parallel
   Parallel build
   -v|--verbose
@@ -55,6 +59,11 @@ Options:
 Example
 ./doGenerate.sh --xlen 32 --verbose
 Generates the RISC-V 32-bit verilog simulator.
+./doGenerate.sh --xlen 64 --haskell --parallel --heapdump
+Generates the Haskell RISCV-V 64-bit simulator with heapdump
+support. If you run runElf with --heapdump it will dump the heap
+if it encounters an exception.
+ 
 Authors
 Murali Vijayaraghavan
 Larry Lee
@@ -70,8 +79,11 @@ EOF
     -s|--haskell)
       haskell=1
       shift;;
-    -f|--prof)
-      prof="-prof -fprof-auto"
+    --profile)
+      profile="-prof -fprof-auto -rtsopts"
+      shift;;
+    --heapdump)
+      heapdump="-fprof-cafs"
       shift;;
     -p|--parallel)
       parallel="-j"
@@ -140,13 +152,12 @@ then
     notice "Compiling the Haskell generator."
     cp Haskell/HaskellTarget.hs HaskellGen
     cp Haskell/Main.hs HaskellGen
-    execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
-  #  execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
+    execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
     notice "Done: Generated Main."
   else
     notice "Compiling Simulation Test."
     cp Haskell/HaskellTarget.hs HaskellGen
-    execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami ./Haskell/TestMain.hs -o TestMain"
+    execute "time ghc $GHCFLAGS $parallel $profile -O1 --make -iHaskellGen -iKami ./Haskell/TestMain.hs -o TestMain"
     notice "Done: Generated TestMain."
   fi
 fi

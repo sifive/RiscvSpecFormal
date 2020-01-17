@@ -11,8 +11,10 @@ signature=""
 sign_size=""
 noprint=""
 xlen=64
+profile=""
+heapdump=""
 
-options=$(getopt --options="hvsp:x:f" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,noprint,path:,debug,enable-ext-interrupts,xlen:,prof" -- "$@")
+options=$(getopt --options="hvsp:x:" --longoptions="signature:,sign_size:,help,verbose,interactive,haskell,noprint,path:,debug,enable-ext-interrupts,xlen:,profile,heapdump" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -44,8 +46,11 @@ Options:
   --xlen 32|64
   Specifies whether or not the generator should produce a 32 or 64
   bit RISC-V processor model. Default is 64.
-  -f|--prof
-  Profiling on
+  --profile
+  Output a heap trace during execution of the Haskell simulator.
+  --heapdump
+  Output a heap dump if an exception occurs during execution of the Haskell simulator.
+  Note: the simulator must have been compiled with the --profile and --heapdump flags.
 Example
 ./runElf.sh -v rv32ui-p-and
 Simulates the rv32ui-p-and test suite program in the RISC-V
@@ -68,8 +73,11 @@ EOF
     -s|--haskell)
       haskell=1
       shift;;
-    -f|--prof)
-      prof="+RTS -p"
+    --profile)
+      profile="+RTS -p -RTS"
+      shift;;
+    --heapdump)
+      heapdump="+RTS -xc -RTS"
       shift;;
     --debug)
       debug="--debug"
@@ -129,7 +137,7 @@ if [[ $haskell == 0 ]]
 then
     cmd="./models/model$xlen/obj_dir/Vsystem +sign_size=$sign_sizev +signature=$signaturev +testfile=$hexfile +boot_rom=boot_ROM_RV${xlen}.hex +tohost_address=$tohost_address > $dump/$base.out"
 else
-    cmd="./Haskell/Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts $prof > $dump/$base.out"
+    cmd="./Haskell/Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts $profile $heapdump > $dump/$base.out"
 fi
 
 execute "time $cmd"
