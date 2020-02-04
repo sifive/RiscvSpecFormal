@@ -138,6 +138,7 @@ then
     cmd="./models/model$xlen/obj_dir/Vsystem +sign_size=$sign_sizev +signature=$signaturev +testfile=$hexfile +boot_rom=boot_ROM_RV${xlen}.hex +tohost_address=$tohost_address > $dump/$base.out"
 else
     cmd="./Haskell/Main boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts $profile $heapdump > $dump/$base.out"
+    #cmd="./Haskell/CoqMain boot_rom=boot_ROM_RV${xlen}.hex $interactive --debug $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts > $dump/$base.out"
 fi
 
 execute "time $cmd"
