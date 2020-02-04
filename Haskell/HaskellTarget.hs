@@ -2,7 +2,7 @@ module HaskellTarget (module Syntax, module Word, module Fin, module EclecticLib
 import EclecticLib hiding (__)
 import PeanoNat
 import Fin
-import Instance hiding (unsafeCoerce)
+import Instance hiding (unsafeCoerce, Any)
 import Syntax hiding (unsafeCoerce, __)
 import Word
 import Test hiding (unsafeCoerce, __, counter)
