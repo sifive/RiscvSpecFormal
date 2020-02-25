@@ -3,7 +3,7 @@ import EclecticLib hiding (__)
 import PeanoNat
 import Fin
 import Instance hiding (unsafeCoerce, Any)
-import Syntax hiding (unsafeCoerce, __)
+import Syntax hiding (__)
 import Word
 import Test hiding (unsafeCoerce, __, counter)
 import NativeTest hiding (unsafeCoerce, Any)
