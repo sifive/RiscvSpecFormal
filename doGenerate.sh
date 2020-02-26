@@ -6,15 +6,17 @@
 source common.sh
 
 verbose=0
-rebuild=0 # indicates whether or not to recompile source files that Make thinks have not changed.
+rebuild=''
 xlen=64
-haskell=0
-parallel=""
-testcase=""
-profile=""
-heapdump=""
+parallel=''
+testcase=''
+profile=''
+heapdump=''
+coqSim=0
+haskellSim=0
+verilogSim=0
 
-options=$(getopt --options="hrvsx:pt:" --longoptions="help,rebuild,verbose,haskell,xlen:,parallel,profile,heapdump,test:" -- "$@")
+options=$(getopt --options="hrvsx:pt:" --longoptions="coq-sim,help,rebuild,verbose,haskell,haskell-sim,xlen:,parallel,profile,heapdump,test:,verilog-sim" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -23,77 +25,173 @@ do
   case "$1" in
     -h | --help)
       cat <<- EOF
-Usage: ./doGenerate.sh [ARGUMENTS] [OPTIONS]
-This script generates the RISC-V processor simulator from the
-Gallina and Verilog source files.
-By default this simulator program is ./obj_dir/Vsystem. It will
-execute any program whose object code is stored in the hex file
-stored in argument "+testfile".
-When run, the simulator outputs trace messages describing the state
-of its registers and actions during each clock cycle.
-The simulator also outputs a VCD trace file, named trace.vcd,
-that can be viewed using programs such as GTKWave.
-Arguments:
-  --xlen 32|64
-  Specifies whether or not the generator should produce a 32 or 64
-  bit RISC-V processor model. Default is 64.
-Options:
-  -h|--help
-  Displays this message.
-  -s|--haskell
-  Generates the haskell simulator.
-  -r|--rebuild
-  Recompiles source files that Make believes have not changed.
-  --profile
-  Compile the Haskell simulator to support heap tracings
-  (i.e. Profiling)
+USAGE
+-----
+
+./doGenerate.sh [OPTIONS]
+
+SUMMARY
+-------
+
+This script generates programs that simulate the Kami Processor model.
+
+OPTIONS
+-------
+
+  --coq-sim
+  Generates the Coq simulator. See DETAILS for more information.
+
+  --haskell-sim
+  --haskell (DEPRECATED)
+  -s        (DEPRECATED)
+  Generates the haskell simulator. See DETAILS for more information.
+
   --heapdump
   Compile the Haskell simulator so that if called with the
   +RTS -xc -RTS option it will dump its heap state if it
   encounters an exception while executing.
-  (Requires the --profile)
+  (Requires --profile)
+
+  -h|--help
+  Displays this message.
+
   -p|--parallel
   Parallel build
+
+  --profile
+  Compile the Haskell simulator to support heap tracing and profiling.
+
+  -r|--rebuild
+  Recompiles source files that Make believes have not changed.
+
   -v|--verbose
   Enables verbose output.
-Example
-./doGenerate.sh --xlen 32 --verbose
-Generates the RISC-V 32-bit verilog simulator.
-./doGenerate.sh --xlen 64 --haskell --parallel --heapdump
+
+  --verilog-sim
+  Generates the Verilog-based simulator. See DETAILS for more information.
+
+  --xlen 32|64
+  Specifies whether or not the generator should produce a 32 or 64
+  bit RISC-V processor model. Default is 64.
+
+EXAMPLES
+--------
+
+./doGenerate.sh --xlen 32 --verbose --verilog-sim
+Generates the RISC-V 32-bit Verilog simulator.
+
+./doGenerate.sh --xlen 64 --haskell-sim --parallel --heapdump
 Generates the Haskell RISCV-V 64-bit simulator with heapdump
 support. If you run runElf with --heapdump it will dump the heap
 if it encounters an exception.
  
-Authors
-Murali Vijayaraghavan
-Larry Lee
-Evan Marzion
+DETAILS
+-------
+
+This script can generate simulation programs using three different
+methods.
+
+When run using the --verilog-sim flag, this script will generate a
+simulator using the following method:
+
+  Kami Processor model (Kami)
+             |
+             v
+  Verilog printer function (Coq function)
+             |
+             | [extraction]
+             v
+  Verilog printer function (Haskell function)
+             |
+             | [compile]
+             v
+  Verilog printer program
+             |
+             | [execute]
+             v
+         Verilog model
+             |
+             | [Verilator + C compile]
+             v
+  Kami Processor simulation program
+
+The Verilog model will be written to models/rvXX/System.sv. The
+resulting binaries are written to models/.
+
+When run using the --haskell-sim flag, this script will generate a
+simulator using the following method:
+
+  Kami Processor model (Kami)
+            |
+            | [extraction]
+            v
+  Kami Processor model (Haskell datastructure) 
+            |
+            |                      Kami interpreter (Haskell function)
+            |                                     |
+            +--------------------+----------------+
+                                 |
+                                 | [compile]
+                                 v
+                Kami Processor simulation program
+
+When run using the --coq-sim flag, this script will generate a
+simulator using the following method
+
+  Kami Processor model (Kami)
+            |
+            v
+  Kami simulation function (Coq function)
+            |
+            | [extraction]
+            v
+  Kami Processor simulation function (Haskell function)
+            |
+            | [compile]
+            v
+  Kami Processor simulation program
+
+AUTHORS
+-------
+
+* Murali Vijayaraghavan
+* Larry Lee
+* Evan Marzion
 EOF
       exit 0;;
     -v|--verbose)
       verbose=1
       shift;;
     -r|--rebuild)
-      rebuild=1
+      rebuild='-B'
       shift;;
-    -s|--haskell)
-      haskell=1
+    -s|--haskell) # DEPRECATED
+      haskellSim=1
+      shift;;
+    --haskell-sim)
+      haskellSim=1
+      shift;;
+    -c|--coq-sim)
+      coqSim=1
       shift;;
     --profile)
-      profile="-prof -fprof-auto -rtsopts"
+      profile='-prof -fprof-auto -rtsopts'
       shift;;
     --heapdump)
-      heapdump="-fprof-cafs"
+      heapdump='-fprof-cafs'
       shift;;
     -p|--parallel)
-      parallel="-j"
+      parallel='-j'
       shift;;
     -x|--xlen)
       xlen=$2
       shift 2;;
     -t|--test)
-	testcase=$2
-	shift 2;;
+      testcase=$2
+      shift 2;;
+    --verilog-sim)
+      verilogSim=1
+      shift;;
     --)
       shift
       break;;
@@ -101,33 +199,38 @@ EOF
 done
 shift $((OPTIND - 1))
 
-notice "Compiling the Gallina (COQ) source code."
-cmd="time make $parallel"
-if [[ $rebuild == 1 ]]
+execute "time make $rebuild $parallel"
+
+function buildHaskellSim {
+  local mainFunctionName=$1
+  local inputPath=$2
+  local outputPath=$3
+  
+  cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
+  cp Haskell/HaskellTarget.hs HaskellGen
+  cp Haskell/Main.hs HaskellGen
+  cp Haskell/UART.hs HaskellGen
+  execute "time ghc $GHCFLAGS $parallel $profile $heapdump -main-is $mainFunctionName -O2 --make -iHaskellGen -iKami $inputPath -o $outputPath"
+}
+
+[[ $coqSim     == 1 ]] && buildHaskellSim 'CoqMain' './Haskell/CoqMain.hs'  './Haskell/CoqMain'
+[[ $haskellSim == 1 ]] && buildHaskellSim 'Main'    './Haskell/Main.hs'     './Haskell/Main'
+[[ $testcase   == 1 ]] && buildHaskellSim 'Main'    './Haskell/TestMain.hs' './Haskell/TestMain'
+
+if [[ $verilogSim == 1 ]]
 then
-  cmd="$cmd -B"
-fi
-execute "$cmd"
+  if [[ $testcase == "" ]]
+  then
+    model=model$xlen
+  else
+    model=test$testcase
+  fi
 
-cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
-
-if [[ $testcase == "" ]]
-then
-  model=model$xlen
-else
-  model=test$testcase
-fi
-
-cp Haskell/UART.hs HaskellGen
-
-if [[ $haskell == 0 ]]
-then
   cat Haskell/Target.raw > HaskellGen/Target.hs
   echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
 
   notice "Compiling the Verilog generator."
   execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
-  #execute "time ghc $GHCFLAGS $parallel -prof -fprof-auto +RTS -A128m -n4m -s -RTS -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
 
   notice "Generating the Verilog model."
   execute "mkdir -p models/$model; time Kami/Compiler/CompAction > models/$model/System.sv"
@@ -143,24 +246,5 @@ then
 
   notice "Compiling the simulation program."
   execute "cd models/$model; time make $parallel -C obj_dir -f Vsystem.mk Vsystem CXX=$compiler LINK=$compiler; cd ../.."
-fi    
-
-if [[ $haskell == 1 ]]
-then 
-  if [[ $testcase == "" ]]
-  then
-    notice "Compiling the Haskell generator."
-    cp Haskell/HaskellTarget.hs HaskellGen
-    cp Haskell/Main.hs HaskellGen
-    execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O1 --make -iHaskellGen -iKami ./Haskell/Main.hs"
-    #execute "time ghc $GHCFLAGS $parallel -main-is CoqMain +RTS -A128m -n4m -s -RTS -O2 --make -iHaskellGen -iKami ./Haskell/CoqMain.hs"
-    notice "Done: Generated Main."
-  else
-    notice "Compiling Simulation Test."
-    cp Haskell/HaskellTarget.hs HaskellGen
-    execute "time ghc $GHCFLAGS $parallel $profile -O1 --make -iHaskellGen -iKami ./Haskell/TestMain.hs -o TestMain"
-    notice "Done: Generated TestMain."
-  fi
 fi
-
 notice "Done."
