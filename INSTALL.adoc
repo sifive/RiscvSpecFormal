@@ -5,7 +5,7 @@
 
 == Dependencies
 === Dependencies for building the model
-. Coq 8.10.0
+. Coq 8.11.0
 . GHC 8.6.5 or newer and Cabal
 
 === Dependencies for compiling the tests

@@ -7,9 +7,6 @@
 [submodule "FpuKami"]
 	path = FpuKami
 	url = https://github.com/sifive/FpuKami
-[submodule "bbv"]
-	path = bbv
-	url = https://github.com/mit-plv/bbv
 [submodule "coq-record-update"]
 	path = coq-record-update
 	url = https://github.com/tchajed/coq-record-update

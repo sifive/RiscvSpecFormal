@@ -5,7 +5,7 @@ import PeanoNat
 import Fin
 import Instance hiding (unsafeCoerce, __)
 import Rtl
-import Syntax hiding (unsafeCoerce, __)
+import Syntax hiding (__)
 import Extraction hiding (unsafeCoerce, Any)
 import Word
 import LibStruct hiding (unsafeCoerce, __)
