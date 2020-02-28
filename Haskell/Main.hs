@@ -38,7 +38,7 @@ isa_size :: IO Int
 isa_size = do
   args <- getArgs
   let ps = catMaybes $ map (binary_split '@') args
-  case lookup "xlen" ps of
+  case Prelude.lookup "xlen" ps of
     Just n -> return (read n :: Int)
     Nothing -> return 32
 
@@ -199,9 +199,9 @@ instance AbstractEnvironment Environment where
                     if bvCoerce val == 1 then do
                         args <- getArgs
                         let ps = catMaybes $ map (binary_split '@') args
-                        case lookup "signature" ps of
+                        case Prelude.lookup "signature" ps of
                             Nothing -> return ()
-                            Just filename -> case lookup "sign_size" ps of
+                            Just filename -> case Prelude.lookup "sign_size" ps of
                                 Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
                                 Just x -> let sign_size = read x in
                                     case M.lookup mem_file (arrs filestate) of
