@@ -75,7 +75,7 @@ simEnvPre simEnv = do
         Right _ -> return ()
     writeIORef (consoleUART simEnv) nextUARTState 
 
-env :: S.Environment a b c d SimEnvironment
+env :: S.Environment a b c d e SimEnvironment
 env = S.Build_Environment 
     (\simEnv _ _ _ -> unsafeCoerce $ do
       simEnvPre simEnv
@@ -106,7 +106,7 @@ process_args :: [String] -> [(String,String)]
 process_args = catMaybes . map (binary_split '=')
 
 timeout :: Int
-timeout = 10000
+timeout = 200000
 
 proc_core_readUART :: (BV.BV, (BV.BV, ())) -> fileState -> regs -> SimEnvironment -> IO (SimEnvironment, BV.BV)
 proc_core_readUART (addr, (size, _)) _ _ simEnv = do
@@ -139,9 +139,9 @@ main = do
     args <- getArgs
     let files = process_args args
     sz <- isa_size
-    let sim = if sz == 32 then coqSim_32 else coqSim_64
+    let sim = unsafeCoerce (if sz == 32 then coqSim_32 else coqSim_64)
     initSimEnv <- mkInitSimEnv
     sim env initSimEnv files timeout
-      (\_ _ _ _ -> return (initSimEnv, False)) -- proc_core_pipeline
+      (\_ _ _ _ -> return (initSimEnv, False) :: IO (SimEnvironment, Bool)) -- proc_core_pipeline
       proc_core_readUART
       proc_core_writeUART
