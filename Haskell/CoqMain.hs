@@ -106,7 +106,7 @@ process_args :: [String] -> [(String,String)]
 process_args = catMaybes . map (binary_split '=')
 
 timeout :: Int
-timeout = 10000
+timeout = 200000
 
 proc_core_readUART :: (BV.BV, (BV.BV, ())) -> fileState -> regs -> SimEnvironment -> IO (SimEnvironment, BV.BV)
 proc_core_readUART (addr, (size, _)) _ _ simEnv = do
