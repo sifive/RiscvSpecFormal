@@ -15,6 +15,7 @@ heapdump=''
 coqSim=0
 haskellSim=0
 verilogSim=0
+noSimSelected=1
 
 options=$(getopt --options="hrvsx:pt:" --longoptions="coq-sim,help,rebuild,verbose,haskell,haskell-sim,xlen:,parallel,profile,heapdump,test:,verilog-sim" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
@@ -167,9 +168,11 @@ EOF
       shift;;
     -s|--haskell) # DEPRECATED
       haskellSim=1
+      noSimSelected=0
       shift;;
     --haskell-sim)
       haskellSim=1
+      noSimSelected=0
       shift;;
     -c|--coq-sim)
       coqSim=1
@@ -191,6 +194,7 @@ EOF
       shift 2;;
     --verilog-sim)
       verilogSim=1
+      noSimSelected=0
       shift;;
     --)
       shift
@@ -202,22 +206,20 @@ shift $((OPTIND - 1))
 execute "time make $rebuild $parallel"
 
 function buildHaskellSim {
-  local mainFunctionName=$1
-  local inputPath=$2
-  local outputPath=$3
+  local fileName=$1
   
   cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
   cp Haskell/HaskellTarget.hs HaskellGen
   cp Haskell/Main.hs HaskellGen
   cp Haskell/UART.hs HaskellGen
-  execute "time ghc $GHCFLAGS $parallel $profile $heapdump -main-is $mainFunctionName -O2 --make -iHaskellGen -iKami $inputPath -o $outputPath"
+  execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O2 --make -iHaskellGen -iKami ./Haskell/$fileName.hs -o ./Haskell/$fileName"
 }
 
-[[ $coqSim     == 1 ]] && buildHaskellSim 'CoqMain' './Haskell/CoqMain.hs'  './Haskell/CoqMain'
-[[ $haskellSim == 1 ]] && buildHaskellSim 'Main'    './Haskell/Main.hs'     './Haskell/Main'
-[[ $testcase   == 1 ]] && buildHaskellSim 'Main'    './Haskell/TestMain.hs' './Haskell/TestMain'
+[[ $coqSim     == 1  ]] && buildHaskellSim 'CoqMain'
+[[ $haskellSim == 1  ]] && buildHaskellSim 'SimMain'
+[[ $testcase   != '' ]] && buildHaskellSim 'TestMain'
 
-if [[ $verilogSim == 1 ]]
+if [[ $verilogSim == 1 || $noSimSelected == 1 ]]
 then
   if [[ $testcase == "" ]]
   then
@@ -228,6 +230,8 @@ then
 
   cat Haskell/Target.raw > HaskellGen/Target.hs
   echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
+
+  cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
 
   notice "Compiling the Verilog generator."
   execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
