@@ -1,6 +1,3 @@
-
-module Main where
-
 import qualified Data.List
 import Simulator.All
 

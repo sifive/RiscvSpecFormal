@@ -1,6 +1,3 @@
-
-module CoqMain where
-
 import qualified Simulator as S
 import qualified RegisterFile as R
 import Instance
