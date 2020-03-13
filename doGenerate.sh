@@ -65,6 +65,12 @@ OPTIONS
   -r|--rebuild
   Recompiles source files that Make believes have not changed.
 
+  --test (Async|Reg|SyncIsAddr|SyncNotIsAddr)
+  Compiles one of the simulator test programs. The generated test
+  programs are stored in models/TEST. If the --verilog-sim flag is also
+  present, it will compile the test program using Verilator. Otherwise,
+  it will use the haskell simulator.
+
   -v|--verbose
   Enables verbose output.
 
@@ -210,7 +216,7 @@ function buildHaskellSim {
   
   cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
   cp Haskell/HaskellTarget.hs HaskellGen
-  cp Haskell/Main.hs HaskellGen
+  cp Haskell/SimMain.hs HaskellGen
   cp Haskell/UART.hs HaskellGen
   execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O2 --make -iHaskellGen -iKami ./Haskell/$fileName.hs -o ./Haskell/$fileName"
 }
