@@ -211,13 +211,13 @@ function buildHaskellSim {
   
   cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
   cp Haskell/HaskellTarget.hs HaskellGen
-  cp Haskell/Main.hs HaskellGen
+  cp Haskell/SimMain.hs HaskellGen
   cp Haskell/UART.hs HaskellGen
   execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O2 --make -iHaskellGen -iKami ./Haskell/$fileName.hs -o ./Haskell/$fileName"
 }
 
 [[ $coqSim     == 1  ]] && buildHaskellSim 'CoqMain'
-[[ $haskellSim == 1  ]] && buildHaskellSim 'Main'
+[[ $haskellSim == 1  ]] && buildHaskellSim 'SimMain'
 [[ $testcase   != '' ]] && buildHaskellSim 'TestMain'
 
 if [[ $verilogSim == 1 || $noSimSelected == 1 ]]
