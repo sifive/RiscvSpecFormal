@@ -72,7 +72,7 @@ simEnvPre simEnv = do
         Right _ -> return ()
     writeIORef (consoleUART simEnv) nextUARTState 
 
-env :: S.Environment a b c d e SimEnvironment
+env :: S.Environment SimEnvironment
 env = S.Build_Environment 
     (\simEnv _ _ _ -> unsafeCoerce $ do
       simEnvPre simEnv
