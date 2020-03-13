@@ -97,6 +97,7 @@ EOF
       exit 0;;
     --coq-sim)
       coqSim=1
+      noSimSelected=0
       shift;;
     -v|--verbose)
       verbose=1
