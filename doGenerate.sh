@@ -6,12 +6,12 @@
 source common.sh
 
 verbose=0
-rebuild=''
+rebuild=""
 xlen=64
-parallel=''
-testcase=''
-profile=''
-heapdump=''
+parallel=""
+testcase=""
+profile=""
+heapdump=""
 coqSim=0
 haskellSim=0
 verilogSim=0
@@ -164,12 +164,12 @@ EOF
       verbose=1
       shift;;
     -r|--rebuild)
-      rebuild='-B'
+      rebuild="-B"
       shift;;
-    -s|--haskell) # DEPRECATED
-      haskellSim=1
-      noSimSelected=0
-      shift;;
+    #-s|--haskell) # DEPRECATED
+    #  haskellSim=1
+    #  noSimSelected=0
+    #  shift;;
     --haskell-sim)
       haskellSim=1
       noSimSelected=0
@@ -179,13 +179,13 @@ EOF
       noSimSelected=0
       shift;;
     --profile)
-      profile='-prof -fprof-auto -rtsopts'
+      profile="-prof -fprof-auto -rtsopts"
       shift;;
     --heapdump)
-      heapdump='-fprof-cafs'
+      heapdump="-fprof-cafs"
       shift;;
     -p|--parallel)
-      parallel='-j'
+      parallel="-j"
       shift;;
     -x|--xlen)
       xlen=$2
@@ -195,7 +195,6 @@ EOF
       shift 2;;
     --verilog-sim)
       verilogSim=1
-      noSimSelected=0
       shift;;
     --)
       shift
@@ -216,9 +215,9 @@ function buildHaskellSim {
   execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O2 --make -iHaskellGen -iKami ./Haskell/$fileName.hs -o ./Haskell/$fileName"
 }
 
-[[ $coqSim     == 1  ]] && buildHaskellSim 'CoqMain'
-[[ $haskellSim == 1  ]] && buildHaskellSim 'SimMain'
-[[ $testcase   != '' ]] && buildHaskellSim 'TestMain'
+[[ $coqSim     == 1  ]] && buildHaskellSim "CoqMain"
+[[ $haskellSim == 1  ]] && buildHaskellSim "SimMain"
+[[ $testcase   != "" ]] && buildHaskellSim "TestMain"
 
 if [[ $verilogSim == 1 || $noSimSelected == 1 ]]
 then
@@ -229,10 +228,10 @@ then
     model=test$testcase
   fi
 
+  cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
+
   cat Haskell/Target.raw > HaskellGen/Target.hs
   echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
-
-  cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
 
   notice "Compiling the Verilog generator."
   execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"

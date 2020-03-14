@@ -17,7 +17,7 @@ profile=""
 heapdump=""
 noSimSelected=1
 
-options=$(getopt --options="hvsp:x:" --longoptions="coq-sim,haskell-sim,signature:,sign_size:,help,verbose,interactive,haskell,noprint,path:,debug,enable-ext-interrupts,xlen:,profile,heapdump,verilog-sim" -- "$@")
+options=$(getopt --options="hvsp:x:" --longoptions="coq-sim,haskell-sim,signature:,sign_size:,help,verbose,interactive,noprint,path:,debug,enable-ext-interrupts,xlen:,profile,heapdump,verilog-sim" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -108,10 +108,10 @@ EOF
     --interactive)
       interactive="--interactive"
       shift;;
-    -s|--haskell)
-      haskellSim=1
-      noSimSelected=0
-      shift;;
+    #-s|--haskell)
+    #  haskellSim=1
+    #  noSimSelected=0
+    #  shift;;
     --haskell-sim)
       haskellSim=1
       noSimSelected=0

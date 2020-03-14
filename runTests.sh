@@ -11,7 +11,7 @@ skip=0
 
 xlen=64
 
-options=$(getopt --options="hvcfdx:p:so" --longoptions="help,noprint,verbose,parallel,haskell,debug,xlen:,path:,skip,prof" -- "$@")
+options=$(getopt --options="hvcfdx:p:so" --longoptions="help,noprint,verbose,parallel,haskell-sim,debug,xlen:,path:,skip,prof" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -60,8 +60,8 @@ EOF
     -o|--prof)
       prof="--prof"
       shift;;
-    -f|--haskell)
-      haskell="--haskell"
+    -f|--haskell-sim)
+      haskell="--haskell-sim"
       shift;;
     -x|--xlen)
       xlen=$2

@@ -144,11 +144,11 @@ The following command builds the model and runs the riscv-tests. `runTests.sh` r
 ==== Running the 32-bit tests on the Haskell model generated from Kami
 [souce,shell]
 ----
-./runTests.sh --path `pwd`/../riscv-tests/isa --haskell --xlen 32
+./runTests.sh --path `pwd`/../riscv-tests/isa --haskell-sim --xlen 32
 ----
 
 ==== Running the 64-bit tests on the Haskell model generated from Kami
 [souce,shell]
 ----
-./runTests.sh --path `pwd`/../riscv-tests/isa --haskell --xlen 64
+./runTests.sh --path `pwd`/../riscv-tests/isa --haskell-sim --xlen 64
 ----
