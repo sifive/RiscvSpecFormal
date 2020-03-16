@@ -17,7 +17,7 @@ haskellSim=0
 verilogSim=0
 noSimSelected=1
 
-options=$(getopt --options="hrvsx:pt:" --longoptions="coq-sim,help,rebuild,verbose,haskell,haskell-sim,xlen:,parallel,profile,heapdump,test:,verilog-sim" -- "$@")
+options=$(getopt --options="hrvsx:pt:" --longoptions="coq-sim,help,rebuild,verbose,haskell-sim,xlen:,parallel,profile,heapdump,test:,verilog-sim" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -43,8 +43,7 @@ OPTIONS
   Generates the Coq simulator. See DETAILS for more information.
 
   --haskell-sim
-  --haskell (DEPRECATED)
-  -s        (DEPRECATED)
+  -s
   Generates the haskell simulator. See DETAILS for more information.
 
   --heapdump
@@ -166,10 +165,6 @@ EOF
     -r|--rebuild)
       rebuild="-B"
       shift;;
-    #-s|--haskell) # DEPRECATED
-    #  haskellSim=1
-    #  noSimSelected=0
-    #  shift;;
     --haskell-sim)
       haskellSim=1
       noSimSelected=0

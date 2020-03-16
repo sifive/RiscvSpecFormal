@@ -47,8 +47,7 @@ OPTIONS
   Runs the Coq simulator. See the doGenerate help docs for more information.
 
   --haskell-sim
-  --haskell (DEPRECATED)
-  -s        (DEPRECATED)
+  -s
   Runs the haskell simulator. See the doGenerate help docs for more information.
 
   --heapdump
@@ -108,10 +107,6 @@ EOF
     --interactive)
       interactive="--interactive"
       shift;;
-    #-s|--haskell)
-    #  haskellSim=1
-    #  noSimSelected=0
-    #  shift;;
     --haskell-sim)
       haskellSim=1
       noSimSelected=0
