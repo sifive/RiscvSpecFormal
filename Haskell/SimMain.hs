@@ -273,6 +273,6 @@ main = do
   env <- mkEnv
   envRef <- newIORef env
   n <- isa_size
-  --putStrLn "[main] starting the simulation"
+  -- hPutStrLn stdout "[main] starting the simulation"
   simulate_module 0 round_robin_rules envRef (map fst $ getRules (basemod n)) Main.meths (regfiles n) (kami_hides n) (basemod n)
   return ()

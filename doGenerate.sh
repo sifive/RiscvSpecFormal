@@ -204,10 +204,8 @@ function buildHaskellSim {
   local fileName=$1
   
   cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
-  cp Haskell/HaskellTarget.hs HaskellGen
-  cp Haskell/SimMain.hs HaskellGen
-  cp Haskell/UART.hs HaskellGen
-  execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O2 --make -iHaskellGen -iKami ./Haskell/$fileName.hs -o ./Haskell/$fileName"
+  cp Haskell/*.hs HaskellGen
+  execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O2 --make -iHaskellGen -iKami ./HaskellGen/$fileName.hs -o ./HaskellGen/$fileName"
 }
 
 [[ $coqSim     == 1  ]] && buildHaskellSim "CoqMain"
