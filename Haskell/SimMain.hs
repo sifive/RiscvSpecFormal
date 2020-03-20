@@ -16,7 +16,7 @@ import System.Random (randomIO)
 import System.Environment (getArgs)
 import Text.Read
 import Control.Exception
-import UART
+import UartDev
 import Data.BitVector as BV
 import Data.Array.MArray as MA
 
@@ -54,7 +54,7 @@ basemod :: Int -> BaseModule
 basemod n = snd $ kami_model n
 
 mem_file :: String
-mem_file = "proc_core_mem_reg_file"
+mem_file = "pMemFile"
 
 float_file :: String
 float_file = "proc_core_float_reg_file"

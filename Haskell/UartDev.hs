@@ -1,7 +1,7 @@
 -- Copyright (c) 2018-2019 Rishiyur S. Nikhil
 -- See LICENSE for license details
 
-module UART where
+module UartDev where
 
 -- ================================================================
 -- This is (partial) model of the classic National Semiconductor NS16550A UART.

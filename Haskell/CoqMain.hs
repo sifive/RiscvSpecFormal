@@ -16,7 +16,7 @@ import qualified Data.Text as T (Text, pack, unpack, null)
 import Data.BitVector as BV
 import Control.Exception
 import Data.IORef
-import UART
+import UartDev
 
 hex_to_integer :: T.Text -> Integer
 hex_to_integer txt = case hexadecimal txt of
@@ -42,7 +42,7 @@ getArgVal name n = do
         Nothing -> error $ "Argument value " ++ name ++ " not supplied."
 
 mem_file :: String
-mem_file = "proc_core_mem_reg_file"
+mem_file = "pMemFile"
 
 data SimEnvironment = SimEnvironment {
   consoleUART :: IORef UART_NS16550A
@@ -80,7 +80,7 @@ env = S.Build_Environment
     (\simEnv (R.Build_FileState methods int_regs files) _ ruleName -> unsafeCoerce $ do
         when (ruleName /= "proc_core_pipeline") (return ()) -- TODO: LLEE: increment timeout counter.
         case M.lookup mem_file (unsafeCoerce files) of
-            Nothing -> error "File not found."
+            Nothing -> error $ "File not found." ++ mem_file
             Just (R.Build_RegFile _ _ _ _ _ _ _ v) -> do
                 sz <- isa_size
                 tohost_addr <- getArgVal "tohost_address" sz
