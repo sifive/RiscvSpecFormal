@@ -42,7 +42,7 @@ getArgVal name n = do
         Nothing -> error $ "Argument value " ++ name ++ " not supplied."
 
 mem_file :: String
-mem_file = "proc_core_mem_reg_file"
+mem_file = "pMemFile"
 
 data SimEnvironment = SimEnvironment {
   consoleUART :: IORef UART_NS16550A

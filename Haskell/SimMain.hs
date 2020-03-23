@@ -54,7 +54,7 @@ basemod :: Int -> BaseModule
 basemod n = snd $ kami_model n
 
 mem_file :: String
-mem_file = "proc_core_mem_reg_file"
+mem_file = "pMemFile"
 
 float_file :: String
 float_file = "proc_core_float_reg_file"
