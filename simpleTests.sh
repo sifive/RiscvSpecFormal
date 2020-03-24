@@ -13,8 +13,8 @@ pre=$2
 test=$3
 [[ $test == '' ]] && error "Error: TEST argument is missing (example 'add')."
 
-resDir='simpleTestResults'
-mkdir $resDir
+rm -rf simpleTestsResult
+mkdir -p simpleTestsResult
 
 function runTest {
   local xlen=$1
@@ -22,44 +22,23 @@ function runTest {
   local sim=$3
 
   local fileName="rv$xlen$pre-$type-$test"
-  local resPath="$resDir/$fileName.out"
+  local resPath="simpleTestsResult/$fileName$sim.out"
   
-  echo "runTest xlen=$xlen type=$type sim=$sim fileName=$fileName resPath=$resPath"
+  echo "run Test xlen=$xlen type=$type sim=$sim fileName=$fileName resPath=$resPath"
 
-  rm -vf $resPath
-  ./runElf.sh --xlen $xlen $sim --path $path/$fileName &> $resDir/$fileName$sim.out
+  rm -f $resPath
+  ./runElf.sh --xlen $xlen $sim --path $path/$fileName &> $resPath
 }
 
 function runTests {
   local xlen=$1
   local sim=$2
 
-  echo "runTests xlen=$xlen sim=$sim"
+  echo "run Tests xlen=$xlen sim=$sim"
   runTest $xlen 'p' $sim & runTest $xlen 'v' $sim
 }
 
-function runHaskellTests {
-  local xlen=$1
-  echo "runHaskellTests xlen=$xlen"
-  runTests $xlen '--haskell-sim'
-}
-
-( \
-  ./doGenerate.sh --haskell-sim --parallel && \
-  ( \
-    runHaskellTests 64 & \
-    runHaskellTests 32 & \
-  ) \
-) && \
-( \
-  ./doGenerate.sh --xlen 64 --parallel && \
-  ( \
-    runTests 64 \
-  ) \
-) && \
-( \
-  ./doGenerate.sh --xlen 32 --parallel && \
-  ( \
-    runTests 32 \
-  ) \
-)
+./doGenerate.sh --coq-sim --parallel
+(runTests 64 --coq-sim & runTests 32 --coq-sim)
+./doGenerate.sh --xlen 64 --parallel && ./doGenerate.sh --xlen 32 --parallel
+(runTests 64 --verilog-sim & runTests 32 --verilog-sim)
