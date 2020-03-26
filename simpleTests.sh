@@ -38,10 +38,6 @@ function runTests {
   runTest $xlen 'p' $sim & runTest $xlen 'v' $sim
 }
 
-./doGenerate.sh --coq-sim --parallel
-(runTests 64 --coq-sim & runTests 32 --coq-sim)
-./doGenerate.sh --xlen 64 --parallel
-#./doGenerate.sh --xlen 32 --parallel
-#(runTests 64 --verilog-sim & runTests 32 --verilog-sim)
+./doGenerate.sh --coq-sim --parallel &&(runTests 64 --coq-sim & runTests 32 --coq-sim) #&& ./doGenerate.sh --xlen 64 --parallel && ./doGenerate.sh --xlen 32 --parallel &&(runTests 64 --verilog-sim & runTests 32 --verilog-sim)
 
-cat simpleTestResults/*
+cat simpleTestsResult/*
