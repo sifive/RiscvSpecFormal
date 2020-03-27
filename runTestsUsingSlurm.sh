@@ -76,10 +76,7 @@ do
     testNames=$(./blackList.sh $testDir $xlen)
     for testName in $testNames
     do
-      # runTest $sim $xlen $testName
-      true
+      runTest $sim $xlen $testName &
     done
   done
 done
-
-runTest 'coq-sim' '64' 'rv64ui-p-add' &
