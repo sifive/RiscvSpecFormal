@@ -66,7 +66,8 @@ function runTest () {
   local xlen=$2
   local testName=$3
   local cmd="time srun --cpus-per-task=$slurmNumCpus --mem=$slurmMemSize runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/summary.out" 
-  execute "$cmd"
+  # execute "$cmd"
+  echo "$cmd"
 }
 
 for sim in ${sims[@]}
@@ -76,7 +77,7 @@ do
     testNames=$(./blackList.sh $testDir $xlen)
     for testName in $testNames
     do
-      runTest $sim $xlen $testName &
+      runTest $sim $xlen $(basename $testName) &
     done
   done
 done
