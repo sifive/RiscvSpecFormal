@@ -23,3 +23,4 @@ clean:: Makefile.coq.all
 	rm -rf HaskellGen
 	rm -f Makefile.coq.all Makefile.coq.all.conf .Makefile.coq.all.d
 	rm -rf obj_dir
+	rm -rf simpleTestResults

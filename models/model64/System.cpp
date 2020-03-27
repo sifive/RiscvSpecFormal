@@ -5,7 +5,7 @@
 #include <getopt.h>
 #include "verilated_vcd_c.h"
 
-#include "Vsystem_proc_core_mem_reg_file.h"
+#include "Vsystem_pMemFile.h"
 #include "Vsystem_system.h"
 #include "Vsystem.h"
 
@@ -47,7 +47,7 @@ int main(int argc, char ** argv, char **env) {
 
     tohost_val = 0;
     for(int j = 3; j >= 0; j--) {
-      tohost_val = (tohost_val << 8) | system->system->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[tohost_address+j];
+      tohost_val = (tohost_val << 8) | system->system->pMemFile__024_inst->pMemFile__024_data[tohost_address+j];
     }
     if (!system->RESET) {
       if(tohost_val == 1) {
@@ -82,7 +82,7 @@ int main(int argc, char ** argv, char **env) {
     if(signature_fd != NULL) {
       for(int i = numBlockBytes-sign_size+1; i < numBlockBytes; i+=4) {
         for(int j = 3; j >= 0; j--) {
-          fprintf(signature_fd, "%02x", system->system->proc_core_mem_reg_file__024_inst->proc_core_mem_reg_file__024_data[i+j]);
+          fprintf(signature_fd, "%02x", system->system->pMemFile__024_inst->pMemFile__024_data[i+j]);
         }
         fprintf(signature_fd, "\n");
       }

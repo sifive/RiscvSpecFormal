@@ -200,17 +200,16 @@ shift $((OPTIND - 1))
 
 execute "time make $rebuild $parallel"
 
-function buildHaskellSim {
+cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
+cp Haskell/*.hs HaskellGen
+function buildSim {
   local fileName=$1
-  
-  cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
-  cp Haskell/*.hs HaskellGen
   execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O2 --make -iHaskellGen -iKami ./HaskellGen/$fileName.hs -o ./HaskellGen/$fileName"
 }
 
-[[ $coqSim     == 1  ]] && buildHaskellSim "CoqMain"
-[[ $haskellSim == 1  ]] && buildHaskellSim "SimMain"
-[[ $testcase   != "" ]] && buildHaskellSim "TestMain"
+[[ $coqSim     == 1  ]] && buildSim "CoqSim"
+[[ $haskellSim == 1  ]] && buildSim "HaskellSim"
+[[ $testcase   != "" ]] && buildSim "TestMain"
 
 if [[ $verilogSim == 1 || $noSimSelected == 1 ]]
 then
@@ -220,14 +219,10 @@ then
   else
     model=test$testcase
   fi
-
-  cd Kami && ./fixHaskell.sh ../HaskellGen .. && cd ..
-
-  cat Haskell/Target.raw > HaskellGen/Target.hs
+  
   echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
 
-  notice "Compiling the Verilog generator."
-  execute "time ghc $GHCFLAGS $parallel $prof -O1 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
+  execute "time ghc $GHCFLAGS $parallel $profile $heapdump -O2 --make -iHaskellGen -iKami -iKami/Compiler Kami/Compiler/CompAction.hs"
 
   notice "Generating the Verilog model."
   execute "mkdir -p models/$model; time Kami/Compiler/CompAction > models/$model/System.sv"
