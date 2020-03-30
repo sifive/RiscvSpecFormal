@@ -36,8 +36,17 @@ Each time these jobs are invoked, they append their log output to
 their associated log file.
 
 A summary of the job results can be found in
-runTestsUsingSlurmResults/summary.out. 0 indicates success. Any
-other code indicates failure.
+runTestsUsingSlurmResults/summary.out. 0 indicates success. 1
+indicates that the test failed. 137 indicates that the slurm job
+exceeded its memory limit. Other code indicate failure.
+
+You can observe the slurm queue using:
+
+  watch squeue -u USERNAME
+
+You can observe the test results using:
+
+  watch tail --lines 40 riscvTestsUsingSlurmResults/summary.out
 
 OPTIONS
 -------
