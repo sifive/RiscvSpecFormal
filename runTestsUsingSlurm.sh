@@ -65,7 +65,7 @@ function runTest () {
   local sim=$1
   local xlen=$2
   local testName=$3
-  local cmd="srun --cpus-per-task=$slurmNumCpus --mem=$slurmMemSize runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/summary.out" 
+  local cmd="srun --cpus-per-task=$slurmNumCpus --mem=$slurmMemSize runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName-$sim.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/summary.out" 
   execute "$cmd"
 }
 
