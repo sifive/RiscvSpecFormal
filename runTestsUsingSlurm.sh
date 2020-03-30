@@ -46,7 +46,7 @@ You can observe the slurm queue using:
 
 You can observe the test results using:
 
-  watch tail --lines 40 riscvTestsUsingSlurmResults/summary.out
+  watch tail --lines 40 runTestsUsingSlurmResults/summary.out
 
 OPTIONS
 -------
