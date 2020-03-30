@@ -1,10 +1,10 @@
-# This script generates a Slurm job that runs runElf for most possible runElf configurations.
+# This script generates a Slurm job that runs runElf for most
+# possible runElf configurations.
 
 source common.sh
 
-
 slurmNumCpus='2'
-slurmMemSize='1G'
+slurmMemSize='7G' # 5G < mem req for rv64ui-v-lb <= 10G
 testDir='/nettmp/netapp1a/vmurali/riscv-tests/isa'
 resultsDir='runTestsUsingSlurmResults'
 sims=('coq-sim' 'haskell-sim')
@@ -65,9 +65,8 @@ function runTest () {
   local sim=$1
   local xlen=$2
   local testName=$3
-  local cmd="time srun --cpus-per-task=$slurmNumCpus --mem=$slurmMemSize runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/summary.out" 
-  # execute "$cmd"
-  echo "$cmd"
+  local cmd="srun --cpus-per-task=$slurmNumCpus --mem=$slurmMemSize runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/summary.out" 
+  execute "$cmd"
 }
 
 for sim in ${sims[@]}
