@@ -4,7 +4,7 @@
 source common.sh
 
 slurmNumCpus='2'
-slurmMemSize='10G' # 5G < mem req for rv64ui-v-lb <= 10G
+slurmMemSize='15G' # 5G < mem req for rv64ui-v-lb <= 10G
 testDir='/nettmp/netapp1a/vmurali/riscv-tests/isa'
 resultsDir='runTestsUsingSlurmResults'
 sims=('coq-sim' 'haskell-sim')
