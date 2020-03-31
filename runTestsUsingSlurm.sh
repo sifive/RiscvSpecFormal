@@ -4,7 +4,8 @@
 source common.sh
 
 slurmNumCpus='2'
-slurmMemSize='15G' # 5G < mem req for rv64ui-v-lb <= 10G
+slurmMinMemSize='3G'
+slurmMaxMemSize='15G'
 testDir='/nettmp/netapp1a/vmurali/riscv-tests/isa'
 resultsDir='runTestsUsingSlurmResults'
 sims=('coq-sim' 'haskell-sim')
@@ -70,11 +71,24 @@ shift $((OPTIND - 1))
 
 mkdir -p $resultsDir
 
+function isPTest () {
+  local testName=$1
+  [[ ${testName:7:1} == 'p' ]]
+}
+
+function getMemLimit () {
+  local testName=$1
+  if isPTest $testName
+  then echo $slurmMinMemSize
+  else echo $slurmMaxMemSize
+  fi
+}
+
 function runTest () {
   local sim=$1
   local xlen=$2
   local testName=$3
-  local cmd="srun --cpus-per-task=$slurmNumCpus --mem=$slurmMemSize runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName-$sim.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/summary.out" 
+  local cmd="srun --cpus-per-task=$slurmNumCpus --mem=$(getMemLimit $testName) runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName-$sim.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/summary.out" 
   execute "$cmd"
 }
 
@@ -86,6 +100,7 @@ do
     for testName in $testNames
     do
       runTest $sim $xlen $(basename $testName) &
+      true
     done
   done
 done
