@@ -93,12 +93,16 @@ proc_core_writeUART (addr, (val, (size, _))) _ _ simEnv = do
     return (simEnv, BV.nil)
 -}
 
-proc_core_ext_interrupt_pending :: R.Any -> S.KamiState -> IO R.Any
-proc_core_ext_interrupt_pending _ _ = return $ unsafeCoerce False
+externalInterruptMethod :: R.Any -> S.KamiState -> IO R.Any
+externalInterruptMethod _ _ = return $ unsafeCoerce False
+
+debugInterruptMethod :: R.Any -> S.KamiState -> IO R.Any
+debugInterruptMethod _ _ = return $ unsafeCoerce False
 
 methods :: M.Map String (Syntax.Signature,S.Coq_meth_sig)
 methods = M.fromList [
-    ("proc_core_ext_interrupt_pending", ((Syntax.Bit 0,Syntax.Bool), proc_core_ext_interrupt_pending))
+    ("proc_core_externalInterrupt", ((Syntax.Bit 0,Syntax.Bool), externalInterruptMethod)),
+    ("proc_core_debugInterrupt", ((Syntax.Bit 0,Syntax.Bool), debugInterruptMethod))
   ]
 
 data Stream a = (:+) a (Stream a) deriving Show

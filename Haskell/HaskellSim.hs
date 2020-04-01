@@ -256,16 +256,26 @@ proc_core_writeUART env v filestate regstate = do
       [0 .. (2 ^ (BV.nat $ bvCoerce $ struct_field_access "size" v) - 1)]
     return (env, BVVal BV.nil)
 
+{-
 io_meth :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 io_meth env v filestate regstate = do
   consoleUART <- readIORef $ consoleUART env
   return (env, BoolVal $ uart_has_interrupt consoleUART)
+-}
+
+externalInterrupt :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
+externalInterrupt env _ _ _ = return (env, BoolVal False)
+
+debugInterrupt :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
+debugInterrupt env _ _ _ = return (env, BoolVal False)
 
 meths :: [(String, Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val))]
 meths =
-  [("proc_core_ext_interrupt_pending", io_meth),
-   ("proc_core_readUART", proc_core_readUART),
-   ("proc_core_writeUART", proc_core_writeUART)]
+  [("proc_core_externalInterrupt", externalInterrupt),
+   ("proc_core_debugInterrupt", debugInterrupt)
+   -- ("proc_core_readUART", proc_core_readUART),
+   -- ("proc_core_writeUART", proc_core_writeUART)
+   ]
 
 main :: IO()
 main = do
