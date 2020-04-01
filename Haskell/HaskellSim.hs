@@ -179,6 +179,7 @@ instance AbstractEnvironment Environment where
         let currCounter = counter env
             currSteps = steps env in do
           isaSize <- isa_size
+          putStr $ "[sim] current cycle count: " ++ show currCounter
           -- handle timeouts
           when (currCounter > timeout) $ do
               hPutStrLn stdout "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"

@@ -63,7 +63,7 @@ process_args :: [String] -> [(String,String)]
 process_args = catMaybes . map (binary_split '=')
 
 timeout :: Int
-timeout = 2000000
+timeout = 200000
 
 {-
 proc_core_readUART :: (BV.BV, (BV.BV, ())) -> fileState -> regs -> IO BV.BV
@@ -131,24 +131,32 @@ main = do
   let files = process_args args
   sz <- isa_size
   ct <- newIORef 0
+  ruleCounter <- newIORef 0
   let mod = if sz == 32 then model32 else model64
   let (_,(rfs,basemod)) = separateModRemove mod
   let rules = unwind_list $ getRules basemod
+  let numRules = length $ getRules basemod
   state <- initialize mod files
-  go ct rules state
+  go numRules ct ruleCounter rules state
 
     where
 
-      go ct (r :+ rules') state = do
+      go numRules ct ruleCounter (r :+ rules') state = do
+        ruleCount <- readIORef ruleCounter
+        prevCt <- readIORef ct
+        when (ruleCount >= numRules) $ do
+          writeIORef ruleCounter 0
+          writeIORef ct $ prevCt + 1
         currCt <- readIORef ct
-        when (currCt == timeout) $ do
-          hPutStrLn stderr "TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT."
-          exitFailure
-        writeIORef ct $ currCt + 1
+        putStrLn $ "[sim] current cycle count: " ++ show currCt
+        -- when (currCt >= timeout) $ do
+          -- hPutStrLn stderr "TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT."
+          -- exitFailure
         state' <- simulate methods r state
+        writeIORef ruleCounter $ ruleCount + 1
         outcome <- check_tohost state'
         case outcome of
-          Neither -> go ct rules' state'
+          Neither -> go numRules ct ruleCounter rules' state'
           Pass -> do
             hPutStrLn stderr "PASSED."
             exitSuccess
