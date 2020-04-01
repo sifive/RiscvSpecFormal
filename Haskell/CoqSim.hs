@@ -63,7 +63,7 @@ process_args :: [String] -> [(String,String)]
 process_args = catMaybes . map (binary_split '=')
 
 timeout :: Int
-timeout = 2000000
+timeout = 200000
 
 {-
 proc_core_readUART :: (BV.BV, (BV.BV, ())) -> fileState -> regs -> IO BV.BV
@@ -131,43 +131,30 @@ main = do
   let files = process_args args
   sz <- isa_size
   ct <- newIORef 0
+  ruleCounter <- newIORef 0
   let mod = if sz == 32 then model32 else model64
   let (_,(rfs,basemod)) = separateModRemove mod
   let rules = unwind_list $ getRules basemod
+  let numRules = length $ getRules basemod
   state <- initialize mod files
-  go ct rules state
+  go numRules 0 0 rules state
 
     where
 
-      go ct (r :+ rules') state = do
-        currCt <- readIORef ct
+      go numRules ct ruleCounter (r :+ rules') state = do
+        let nextCt = if ruleCounter == numRules then ct + 1 else ct
+        let nextRuleCounter = if ruleCounter == numRules then 0 else ruleCounter + 1
+        when (nextRuleCounter == 0) $ putStrLn $ "[sim] current cycle count: " ++ show ct
         when (currCt == timeout) $ do
           hPutStrLn stderr "TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT."
           exitFailure
-        writeIORef ct $ currCt + 1
         state' <- simulate methods r state
         outcome <- check_tohost state'
         case outcome of
-          Neither -> go ct rules' state'
+          Neither -> go numRules nextCt nextRuleCounter rules' state'
           Pass -> do
             hPutStrLn stderr "PASSED."
             exitSuccess
           Fail -> do
             hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED."
             exitFailure
-
-
-
-
--- main :: IO()
--- main = do
---     args <- getArgs
---     let files = process_args args
---     sz <- isa_size
---     let sim = unsafeCoerce (if sz == 32 then coqSim_32 else coqSim_64)
---     initSimEnv <- mkInitSimEnv
---     sim env initSimEnv files timeout
---       (\_ _ _ _ -> return (initSimEnv, False) :: IO (SimEnvironment, Bool)) -- proc_core_pipeline
---       proc_core_readUART
---       proc_core_writeUART
-
