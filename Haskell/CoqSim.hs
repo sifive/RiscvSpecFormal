@@ -137,45 +137,24 @@ main = do
   let rules = unwind_list $ getRules basemod
   let numRules = length $ getRules basemod
   state <- initialize mod files
-  go numRules ct ruleCounter rules state
+  go numRules 0 0 rules state
 
     where
 
       go numRules ct ruleCounter (r :+ rules') state = do
-        ruleCount <- readIORef ruleCounter
-        prevCt <- readIORef ct
-        when (ruleCount >= numRules) $ do
-          writeIORef ruleCounter 0
-          writeIORef ct $ prevCt + 1
-        currCt <- readIORef ct
-        putStrLn $ "[sim] current cycle count: " ++ show currCt
-        -- when (currCt >= timeout) $ do
-          -- hPutStrLn stderr "TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT."
-          -- exitFailure
+        let nextCt = if ruleCounter == numRules then ct + 1 else ct
+        let nextRuleCounter = if ruleCounter == numRules then 0 else ruleCounter + 1
+        when (nextRuleCounter == 0) $ putStrLn $ "[sim] current cycle count: " ++ show ct
+        when (currCt == timeout) $ do
+          hPutStrLn stderr "TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT."
+          exitFailure
         state' <- simulate methods r state
-        writeIORef ruleCounter $ ruleCount + 1
         outcome <- check_tohost state'
         case outcome of
-          Neither -> go numRules ct ruleCounter rules' state'
+          Neither -> go numRules nextCt nextRuleCounter rules' state'
           Pass -> do
             hPutStrLn stderr "PASSED."
             exitSuccess
           Fail -> do
             hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED."
             exitFailure
-
-
-
-
--- main :: IO()
--- main = do
---     args <- getArgs
---     let files = process_args args
---     sz <- isa_size
---     let sim = unsafeCoerce (if sz == 32 then coqSim_32 else coqSim_64)
---     initSimEnv <- mkInitSimEnv
---     sim env initSimEnv files timeout
---       (\_ _ _ _ -> return (initSimEnv, False) :: IO (SimEnvironment, Bool)) -- proc_core_pipeline
---       proc_core_readUART
---       proc_core_writeUART
-
