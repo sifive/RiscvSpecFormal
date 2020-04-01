@@ -45,9 +45,10 @@ You can observe the slurm queue using:
 
   watch squeue -u USERNAME
 
-You can observe the test results using:
+You can observe the test results by monitoring coq-sim.out and haskell-sim.out
 
-  watch tail --lines 40 runTestsUsingSlurmResults/summary.out
+  watch tail --lines 40 runTestsUsingSlurmResults/coq-sim.out
+  watch tail --lines 40 runTestsUsingSlurmResults/haskell-sim.out
 
 OPTIONS
 -------
@@ -58,7 +59,6 @@ OPTIONS
 AUTHORS
 -------
 
-* Murali Vijayaraghavan
 * Larry Lee
 EOF
       exit 0;;
@@ -78,7 +78,8 @@ function isPTest () {
 
 function getMemLimit () {
   local testName=$1
-  if isPTest $testName
+  local simName=$2
+  if isPTest $testName || [[ $simName == 'haskell-sim' ]]
   then echo $slurmMinMemSize
   else echo $slurmMaxMemSize
   fi
@@ -88,9 +89,19 @@ function runTest () {
   local sim=$1
   local xlen=$2
   local testName=$3
-  local cmd="srun --cpus-per-task=$slurmNumCpus --mem=$(getMemLimit $testName) runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName-$sim.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/summary.out" 
+  local cmd="srun --cpus-per-task=$slurmNumCpus --mem=$(getMemLimit $testName $sim) runElf.sh --verbose --$sim --xlen $xlen --path $testDir/$testName >> $resultsDir/$testName-$sim.out 2>&1; echo \"\$? $testName $xlen $sim\" >> $resultsDir/$sim.out" 
   execute "$cmd"
 }
+
+rm -rf $resultsDir
+
+rm -rf haskelldump
+rm -rf coqdump
+rm -rf verilogdump
+
+mkdir $resultsDir
+./doGenerate.sh --parallel --coq-sim
+./doGenerate.sh --parallel --haskell-sim
 
 for sim in ${sims[@]}
 do

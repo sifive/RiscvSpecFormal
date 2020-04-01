@@ -152,14 +152,18 @@ shift $((OPTIND - 1))
 
 base=$(basename $path)
 
-if [[ $verilogSim == 1 || $noSimSelected == 1 ]]
+if [[ $haskellSim == 1 ]]
 then
-    dump=verilogdump
-else
     dump=haskelldump
+else
+    if [[ $coqSim == 1 ]]
+    then
+        dump=coqdump
+    else
+        dump=verilogdump
+    fi
 fi
 
-mkdir -p $dump
 mkdir -p $dump
 
 binfile=$dump/$base.bin
