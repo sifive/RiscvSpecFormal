@@ -15,9 +15,10 @@ heapdump=""
 coqSim=0
 haskellSim=0
 verilogSim=0
+verilogCore=0
 noSimSelected=1
 
-options=$(getopt --options="hrvsx:pt:" --longoptions="coq-sim,help,rebuild,verbose,haskell-sim,xlen:,parallel,profile,heapdump,test:,verilog-sim" -- "$@")
+options=$(getopt --options="hrvsx:pt:" --longoptions="coq-sim,help,rebuild,verbose,haskell-sim,xlen:,parallel,profile,heapdump,test:,verilog-sim,verilog-core" -- "$@")
 [ $? == 0 ] || error "Invalid command line. The command line includes one or more invalid command line parameters."
 
 eval set -- "$options"
@@ -34,7 +35,9 @@ USAGE
 SUMMARY
 -------
 
-This script generates programs that simulate the Kami Processor model.
+This script generates programs that simulate the Kami Processor
+model, and may be used to generate a Verilog model of the Kami
+Processor core.
 
 OPTIONS
 -------
@@ -67,12 +70,20 @@ OPTIONS
   -v|--verbose
   Enables verbose output.
 
+  --verilog-core
+  Generates a Verilog model of the Kami processor core. See DETAILS
+  for more information. (Cannot be used with --verilog-sim).
+
   --verilog-sim
   Generates the Verilog-based simulator. See DETAILS for more information.
+  (Cannot be used with --verilog-core).
 
   --xlen 32|64
   Specifies whether or not the generator should produce a 32 or 64
   bit RISC-V processor model. Default is 64.
+
+  -t|--test
+  Overrides --verilog-sim and --verilog-core.
 
 EXAMPLES
 --------
@@ -117,6 +128,12 @@ simulator using the following method:
 
 The Verilog model will be written to models/rvXX/System.sv. The
 resulting binaries are written to models/.
+
+When run using the --verilog-core flag, this script will generate
+a Verilog model of the ProcKami processor that does not include the
+device models. This model of a ProcKami core can be integrated into
+the Chisel based frameworks provided by SiFive. The generated cores
+will be written to models/coreXX/System.sv.
 
 When run using the --haskell-sim flag, this script will generate a
 simulator using the following method:
@@ -188,6 +205,9 @@ EOF
     -t|--test)
       testcase=$2
       shift 2;;
+    --verilog-core)
+      verilogCore=1
+      shift;;
     --verilog-sim)
       verilogSim=1
       shift;;
@@ -211,14 +231,17 @@ function buildSim {
 [[ $haskellSim == 1  ]] && buildSim "HaskellSim"
 [[ $testcase   != "" ]] && buildSim "TestMain"
 
-if [[ $verilogSim == 1 || $noSimSelected == 1 ]]
+if [[ $verilogSim == 1 && $verilogCore == 1 ]]
 then
-  if [[ $testcase == "" ]]
-  then
-    model=model$xlen
-  else
-    model=test$testcase
-  fi
+  error "The --verilogSim and --verilogCore flags are incompatible. See --help for more information."
+  exit 1
+fi
+
+if [[ $verilogSim == 1 || $verilogCore == 1 || $noSimSelected == 1 ]]
+then
+  if [[ $testcase != ""   ]]; then model=test$testcase; fi
+  if [[ $verilogSim == 1  ]]; then model=model$xlen; fi
+  if [[ $verilogCore == 1 ]]; then model=core$xlen; fi
   
   echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
 
@@ -226,7 +249,14 @@ then
 
   notice "Generating the Verilog model."
   execute "mkdir -p models/$model; time Kami/Compiler/CompAction > models/$model/System.sv"
-    
+  exitCode=$?
+ 
+  if [[ $verilogCore == 1 ]]
+  then
+    notice "Done."
+    exit $exitCode
+  fi
+
   notice "Generating the simulator source code (i.e. C files)."
   execute "cd models/$model; time verilator --top-module system -Wno-CMPCONST -O0 -Wno-WIDTH --cc System.sv --trace --trace-underscore -Wno-fatal --exe System.cpp; cd ../.."
     

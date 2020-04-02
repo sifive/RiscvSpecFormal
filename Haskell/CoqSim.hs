@@ -63,7 +63,7 @@ process_args :: [String] -> [(String,String)]
 process_args = catMaybes . map (binary_split '=')
 
 timeout :: Int
-timeout = 200000
+timeout = 2000000
 
 {-
 proc_core_readUART :: (BV.BV, (BV.BV, ())) -> fileState -> regs -> IO BV.BV
