@@ -130,7 +130,7 @@ main = do
   args <- getArgs
   let files = process_args args
   sz <- isa_size
-  ct <- newIORef 0
+  cycleCounter <- newIORef 0
   ruleCounter <- newIORef 0
   let mod = if sz == 32 then model32 else model64
   let (_,(rfs,basemod)) = separateModRemove mod
@@ -141,20 +141,23 @@ main = do
 
     where
 
-      go numRules ct ruleCounter (r :+ rules') state = do
-        let nextCt = if ruleCounter == numRules then ct + 1 else ct
+      go numRules cycleCounter ruleCounter (r :+ rules') state = do
+        when (ruleCounter == 0) $ putStrLn $ "[sim] current cycle count: " ++ show cycleCounter
+        let nextCt = if ruleCounter == numRules then cycleCounter + 1 else cycleCounter
         let nextRuleCounter = if ruleCounter == numRules then 0 else ruleCounter + 1
-        when (nextRuleCounter == 0) $ putStrLn $ "[sim] current cycle count: " ++ show ct
-        when (currCt == timeout) $ do
-          hPutStrLn stderr "TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT TIMEOUT."
+        when (cycleCounter > timeout) $ do
+          hPutStrLn stdout "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
+          hPutStrLn stderr "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
           exitFailure
         state' <- simulate methods r state
         outcome <- check_tohost state'
         case outcome of
           Neither -> go numRules nextCt nextRuleCounter rules' state'
           Pass -> do
-            hPutStrLn stderr "PASSED."
+            hPutStrLn stderr "Passed"
+            hPutStrLn stdout "Passed"
             exitSuccess
           Fail -> do
-            hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED."
+            hPutStrLn stdout "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
+            hPutStrLn stderr "FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED FAILED"
             exitFailure
