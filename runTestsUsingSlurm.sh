@@ -50,6 +50,8 @@ You can observe the test results by monitoring coq-sim.out and haskell-sim.out
   watch tail --lines 40 runTestsUsingSlurmResults/coq-sim.out
   watch tail --lines 40 runTestsUsingSlurmResults/haskell-sim.out
 
+You can cancel your jobs using: scancel -u USERNAME
+
 OPTIONS
 -------
 
@@ -94,10 +96,6 @@ function runTest () {
 }
 
 rm -rf $resultsDir
-
-rm -rf haskelldump
-rm -rf coqdump
-rm -rf verilogdump
 
 mkdir $resultsDir
 ./doGenerate.sh --parallel --coq-sim
