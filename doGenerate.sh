@@ -239,17 +239,9 @@ fi
 
 if [[ $verilogSim == 1 || $verilogCore == 1 || $noSimSelected == 1 ]]
 then
-  if [[ $testcase == "" ]]
-  then
-    if [[ $verilogSim == 1 ]]
-    then
-      model=model$xlen
-    else # verilogCore == 1
-      model=core$xlen
-    fi
-  else
-    model=test$testcase
-  fi
+  if [[ $testcase != ""   ]]; then model=test$testcase; fi
+  if [[ $verilogSim == 1  ]]; then model=model$xlen; fi
+  if [[ $verilogCore == 1 ]]; then model=core$xlen; fi
   
   echo "rtlMod = separateModRemove $model" >> HaskellGen/Target.hs
 
