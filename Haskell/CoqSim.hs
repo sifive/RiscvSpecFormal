@@ -134,8 +134,9 @@ main = do
   ruleCounter <- newIORef 0
   let mod = if sz == 32 then model32 else model64
   let (_,(rfs,basemod)) = separateModRemove mod
-  let rules = unwind_list $ getRules basemod
-  let numRules = length $ getRules basemod
+  let erules = if sz == 32 then rules_32 else rules_64
+  let rules = unwind_list $ erules
+  let numRules = length erules
   state <- initialize mod files
   go numRules 0 0 rules state
 
