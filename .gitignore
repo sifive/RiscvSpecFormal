@@ -36,3 +36,4 @@ Main.prof
 .*.swo
 .*.swp
 simpleTestsResult
+runTestsUsingSlurmResults

@@ -1,9 +1,14 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
 import qualified Data.List
 import Simulator.All
 
 import qualified Data.HashMap as M
 import qualified Data.Vector as V
 import qualified Data.BitVector as BV
+import qualified Data.Vector.Mutable as MV
 
 import Data.String
 import Data.List
@@ -19,6 +24,8 @@ import Control.Exception
 import UartDev
 import Data.BitVector as BV
 import Data.Array.MArray as MA
+import Data.Array.IO
+import qualified Data.Map.Strict as Map
 
 import HaskellTarget as T
 
@@ -40,12 +47,12 @@ isa_size = do
     Nothing -> return 32
 
 kami_model :: Int -> ([RegFileBase] , BaseModule)
-kami_model 32 = snd (T.separateModHidesNoInline T.model32)
-kami_model 64 = snd (T.separateModHidesNoInline T.model64)
+kami_model 32 = snd (T.separateModRemove T.model32)
+kami_model 64 = snd (T.separateModRemove T.model64)
 
 kami_hides :: Int -> [String]
-kami_hides 32 = fst (T.separateModHidesNoInline T.model32)
-kami_hides 64 = fst (T.separateModHidesNoInline T.model64)
+kami_hides 32 = fst (T.separateModRemove T.model32)
+kami_hides 64 = fst (T.separateModRemove T.model64)
 
 regfiles :: Int -> [RegFileBase]
 regfiles n = fst $ kami_model n
@@ -107,7 +114,7 @@ console_read = do
 hasArg :: String -> IO Bool
 hasArg name = getArgs >>= (.) return (maybe False (const True) . find (\arg -> (isPrefixOf name arg)))
 
-io_stuff :: FileState -> M.Map String Val -> Environment -> IO Environment
+io_stuff :: forall m a v. (StringMap m, Array a, Vec v) => FileState m a v -> m (Val v) -> Environment -> IO Environment
 io_stuff filestate regstate env =
   let currSteps = steps env :: Int in do
     modes <- get_modes
@@ -134,12 +141,12 @@ io_stuff filestate regstate env =
             ["Int",addr] -> do
                 case hex_to_maybe_integer_str addr of
                     Just n -> case n == 0 of
-                        True -> case M.lookup int_file (files filestate) of
+                        True -> case map_lookup @m int_file (files filestate) of
                             Nothing -> putStrLn $ "File " ++ int_file ++ " not found."
                             Just r -> do
                               let k = kind r
-                              v <- defVal k
-                              pval <- ppr_hex v
+                              let v = defVal @v k
+                              let pval = ppr_hex @v v
                               putStrLn pval
                         False -> print_file_reg filestate int_file $ fromInteger n
                     Nothing -> putStrLn "Formatting error."
@@ -179,6 +186,7 @@ instance AbstractEnvironment Environment where
         let currCounter = counter env
             currSteps = steps env in do
           isaSize <- isa_size
+          putStr $ "[sim] current cycle count: " ++ show currCounter
           -- handle timeouts
           when (currCounter > timeout) $ do
               hPutStrLn stdout "TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT TIMEDOUT"
@@ -189,10 +197,10 @@ instance AbstractEnvironment Environment where
             then return ()
             else do
               tohost_addr <- getArgVal "tohost_address" isaSize
-              case M.lookup mem_file (arrs filestate) of
+              case map_lookup mem_file (arrs filestate) of
                   Nothing -> error $ "File " ++ mem_file ++ " not found."
                   Just v -> do
-                    val <- MA.readArray v (fromIntegral $ BV.nat $ bvCoerce tohost_addr) 
+                    val <- array_read (fromIntegral $ BV.nat $ bvCoerce tohost_addr) v
                     if bvCoerce val == 1 then do
                         args <- getArgs
                         let ps = catMaybes $ map (binary_split '@') args
@@ -201,12 +209,12 @@ instance AbstractEnvironment Environment where
                             Just filename -> case Prelude.lookup "sign_size" ps of
                                 Nothing -> hPutStrLn stderr "sign_size expected but not supplied"
                                 Just x -> let sign_size = read x in
-                                    case M.lookup mem_file (arrs filestate) of
+                                    case map_lookup mem_file (arrs filestate) of
                                         Nothing -> hPutStrLn stderr $ "File " ++ mem_file ++ " not found."
                                         Just v -> do
-                                            sz <- arr_length v
+                                            sz <- array_length v
                                             let indices = Data.List.reverse [(sz-sign_size)..(sz-1)]
-                                            vals <- sequence $ map (\i -> Control.Monad.join $ liftM ppr_hex (MA.readArray v i)) indices
+                                            vals <- sequence $ map (\i -> liftM ppr_hex (array_read i v)) indices
                                             let spliced = (chunksOf 4 vals) :: [[String]]
                                             let newlined = (map (\t -> Data.List.concat (t ++ [['\n']])) spliced) :: [String]
                                             let reversed = (Data.List.reverse newlined) :: [String]
@@ -228,7 +236,7 @@ instance AbstractEnvironment Environment where
                        }
           return nextEnv
 
-proc_core_readUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
+proc_core_readUART :: StringMap m => Environment -> Val v -> FileState m a v -> m (Val v) -> IO (Environment, Val v)
 proc_core_readUART env v filestate regstate = do
     --putStrLn "[proc_core_readUART]"
     result <- foldM
@@ -243,7 +251,7 @@ proc_core_readUART env v filestate regstate = do
                 (Data.List.reverse [0 .. (2 ^ (BV.nat $ bvCoerce $ struct_field_access "size" v) - 1)])
     return (env, BVVal result)
 
-proc_core_writeUART :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
+proc_core_writeUART :: StringMap m => Environment -> Val v -> FileState m a v -> m (Val v) -> IO (Environment, Val v)
 proc_core_writeUART env v filestate regstate = do
     --putStrLn "[proc_core_writeUART]"
     mapM_
@@ -256,23 +264,36 @@ proc_core_writeUART env v filestate regstate = do
       [0 .. (2 ^ (BV.nat $ bvCoerce $ struct_field_access "size" v) - 1)]
     return (env, BVVal BV.nil)
 
+{-
 io_meth :: Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val)
 io_meth env v filestate regstate = do
   consoleUART <- readIORef $ consoleUART env
   return (env, BoolVal $ uart_has_interrupt consoleUART)
+-}
 
-meths :: [(String, Environment -> Val -> FileState -> M.Map String Val -> IO (Environment, Val))]
+externalInterrupt :: StringMap m => Environment -> Val v -> FileState m a v -> m (Val v) -> IO (Environment, Val v)
+externalInterrupt env _ _ _ = return (env, BoolVal False)
+
+debugInterrupt :: StringMap m => Environment -> Val v -> FileState m a v -> m (Val v) -> IO (Environment, Val v)
+debugInterrupt env _ _ _ = return (env, BoolVal False)
+
+meths :: StringMap m => [(String, Environment -> Val v -> FileState m a v -> m (Val v) -> IO (Environment, Val v))]
 meths =
-  [("proc_core_ext_interrupt_pending", io_meth),
-   ("proc_core_readUART", proc_core_readUART),
-   ("proc_core_writeUART", proc_core_writeUART)]
+  [("proc_core_externalInterrupt", externalInterrupt),
+   ("proc_core_debugInterrupt", debugInterrupt)
+   -- ("proc_core_readUART", proc_core_readUART),
+   -- ("proc_core_writeUART", proc_core_writeUART)
+   ]
 
-main :: IO()
-main = do
+poly_main :: forall m a v. (StringMap m, Array a, Vec v) => IO()
+poly_main = do
   hSetBuffering stdout NoBuffering
   env <- mkEnv
   envRef <- newIORef env
   n <- isa_size
   -- hPutStrLn stdout "[main] starting the simulation"
-  simulate_module 0 round_robin_rules envRef (map fst $ getRules (basemod n)) Main.meths (regfiles n) (kami_hides n) (basemod n)
+  simulate_module @m @a @v 0 round_robin_rules envRef (map fst $ getRules (basemod n)) Main.meths (regfiles n) (kami_hides n) (basemod n)
   return ()
+
+main :: IO ()
+main = poly_main @(AssocList) @(IOArray Int) @V.Vector

@@ -8,7 +8,7 @@ verbose=0
 function error () {
   local emsg=$1
 
-  echo -e "\033[91mError:\033[0m $emsg" >&2
+  echo -e "ERROR ERROR ERROR: $emsg" >&2
   exit 1
 }
 
@@ -17,7 +17,7 @@ function error () {
 function notice () {
   local msg=$1
 
-  echo -e "\033[92mNotice:\033[0m $msg" >&2
+  echo -e "Notice: $msg" >&2
 }
 
 # Accepts one argument, $cmd, a bash command
@@ -27,7 +27,7 @@ function execute () {
   local cmd=$1
   if [[ $verbose == 1 ]]
   then
-    echo -e "\033[93mNotice:\033[0m $cmd" >&2
+    echo -e "Notice: $cmd" >&2
   fi
   eval $cmd
   [ $? == 0 ] || error "An error occured while trying to execute the following command: \"$cmd\"."
