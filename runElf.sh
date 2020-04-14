@@ -180,7 +180,7 @@ tohost_address=$(printf "%x" $tohost_address)
 notice "Running $base"
 
 [[ $verilogSim == 1 || $noSimSelected == 1 ]] && execute "time ./models/model$xlen/obj_dir/Vsystem +sign_size=$sign_sizev +signature=$signaturev +testfile=$hexfile +boot_rom=boot_ROM_RV${xlen}.hex +tohost_address=$tohost_address > $dump/$base.out"
-[[ $haskellSim == 1 ]] && execute "time ./HaskellGen/HaskellSim boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts $profile $heapdump > $dump/$base.out"
+[[ $haskellSim == 1 ]] && execute "time ./HaskellGen/HaskellSim boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts $profile $heapdump +RTS -p -hc > $dump/$base.out"
 [[ $coqSim     == 1 ]] && execute "time ./HaskellGen/CoqSim boot_rom=boot_ROM_RV${xlen}.hex $interactive $noprint testfile=$hexfile tohost_address:$tohost_address xlen@${xlen} $signature $sign_size $debug $interrupts > $dump/$base.out"
 
 execute "time $cmd"
