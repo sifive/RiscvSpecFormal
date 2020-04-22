@@ -296,4 +296,4 @@ poly_main = do
   return ()
 
 main :: IO ()
-main = poly_main @(AssocList) @(IOArray Int) @V.Vector
+main = poly_main @(Map.Map String) @(MV.IOVector) @V.Vector
